@@ -1,0 +1,5 @@
+%include <nopie.specs>
+%include <nossp.specs>
+%include <nosspall.specs>
+%include <zrelro.specs>
+%include <znow.specs>

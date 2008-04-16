@@ -1,0 +1,27 @@
+--- gcc/config.gcc.orig	2007-05-20 21:12:05.000000000 +0200
++++ gcc/config.gcc	2007-05-20 21:13:09.000000000 +0200
+@@ -459,7 +459,7 @@
+   ;;
+ *-*-linux* | frv-*-*linux* | *-*-kfreebsd*-gnu | *-*-knetbsd*-gnu)
+   # Must come before *-*-gnu* (because of *-*-linux-gnu* systems).
+-  extra_parts="crtbegin.o crtbeginS.o crtbeginT.o crtend.o crtendS.o"
++  extra_parts="crtbegin.o crtbeginS.o crtbeginT.o crtbeginTS.o crtend.o crtendS.o"
+   extra_options="${extra_options} linux.opt"
+   gas=yes
+   gnu_ld=yes
+--- gcc/Makefile.in.orig	2007-05-20 21:09:20.000000000 +0200
++++ gcc/Makefile.in	2007-05-20 21:11:45.000000000 +0200
+@@ -1554,6 +1554,13 @@
+ 	  -c $(srcdir)/crtstuff.c -DCRT_BEGIN -DCRTSTUFFT_O \
+ 	  -o $(T)crtbeginT$(objext)
+ 
++# This is a version of crtbegin for -static -fPIE links.
++$(T)crtbeginTS.o: crtstuff.c $(GCC_PASSES) $(TCONFIG_H) auto-host.h \
++  gbl-ctors.h stmp-int-hdrs tsystem.h coretypes.h $(TM_H)
++	$(GCC_FOR_TARGET) $(CRTSTUFF_CFLAGS) $(CRTSTUFF_T_CFLAGS_S) \
++	  -c $(srcdir)/crtstuff.c -DCRT_BEGIN -DCRTSTUFFT_O -DCRTSTUFFS_O \
++	  -o $(T)crtbeginTS$(objext)
++
+ # Compile the start modules crt0.o and mcrt0.o that are linked with
+ # every program
+ crt0.o: s-crt0 ; @true

@@ -1,0 +1,3 @@
+*cc1_ssp:
+%{!nostdlib:%{!nodefaultlibs: %{!fno-stack-protector:%{!fstack-protector:%{!fstack-protector-all:-fstack-protector %(cc1_ssp_all) }}} }}
+

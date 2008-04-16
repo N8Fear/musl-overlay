@@ -1,0 +1,3 @@
+*cc1_ssp_all:
+%{!fno-stack-protector-all:-fstack-protector-all}
+

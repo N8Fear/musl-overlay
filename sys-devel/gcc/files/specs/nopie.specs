@@ -1,0 +1,21 @@
+*asm_pie:
+%{pie:-K PIC}
+
+*cc1_pie:
+%{pie:-fPIE}
+
+*crtfile_pie:
+%{pie:Scrt1.o%s;:crt1.o%s}
+
+*endfile_pie:
+%{pie:crtendS.o%s;:crtend.o%s}
+
+*startfile_pie:
+%{pie:crtbeginS.o%s;:crtbegin.o%s}
+
+*startfile_pie_t:
+%{static:crtbeginT.o%s;pie:crtbeginS.o%s;:crtbegin.o%s}
+
+*link_pie:
+%{pie:-pie}
+

@@ -1,0 +1,5 @@
+%include <pie.specs>
+%include <ssp.specs>
+%include <sspall.specs>
+%include <zrelro.specs>
+%include <znow.specs>
