@@ -1,0 +1,53 @@
+	Ensure that crtbegin.o/crtend.o/crtbeginT.o are built -fno-PIE, and
+	crtbeginS.o/crtendS.o/crtbeginTS.o are built -fPIC.
+	Kevin F. Quinn <kevquinn@gentoo.org> 12 Feb 2007
+
+--- gcc/Makefile.in.orig	2007-01-30 20:12:09.000000000 +0100
++++ gcc/Makefile.in	2007-01-30 20:13:48.000000000 +0100
+@@ -1417,40 +1417,40 @@
+ # constructors.
+ $(T)crtbegin.o: crtstuff.c $(GCC_PASSES) $(TCONFIG_H) auto-host.h \
+   gbl-ctors.h stmp-int-hdrs tsystem.h coretypes.h $(TM_H)
+-	$(GCC_FOR_TARGET) $(CRTSTUFF_CFLAGS) $(CRTSTUFF_T_CFLAGS) \
++	$(GCC_FOR_TARGET) -fno-PIE $(CRTSTUFF_CFLAGS) $(CRTSTUFF_T_CFLAGS) \
+ 	  -c $(srcdir)/crtstuff.c -DCRT_BEGIN \
+ 	  -o $(T)crtbegin$(objext)
+ 
+ $(T)crtend.o: crtstuff.c $(GCC_PASSES) $(TCONFIG_H) auto-host.h \
+   gbl-ctors.h stmp-int-hdrs tsystem.h coretypes.h $(TM_H)
+-	$(GCC_FOR_TARGET) $(CRTSTUFF_CFLAGS) $(CRTSTUFF_T_CFLAGS) \
++	$(GCC_FOR_TARGET) -fno-PIE $(CRTSTUFF_CFLAGS) $(CRTSTUFF_T_CFLAGS) \
+ 	  -c $(srcdir)/crtstuff.c -DCRT_END \
+ 	  -o $(T)crtend$(objext)
+ 
+ # These are versions of crtbegin and crtend for shared libraries.
+ $(T)crtbeginS.o: crtstuff.c $(GCC_PASSES) $(TCONFIG_H) auto-host.h \
+   gbl-ctors.h stmp-int-hdrs tsystem.h coretypes.h $(TM_H)
+-	$(GCC_FOR_TARGET) $(CRTSTUFF_CFLAGS) $(CRTSTUFF_T_CFLAGS_S) \
++	$(GCC_FOR_TARGET) -fno-PIE $(CRTSTUFF_CFLAGS) $(CRTSTUFF_T_CFLAGS_S) \
+ 	  -c $(srcdir)/crtstuff.c -DCRT_BEGIN -DCRTSTUFFS_O \
+ 	  -o $(T)crtbeginS$(objext)
+ 
+ $(T)crtendS.o: crtstuff.c $(GCC_PASSES) $(TCONFIG_H) auto-host.h \
+   gbl-ctors.h stmp-int-hdrs tsystem.h coretypes.h $(TM_H)
+-	$(GCC_FOR_TARGET) $(CRTSTUFF_CFLAGS) $(CRTSTUFF_T_CFLAGS_S) \
++	$(GCC_FOR_TARGET) -fno-PIE $(CRTSTUFF_CFLAGS) $(CRTSTUFF_T_CFLAGS_S) \
+ 	  -c $(srcdir)/crtstuff.c -DCRT_END -DCRTSTUFFS_O \
+ 	  -o $(T)crtendS$(objext)
+ 
+ # This is a version of crtbegin for -static links.
+ $(T)crtbeginT.o: crtstuff.c $(GCC_PASSES) $(TCONFIG_H) auto-host.h \
+   gbl-ctors.h stmp-int-hdrs tsystem.h coretypes.h $(TM_H)
+-	$(GCC_FOR_TARGET) $(CRTSTUFF_CFLAGS) $(CRTSTUFF_T_CFLAGS) \
++	$(GCC_FOR_TARGET) -fno-PIE $(CRTSTUFF_CFLAGS) $(CRTSTUFF_T_CFLAGS) \
+ 	  -c $(srcdir)/crtstuff.c -DCRT_BEGIN -DCRTSTUFFT_O \
+ 	  -o $(T)crtbeginT$(objext)
+ 
+ # This is a version of crtbegin for -static -fPIE links.
+ $(T)crtbeginTS.o: crtstuff.c $(GCC_PASSES) $(TCONFIG_H) auto-host.h \
+   gbl-ctors.h stmp-int-hdrs tsystem.h coretypes.h $(TM_H)
+-	$(GCC_FOR_TARGET) $(CRTSTUFF_CFLAGS) $(CRTSTUFF_T_CFLAGS_S) \
++	$(GCC_FOR_TARGET) -fno-PIE $(CRTSTUFF_CFLAGS) $(CRTSTUFF_T_CFLAGS_S) \
+ 	  -c $(srcdir)/crtstuff.c -DCRT_BEGIN -DCRTSTUFFT_O -DCRTSTUFFS_O \
+ 	  -o $(T)crtbeginTS$(objext)
+ 
