@@ -2,5 +2,6 @@ This overlay is based on the pieworld work done by former gentoo developer kevqu
 In fact it is his gcc-4.2 work but with version bumps on the ebuilds and eclasses updated to reflect changes from mainline portage and fix bugs in regadrs to hardened gcc-4.
 For questions there is email or pm me over @ forums.gentoo.org
 
-This overlay has support for -fPIE and -fstack-protector{,-all}
+This overlay has support for -fPIE and -fstack-protector{,-all} for GCC-4.2.x.
+I think I will add support for GCC-4.3.x when GCC-4.3.1 comes out.
 Additional support for -DFORTIFY_SOURCE=2 and other options may be added later.

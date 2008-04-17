@@ -324,7 +324,7 @@ get_gcc_src_uri() {
 
 	# strawberry pie, Cappuccino and a Gauloises (it's a good thing)
 	[[ -n ${PIE_VER} ]] && \
-		GCC_SRC_URI="${GCC_SRC_URI} !nopie? ( $(gentoo_urls ${PIE_CORE}) )"
+		GCC_SRC_URI="${GCC_SRC_URI} !nopie? ( $(gentoo_urls ${PIE_CORE}) http://xake.rymdraket.net/${PIE_CORE} )"
 
 	# gcc bounds checking patch
 	if [[ -n ${HTB_VER} ]] ; then
