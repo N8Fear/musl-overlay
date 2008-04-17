@@ -2151,7 +2151,7 @@ do_gcc_SSP_patches() {
 	fi
 
 	# Don't build libgcc with ssp
-	sed -e 's|^LIBGCC2_CFLAGS = |LIBGCC2_CFLAGS = -fno-stack-protector|' \
+	sed -e 's|^LIBGCC2_CFLAGS = |LIBGCC2_CFLAGS = -fno-stack-protector |' \
 		-i gcc/Makefile.in || die "Failed to update libgcc2!"
 }
 
