@@ -1,6 +1,6 @@
 # Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/eclass/flag-o-matic.eclass,v 1.120 2007/07/22 08:21:09 dberkholz Exp $
+# $Header: /var/cvsroot/gentoo-x86/eclass/flag-o-matic.eclass,v 1.122 2008/02/18 18:20:47 swegener Exp $
 
 # @ECLASS: flag-o-matic.eclass
 # @MAINTAINER:
@@ -9,7 +9,7 @@
 # @DESCRIPTION:
 # This eclass contains a suite of functions to help developers sanely
 # and safely manage toolchain flags in their builds.
- 
+
 inherit eutils toolchain-funcs multilib
 
 ################ DEPRECATED functions ################
@@ -29,21 +29,20 @@ inherit eutils toolchain-funcs multilib
 # C[XX]FLAGS that we allow in strip-flags
 # Note: shell globs and character lists are allowed
 setup-allowed-flags() {
-	# Default set of allowed flags - ebuilds may override this set
-	# by setting ALLOWED_FLAGS.
-	[[ -z ${ALLOWED_FLAGS} ]] &&
-		ALLOWED_FLAGS="-pipe -O -O0 -O1 -O2 -mcpu -march -mtune \
-			-fstack-protector -fstack-protector-all -fbounds-checking \
-			-g -g[0-9] -ggdb -ggdb[0-9] -gstabs -gstabs+ \
-			-fno-unit-at-a-time -fno-ident"
-	# allow a bunch of flags that negate features / control ABI - these
+	if [[ -z ${ALLOWED_FLAGS} ]] ; then
+		export ALLOWED_FLAGS="-pipe"
+		export ALLOWED_FLAGS="${ALLOWED_FLAGS} -O -O0 -O1 -O2 -mcpu -march -mtune"
+		export ALLOWED_FLAGS="${ALLOWED_FLAGS} -fstack-protector -fstack-protector-all"
+		export ALLOWED_FLAGS="${ALLOWED_FLAGS} -fbounds-checking"
+		export ALLOWED_FLAGS="${ALLOWED_FLAGS} -fno-PIE -fno-pie -fno-unit-at-a-time"
+		export ALLOWED_FLAGS="${ALLOWED_FLAGS} -g -g[0-9] -ggdb -ggdb[0-9] -gstabs -gstabs+"
+		export ALLOWED_FLAGS="${ALLOWED_FLAGS} -fno-ident"
 		export ALLOWED_FLAGS="${ALLOWED_FLAGS} -W* -w"
-	# are always allowed.
-	# ? Why is -fPIC here?  It should be covered by -m<something> where
-	#   necessary.  Setting -fPIC in C[XX]FLAGS isn't sensible, in general.
-	ALLOWED_FLAGS="${ALLOWED_FLAGS} -fno-PIE -fno-pie -fno-bounds-checking \
-		-fno-stack-protector-all -fno-stack-protector \
-		-mregparm -mno-app-regs -mapp-regs \
+	fi
+	# allow a bunch of flags that negate features / control ABI
+	ALLOWED_FLAGS="${ALLOWED_FLAGS} -fno-stack-protector -fno-stack-protector-all \
+		-fno-strict-aliasing -fno-bounds-checking"
+	ALLOWED_FLAGS="${ALLOWED_FLAGS} -mregparm -mno-app-regs -mapp-regs \
 		-mno-mmx -mno-sse -mno-sse2 -mno-sse3 -mno-3dnow \
 		-mips1 -mips2 -mips3 -mips4 -mips32 -mips64 -mips16 \
 		-msoft-float -mno-soft-float -mhard-float -mno-hard-float -mfpu \
@@ -53,7 +52,6 @@ setup-allowed-flags() {
 		-m32 -m64 -mabi -mlittle-endian -mbig-endian -EL -EB -fPIC \
 		-mlive-g0 -mcmodel -mstack-bias -mno-stack-bias \
 		-msecure-plt -D*"
-	export ALLOWED_FLAGS
 
 	# C[XX]FLAGS that we are think is ok, but needs testing
 	# NOTE:  currently -Os have issues with gcc3 and K6* arch's

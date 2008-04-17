@@ -1,6 +1,6 @@
 # Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/eclass/toolchain.eclass,v 1.339 2007/07/20 04:59:51 vapier Exp $
+# $Header: /var/cvsroot/gentoo-x86/eclass/toolchain.eclass,v 1.352 2008/04/12 22:54:40 vapier Exp $
 #
 # Maintainer: Toolchain Ninjas <toolchain@gentoo.org>
 
@@ -137,7 +137,7 @@ if [[ ${ETYPE} == "gcc-library" ]] ; then
 else
 	IUSE="multislot test"
 
-	if [[ ${PN} != "kgcc64" ]] ; then
+	if [[ ${PN} != "kgcc64" && ${PN} != gcc-* ]] ; then
 		IUSE="${IUSE} altivec build fortran nls nocxx"
 		[[ -n ${PIE_VER} ]] && IUSE="${IUSE} nopie"
 		[[ -n ${PP_VER}	 ]] && IUSE="${IUSE} nossp"
@@ -1063,6 +1063,7 @@ do_gcc_rename_java_bins() {
 }
 gcc_src_unpack() {
 	export BRANDING_GCC_PKGVERSION="Gentoo ${GCC_PVR}"
+
 	[[ -z ${UCLIBC_VER} ]] && [[ ${CTARGET} == *-uclibc* ]] && die "Sorry, this version does not support uClibc"
 
 	gcc_quick_unpack
@@ -1698,9 +1699,6 @@ gcc-compiler_src_install() {
 	# This one comes with binutils
 	find "${D}" -name libiberty.a -exec rm -f "{}" \;
 
-	# Move libgcj.pc to libgcj-${PV}
-	mv ${D}/usr/lib/pkgconfig/libgcj.pc ${D}/usr/lib/pkgconfig/libgcj-${PV}.pc
-
 	# Move the libraries to the proper location
 	gcc_movelibs
 
@@ -2114,7 +2112,7 @@ do_gcc_SSP_patches() {
 	fi
 
 	# Don't build crtbegin/end with ssp
-	sed -e 's|^CRTSTUFF_CFLAGS = |CRTSTUFF_CFLAGS = -fno-stack-protector |' \
+	sed -e 's|^CRTSTUFF_CFLAGS = |CRTSTUFF_CFLAGS = -fno-stack-protector |'\
 		-i gcc/Makefile.in || die "Failed to update crtstuff!"
 
 	# if gcc in a stage3 defaults to ssp, is version 3.4.0 and a stage1 is built
@@ -2153,7 +2151,7 @@ do_gcc_SSP_patches() {
 	fi
 
 	# Don't build libgcc with ssp
-	sed -e 's|^LIBGCC2_CFLAGS = |LIBGCC2_CFLAGS = -fno-stack-protector |' \
+	sed -e 's|^LIBGCC2_CFLAGS = |LIBGCC2_CFLAGS = -fno-stack-protector|' \
 		-i gcc/Makefile.in || die "Failed to update libgcc2!"
 }
 
@@ -2163,7 +2161,7 @@ do_gcc_SSP_patches() {
 update_gcc_for_libc_ssp() {
 	if libc_has_ssp ; then
 		einfo "Updating gcc to use SSP from libc ..."
-		sed -e 's|^LIBGCC2_CFLAGS = |LIBGCC2_CFLAGS = -D_LIBC_PROVIDES_SSP_ |' \
+		sed -e 's|^LIBGCC2_CFLAGS = |LIBGCC2_CFLAGS = -D_LIBC_PROVIDES_SSP_|' \
 			-i "${S}"/gcc/Makefile.in || die "Failed to update gcc!"
 	fi
 }
@@ -2521,8 +2519,11 @@ is_ada() {
 	use build && return 1
 	use ada
 }
-is_libffi() {
-	has libffi ${USE} || return 1
+
+is_treelang() {
+	is_crosscompile && return 1 #199924
+	gcc-lang-supported treelang || return 1
 	use build && return 1
-	use libffi
+	#use treelang
+	return 0
 }
