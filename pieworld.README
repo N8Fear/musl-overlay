@@ -1,0 +1,228 @@
+This is PIEworld
+================
+
+Toolchain modified to build everything that isn't -fPIC, as -fPIE.
+
+gcc:
+----
+1) Built with PIE-default, SSP-default, RELRO and BIND_NOW
+2) Non-PIC crtstuff built -fno-PIE (crtbegin.o, crtend.o)
+3) Specs permit -static && -fPIE (but not -pie)
+4) New startfile crtbeginTS.o combining crtbeginS.o and crtbeginT.o, for "static PIE"s
+
+glibc:
+------
+1) Built with PIE-default, SSP off, RELRO and BIND_NOW
+   SSP-default messes up the dependencies, in different ways on different arches; changes
+   to glibc would be too invasive for easy maintenance.
+2) Non-PIC crtstuff built -fno-PIE (crt1.o - note; crtn.o, crti.o, Scrt1.o all built -fPIC)
+3) Make pic-default configure check ignore -fPIE.
+4) Link all apps PIE, adjust TLS initialisation to avoid using the TLS before it's ready.
+
+The results are:
+crt*S*.o, crtn.o, crti.o & Scrt1.o are -fPIC, all other crtfiles are -fno-PIE.
+Code archives lib*.a are -fPIE
+
+Note that since lib*.a are not available -fno-PIE, building static binaries actually creates
+binaries containing PIE code, although the executable has a fixed location.
+
+Upgrade path
+------------
+
+1) emerge --oneshot =sys-devel/binutils-2.17
+2) Switch to 2.17 binutils (binutils-config)
+3) Switch to vanilla compiler (gcc-config)
+4) USE="-hardened" emerge --oneshot =sys-libs/glibc-2.5-r2
+5) USE="-hardened" emerge --oneshot =sys-devel/gcc-4.1.2-r1
+6) switch to hardened compiler
+7) emerge --oneshot =sys-libs/glibc-2.5-r2
+8) emerge --oneshot =sys-devel/gcc-4.1.2-r1
+9) emerge -e world :)
+
+There maybe quicker/shorter ways - but the above should always work.  Care has
+to be taken for several reasons, but mostly because mixing gcc-3/glibc-2.3 with
+the new gcc-4/glibc-2.5 approach during the build of those packages can cause
+odd breakages.
+
+
+Things that can trip up in pieworld
+-----------------------------------
+
+* non-PIC assembler.  Common in x86 media applications; occurs also in x86 media libraries
+  although the latter should really be PIC.  This is nothing new.
+
+* local-exec thread-local storage (TLS).  On x86, causes textrels with PIC - most arches
+  don't allow textrels so don't permit local-exec at all in PIC (including PIE).
+  We've not come across this before, probably because very little has actually used it
+  until recently.  It may become necessary in the future to modify how gcc deals with
+  local-exec TLS in the PIE case.
+
+
+
+Investigations
+--------------
+1) Check all archive lib*.a that don't have a .so - should they be -fPIC rather than -fPIE?
+   Done:
+   All those that don't have a .so are best off -fPIC, which is ok for being linked into
+   shared libraries, and is also ok-enough for use in executables (whereas -fPIE isn't
+   good for shared libraries).
+   
+   lib*.a from gcc-4.1.1 are:
+
+	libgcc.a		built -fPIC
+	libgcc_eh.a		built -fPIC
+	libffi.a		.so equivalent exists
+	libgcj.a		.so equivalent exists
+	libgcjwt.a		.so equivalent exists
+	libgcov.a		built -fPIC
+	libgfortran.a		.so equivalent exists
+	libgfortranbegin.a	Contains fmain.o - looks like only used for executables, so should be ok -fPIE
+	libgij.a		.so equivalent exists
+	libstdc++.a		.so equivalent exists
+
+	lib*.a from glibc-2.5 are:
+
+	libieee.a		shared library (just named '.a')
+	libmcheck.a		shared library (just named '.a')
+	libc_stubs.a		shared library (just named '.a')
+	libBrokenLocale.a	.so equivalent exists
+	libutil.a		.so equivalent exists
+	librpcsvc.a		Built -fPIC (http://sourceware.org/ml/glibc-bugs/2005-07/msg00157.html)
+	libdl.a			.so equivalent exists
+	librt.a			.so equivalent exists
+	libbsd-compat.a		contains only an empty object 'dummy.o' - doesn't matter how it's built
+	libpthread.a		.so equivalent exists
+	libc.a			.so equivalent exists
+	libg.a			contains only an empty object 'dummy.o' - doesn't matter how it's built
+	libm.a			.so equivalent exists
+	libcrypt.a		.so equivalent exists
+	libanl.a		.so equivalent exists
+	libresolv.a		.so equivalent exists
+	libnsl.a		.so equivalent exists
+
+	So looks like it's all ok, both in gcc and glibc.
+
+
+2) glibc-2.5 failures (sandbox always disabled):
+
+For reference, on vanilla x86 the following fail (both in and out of a chroot):
+
+	linuxthreads/posix/annexc
+		Expected (ignored) http://sourceware.org/ml/libc-hacker/1998-11/msg00207.html
+	linuxthreads/linuxthreads/tst-clock1
+		Time between threads is too short - expected 1 sec, got a fraction (why?).
+	linuxthreads/rt/tst-aio9
+		Limitation of linuxthreads? (ok on nptl) Hints to that effect http://sourceware.org/ml/libc-ports/2006-08/msg00016.html
+	linuxthreads/rt/tst-aio10
+		Limitation of linuxthreads? (ok on nptl) http://sourceware.org/ml/libc-ports/2006-08/msg00016.html
+	linuxthreads/elf/check-localplt
+		bunch of stuff appears, mostly from libpthread.so, that isn't expected (why?).
+	linuxthreads/c++-types-check
+		pthread_attr_t and pthread_rwlock_t are different from expected (why?).
+
+ ok	nptl/posix/annexc
+		Expected (ignored) http://sourceware.org/ml/libc-hacker/1998-11/msg00207.html
+ ok	nptl/nptl/tst-cancel1
+		Requires >=gcc-4.2 http://sourceware.org/ml/libc-alpha/2006-09/msg00039.html
+
+and on vanilla amd64 (nptlonly) the following fail:
+	nptl/iconvdata/iconv-test
+	nptl/malloc/tst-mtrace
+	nptl/grp/tst_fgetgrent
+	nptl/posix/tst-nice
+	nptl/posix/globtest
+ ok	nptl/posix/annexc
+	nptl/io/ftwtest
+ ok	nptl/nptl/tst-cancel1
+	nptl/rt/tst-cpuclock2
+
+so are ignored for the purposes of analysing failures on hardened.
+
+Note also - ppc64 and sparc64 can't have linuxthreads as it doesn't
+compile (some changes that are in for nptl have not been back-ported).
+
+
+Arch ->				x86	ppc	x86_64	sparc	ppc64
+NPTL Test v
+iconvdata/iconv-test		---	-..	..X	.-.	.-.	(? segfault)
+libio/tst-wmemstream1		---	-..	.X-	.-.	.-.	(? segfault)
+libio/tst-wmemstream2		---	-..	.X-	.-.	.-.	(? segfault)
+libio/bug-wmemstream1		---	-..	.X-	.-.	.-.	(? segfault)
+malloc/tst-mtrace		---	-..	.-X	.-.	.-.	(? x86_64-only)
+grp/tst_fgetgrent		---	-..	.-X	.-.	.-.	(? x86_64-only)
+math/test-fenv			---	-..	.--	.X.	.-.	(? sparc64 only - never sets UNDERFLOW)
+dlfcn/default			XX-	X..	.X-	.X.	.X.	(? dladdr returns empty string)
+posix/globtest			---	-..	.-X	.-.	.-.	(? x86_64-only)
+posix/annexc			XXX	X..	.XX	.X.	.X.	(expected)
+io/ftwtest			---	-..	.-X	.-.	.-.	(? x86_64-only)
+nptl/tst-mutex5			--X	-..	.--	.-.	.-.	(? vanilla x86-only; not always)
+nptl/tst-cond10			--X	-..	.--	.-.	.-.	(? hardened x86-only)
+nptl/tst-tls2			X--	X..	.X-	.-.	.-. 	(local-exec TLS?)
+nptl/tst-cancel1		XXX	-..	.XX	.-.	.-.	(expected on x86/x86_64)
+nptl/tst-cancelx4		XX-	-..	.--	.-.	.-.	(? x86-only)
+nptl/tst-cancelx5		XX-	-..	.--	.-.	.-.	(? x86-only)
+nptl/tst-cancelx10		XX-	-..	.--	.-.	.-.	(? x86-only)
+nptl/tst-cancelx18		XX-	-..	.--	.-.	.-.	(? x86-only)
+nptl/tst-execstack		---	X..	.--	.-.	.-.	(PaX)
+nptl/rt/tst-cpuclock2		---	-..	.X-	.-.	.-.	(?)
+nptl/tst-eintr1			---	-..	.--	.X.	.-.	(?)
+nptl/tst-cancel20		---	-..	.--	.X.	.-.	(?)
+nptl/tst-cancelx20		---	-..	.--	.X.	.-.	(?)
+elf/tst-tls1			X--	X..	.X-	.X.	.X.	(local-exec TLS)
+elf/tst-tls2			X--	X..	.X-	.X.	.X.	(local-exec TLS)
+elf/tst-tls1-static		---	X..	.X-	.X.	.X.	(local-exec TLS)
+elf/tst-tls2-static		---	X..	.X-	.X.	.X.	(local-exec TLS)
+elf/resolvfail			XX-	X..	.X-	.X.	.X.	(BIND_NOW)
+elf/constload1			XX-	X..	.X-	.X.	.X.	(BIND_NOW)
+elf/order			XX-	X..	.X-	.X.	.X.	(BIND_NOW)
+elf/lateglobal			XX-	X..	.X-	.X.	.X.	(BIND_NOW)
+elf/dblload			XX-	X..	.X-	.X.	.X.	(BIND_NOW)
+elf/dblunload			XX-	X..	.X-	.X.	.X.	(BIND_NOW)
+elf/reldep6			XX-	X..	.X-	.X.	.X.	(BIND_NOW)
+elf/circleload1			XX-	X..	.X-	.X.	.X.	(BIND_NOW)
+elf/tst-tls3			X--	X..	.X-	.X.	...	(?)
+elf/tst-tls10			X--	X..	.X-	.-.	.X.	(local-exec TLS)
+elf/tst-tls14			X--	-..	.X-	.-.	...	(local-exec TLS)
+elf/tst-execstack		X--	X..	.--	.-.	...	(PaX)
+elf/tst-execstack-needed	X--	X..	.--	.-.	...	(PaX)
+elf/tst-execstack-prog		X--	X..	.--	.-.	...	(PaX)
+elf/tst-global1			XX-	X..	.X-	.X.	.X.	(BIND_NOW)
+elf/tst-audit2			XX-	X..	.X-	.-.	.X.	(local-exec TLS)
+
+... is HhV where H: hardened on hardened kernel, h: hardened on vanilla kernel, V: vanilla on vanilla kernel
+X => test failure, - => test pass. . => not run
+
+PaX: PaX kernel causes execstack behaviour to fail (a good thing, where PaX is concerned).
+BIND_NOW: These tests require that some of their links be -Wl,-z,lazy
+local-exec TLS: The local-exec TLS model is not compatible with PIC (and therefore PIE)
+
+posix/annexc is ignored upstream (http://sourceware.org/ml/libc-hacker/1998-11/msg00207.html)
+
+tst-cancel1 fails on x86/amd64 because support is not in gcc-4.1.1 - gcc-4.2 will fix this
+(http://sourceware.org/ml/libc-alpha/2006-09/msg00039.html)
+
+Things to work out:
+1) Why all those mutex/robust (barrier) checks fail on x86 with a hardened kernel (only!)
+  Disabling PaX/GRsecurity (i.e. unhardening!) gets:
+    tst-mutexpi4: pthread_mutex_lock.c:287: __pthread_mutex_lock: Assertion `robust || (oldval & 0x40000000) == 0' failed.
+    Didn't expect signal from child: got `Aborted'
+  This happens when the parent tries to lock the mutex; at this point the child has finished - well,
+  it has aborted, which it shouldn't have done.  The reason the assertion has failed is the
+  'oldval ^ 0x40000000' bit, which is FUTEX_OWNER_DIED.  This is consistent with the child process
+  aborting, instead of going to an idle state waiting to be cleaned up when the parent finishes.
+
+  Now I've repeated, always getting these failures on a non-hardened kernel, when built with gcc/vanilla
+  on both hardened and non-hardened kernels.  Yet I don't get them on my athlon-xp machine.
+
+  Investigation ongoing...
+
+  Turns out it was PAX_UDEREF - which I had failed to switch off even in my 'non-hardened' kernels :/
+  This is fixed in hardened-sources-2.6.19-r6
+
+2) Why x86 passes elf/tst-tls{1,2}-static when all other arches fail it
+3) What's different about x86_64 that it fails a whole bunch that are ok for other arches
+4) Failures marked (?)
+
+Things to consider:
+1) Forcing TLS model local-exec to local-dynamic or initial-exec; or implementing
+   a PIC-friendly local-exec in gcc.
