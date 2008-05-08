@@ -3,3 +3,4 @@
 %include <nosspall.specs>
 %include <zrelro.specs>
 %include <znow.specs>
+%include <nofortify.spece>

@@ -3,14 +3,17 @@
 # $Header: /var/cvsroot/gentoo-x86/sys-devel/gcc/gcc-4.2.0.ebuild,v 1.1 2007/05/19 03:22:33 vapier Exp $
 
 PATCH_VER="1.0"
-UCLIBC_VER="1.0"
-PIE_VER="9.0.7"
+#UCLIBC_VER="1.0"
+PIE_VER="9.0.9"
 PIE_GCC_VER="4.2.0"
+#PP_VER="1.0"
+#PP_GCC_VER="4.2.0"
+
 
 ETYPE="gcc-compiler"
 
 # arch/libc configurations known to be stable with {PIE,SSP}-by-default
-SSP_STABLE="amd64 ppc ppc64 sparc x86"
+SSP_STABLE="amd64 x86"
 SSP_UCLIBC_STABLE="ppc sparc x86"
 PIE_GLIBC_STABLE="amd64 ppc ppc64 sparc x86"
 PIE_UCLIBC_STABLE="mips ppc x86"
@@ -45,7 +48,7 @@ LICENSE="GPL-2 LGPL-2.1"
 KEYWORDS="~x86"
 
 RDEPEND=">=sys-libs/zlib-1.1.4
-	|| ( >=sys-devel/gcc-config-1.3.12-r4 app-admin/eselect-compiler )
+	>=sys-devel/gcc-config-1.3.12-r4
 	virtual/libiconv
 	fortran? (
 		>=dev-libs/gmp-4.2.1
@@ -54,7 +57,11 @@ RDEPEND=">=sys-libs/zlib-1.1.4
 	!build? (
 		gcj? (
 			gtk? (
-				|| ( ( x11-libs/libXt x11-libs/libX11 x11-libs/libXtst x11-proto/xproto x11-proto/xextproto ) virtual/x11 )
+				x11-libs/libXt
+				x11-libs/libX11
+				x11-libs/libXtst
+				x11-proto/xproto
+				x11-proto/xextproto
 				>=x11-libs/gtk+-2.2
 				x11-libs/pango
 			)
@@ -63,17 +70,20 @@ RDEPEND=">=sys-libs/zlib-1.1.4
 		>=sys-libs/ncurses-5.2-r2
 		nls? ( sys-devel/gettext )
 	)"
+# Hardened gcc builds with SSP enabled on itself, so requires a
+# gcc-4-SSP-compatible glibc installed, from gcc's stage1 onwards.
+# We assume uclibc users know what they're doing.
 DEPEND="${RDEPEND}
 	test? ( sys-devel/autogen dev-util/dejagnu )
-	hardened? ( elibc_glibc? ( >=sys-libs/glibc-2.4 ) )
+	hardened? ( elibc_glibc? ( >=sys-libs/glibc-2.6.1 ) )
 	>=sys-apps/texinfo-4.2-r4
 	>=sys-devel/bison-1.875
 	ppc? ( >=${CATEGORY}/binutils-2.17 )
 	ppc64? ( >=${CATEGORY}/binutils-2.17 )
 	>=${CATEGORY}/binutils-2.15.94"
-PDEPEND="|| ( sys-devel/gcc-config app-admin/eselect-compiler )"
+PDEPEND="sys-devel/gcc-config"
 if [[ ${CATEGORY} != cross-* ]] ; then
-	PDEPEND="${PDEPEND} elibc_glibc? ( >=sys-libs/glibc-2.3.6 )"
+	PDEPEND="${PDEPEND} elibc_glibc? ( >=sys-libs/glibc-2.6.1 )"
 fi
 
 src_unpack() {

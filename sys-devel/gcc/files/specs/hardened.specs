@@ -3,3 +3,4 @@
 %include <sspall.specs>
 %include <zrelro.specs>
 %include <znow.specs>
+%include <fortify.specs>

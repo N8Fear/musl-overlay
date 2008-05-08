@@ -4,7 +4,7 @@
 #
 # Maintainer: Toolchain Ninjas <toolchain@gentoo.org>
 
-# I do not like eselect and GCC-4.0.x, but will try behave against the rest.
+# I do not like eselect and <= GCC-4.0.x, but will try behave against the rest.
 
 HOMEPAGE="http://gcc.gnu.org/"
 LICENSE="GPL-2 LGPL-2.1"
@@ -61,6 +61,12 @@ is_crosscompile() {
 
 tc_version_is_at_least() { version_is_at_least "$1" "${2:-${GCC_PV}}" ; }
 
+gcc_has_native_ssp() {
+	[[ ${GCCMAJOR} -lt 4 ]] && ! use hardened && return 1
+        # gcc 4.2 and above have native ssp support
+        tc_version_is_at_least "4.2" && return 0
+        return 1
+}
 
 GCC_PV=${TOOLCHAIN_GCC_PV:-${PV}}
 GCC_PVR=${GCC_PV}
@@ -451,13 +457,6 @@ hardened_gcc_check_unsupported() {
 	return 1
 }
 
-gcc_has_native_ssp() {
-	[[ ${GCCMAJOR} -lt 4 ]] && return 1
-
-	# gcc 4.1 and above have native ssp support
-	tc_version_is_at_least "4.1" && return 0
-}
-
 has_libssp() {
 	[[ -e /$(get_libdir)/libssp.so ]] && return 0
 	return 1
@@ -571,9 +570,6 @@ make_gcc_hard() {
 		ebeep
 		return 0
 	fi
-
-	# rebrand to make bug reports easier
-	BRANDING_GCC_PKGVERSION=${BRANDING_GCC_PKGVERSION/Gentoo/Gentoo Hardened}
 }
 
 # now we generate different spec files so that the user can select a compiler
@@ -584,7 +580,8 @@ _create_specs_file() {
 	local uflag=$1 name=$2 flags=${*:3}
 	ebegin "Creating a ${name} gcc specs file"
 	if want_minispecs ; then
-		concat_minispecs ${name}.specs "${WORKDIR}"/build ${name}.specs
+#		concat_minispecs ${name}.specs "${WORKDIR}"/build ${name}.specs
+		cp -f ${GCC_FILESDIR}/specs/${name}.specs "${WORKDIR}"/build/ || die "failed copying specs file"
 	else
 		pushd "${WORKDIR}"/build/gcc > /dev/null
 		if [[ -z ${uflag} ]] || use ${uflag} ; then
@@ -787,6 +784,7 @@ gcc-compiler_pkg_preinst() {
 }
 
 gcc-compiler_pkg_postinst() {
+
 	do_gcc_config
 
 	if ! is_crosscompile ; then
@@ -896,8 +894,20 @@ gcc-compiler_src_unpack() {
 	# the necessary support
 	want_pie && use hardened && glibc_have_pie
 
+	if use hardened && tc_version_is_at_least 4.2 ; then
+		ebegin "Glibc support SSP"
+		libc_has_ssp
+        	eend $?
+        	ebegin "Glibc support PIE"
+        	glibc_have_pie
+        	eend $?
+        fi
+	if use hardened ; then
+		BRANDING_GCC_PKGVERSION=${BRANDING_GCC_PKGVERSION/Gentoo/Gentoo Hardened}
+	fi
+
 	if use hardened && ! want_minispecs ; then
-		einfo "updating configuration to build hardened GCC, old-style"
+		einfo "updating configuration to build hardened GCC gcc-3 style"
 		make_gcc_hard || die "failed to make gcc hard"
 	fi
 
@@ -913,7 +923,6 @@ gcc-library_src_unpack() {
 	:
 }
 guess_patch_type_in_dir() {
-			BRANDING_GCC_PKGVERSION="${BRANDING_GCC_PKGVERSION} p${PATCH_VER}"
 	[[ -n $(ls "$1"/*.bz2 2>/dev/null) ]] \
 		&& EPATCH_SUFFIX="patch.bz2" \
 		|| EPATCH_SUFFIX="patch"
@@ -967,6 +976,7 @@ gcc_src_unpack() {
 			guess_patch_type_in_dir "${WORKDIR}"/patch
 			EPATCH_MULTI_MSG="Applying Gentoo patches ..." \
 			epatch "${WORKDIR}"/patch
+			BRANDING_GCC_PKGVERSION="${BRANDING_GCC_PKGVERSION} p${PATCH_VER}"
 		fi
 		if [[ -n ${UCLIBC_VER} ]] ; then
 			guess_patch_type_in_dir "${WORKDIR}"/uclibc
@@ -1111,7 +1121,7 @@ gcc-compiler-configure() {
 			;;
 		# Enable sjlj exceptions for backward compatibility on hppa
 		hppa)
-			[[ ${GCC_PV:0:1} == "3" ]] && \
+			[[ ${GCCMAJOR} == "3" ]] && \
 			confgcc="${confgcc} --enable-sjlj-exceptions"
 			;;
 	esac
@@ -1251,12 +1261,14 @@ gcc_do_configure() {
 		confgcc="${confgcc} --enable-__cxa_atexit --enable-target-optspace"
 		[[ ${GCCMAJOR}.${GCCMINOR} == 3.3 ]] && \
 			confgcc="${confgcc} --enable-sjlj-exceptions"
+		[[ ${GCCMAJOR}.${GCCMINOR} > 3.3 ]] && \ 
+			confgcc="${confgcc} --enable-clocale=uclibc"
 	elif [[ ${CTARGET} == *-gnu* ]] ; then
 		confgcc="${confgcc} --enable-__cxa_atexit"
+		confgcc="${confgcc} --enable-clocale=gnu"
 	elif [[ ${CTARGET} == *-freebsd* ]]; then
 		confgcc="${confgcc} --enable-__cxa_atexit"
 	fi
-	[[ ${CTARGET} == *-gnu* ]] && confgcc="${confgcc} --enable-clocale=gnu"
 	[[ ${CTARGET} == *-uclibc* ]] && [[ ${GCCMAJOR}.${GCCMINOR} > 3.3 ]] \
 		&& confgcc="${confgcc} --enable-clocale=uclibc"
 
@@ -1619,7 +1631,11 @@ gcc-compiler_src_install() {
 		create_gcc_env_entry hardenednopiessp
 
 		insinto ${LIBPATH}
-		doins "${WORKDIR}"/build/*.specs || die "failed to install specs"
+		if want_minispecs ; then
+			doins "${GCC_FILESDIR}"/specs/*.specs || die "failed to install specs"
+		else
+			doins "${WORKDIR}"/build/*.specs || die "failed to install specs"
+		fi
 	fi
 
 	# Make sure we dont have stuff lying around that
@@ -1754,16 +1770,34 @@ gcc-compiler_src_install() {
 	if use hardened && want_minispecs ; then
 		$(XGCC) -dumpspecs > "${WORKDIR}"/build/specs
 		if hardened_gcc_works ; then
-			concat_minispecs hardened.specs "${WORKDIR}"/build specs
+#			concat_minispecs hardened.specs "${WORKDIR}"/build specs
+#		elif hardened_gcc_works pie ; then
+#			concat_minispecs hardenednossp.specs "${WORKDIR}"/build specs
+#		elif hardened_gcc_works ssp ; then
+#			concat_minispecs hardenednopie.specs "${WORKDIR}"/build specs
+#		else
+#			concat_minispecs hardenednopiessp.specs "${WORKDIR}"/build specs
+#		fi
+#		insinto ${LIBPATH}
+#		doins "${WORKDIR}"/build/specs || die "Failed to install hardened system specs"
+			for s in pie ssp sspall znow zrelro fortify; do
+				cat "${GCC_FILESDIR}"/specs/${s}.specs >> "${WORKDIR}"/build/specs
+			done
 		elif hardened_gcc_works pie ; then
-			concat_minispecs hardenednossp.specs "${WORKDIR}"/build specs
+			for s in pie znow zrelro; do
+				cat "${GCC_FILESDIR}"/specs/${s}.specs >> "${WORKDIR}"/build/specs
+			done
 		elif hardened_gcc_works ssp ; then
-			concat_minispecs hardenednopie.specs "${WORKDIR}"/build specs
+			for s in ssp sspall fortify znow zrelro; do
+				cat "${GCC_FILESDIR}"/specs/${s}.specs >> "${WORKDIR}"/build/specs
+			done
 		else
-			concat_minispecs hardenednopiessp.specs "${WORKDIR}"/build specs
+			for s in znow zrelro; do
+				cat "${GCC_FILESDIR}"/specs/${s}.specs >> "${WORKDIR}"/build/specs
+			done
 		fi
 		insinto ${LIBPATH}
-		doins "${WORKDIR}"/build/specs || die "Failed to install hardened system specs"
+		doins "${WORKDIR}"/build/specs || die "Failed to install system specs"
 	fi
 }
 
@@ -1873,12 +1907,15 @@ gcc_quick_unpack() {
 	[[ -n ${UCLIBC_VER} ]] && \
 		unpack gcc-${UCLIBC_GCC_VER}-uclibc-patches-${UCLIBC_VER}.tar.bz2
 
-	if want_ssp && ! gcc_has_native_ssp ; then
+	if want_ssp ; then
 		if [[ -n ${PP_FVER} ]] ; then
 			# The gcc 3.4 propolice versions are meant to be unpacked to ${S}
 			pushd "${S}" > /dev/null
 			unpack protector-${PP_FVER}.tar.gz
 			popd > /dev/null
+		elif
+			tc_version_is_at_least "4.2" && use hardened || [[ -n ${PP_VER} ]] ; then
+			    einfo "No need for ssp patch using the built in ssp."
 		else
 			unpack gcc-${PP_GCC_VER}-ssp-${PP_VER}.tar.bz2
 		fi
@@ -1894,7 +1931,6 @@ gcc_quick_unpack() {
 
 	want_boundschecking && \
 		unpack "bounds-checking-gcc-${HTB_GCC_VER}-${HTB_VER}.patch.bz2"
-
 	popd > /dev/null
 }
 
@@ -1953,56 +1989,55 @@ do_gcc_HTB_patches() {
 
 # patch in ProPolice Stack Smashing protection
 do_gcc_SSP_patches() {
-	if ! gcc_has_native_ssp ; then
-		# PARISC has no love ... it's our stack :(
-		if [[ $(tc-arch) == "hppa" ]] || \
-			! want_ssp || \
-			(want_boundschecking && [[ ${HTB_EXCLUSIVE} == "true" ]])
-		then
-			do_gcc_stub ssp
-			return 0
+	# PARISC has no love ... it's our stack :(
+	if [[ $(tc-arch) == "hppa" ]] || \
+	   ! want_ssp || \
+	   (want_boundschecking && [[ ${HTB_EXCLUSIVE} == "true" ]])
+	then
+		do_gcc_stub ssp
+		return 0
+	fi
+
+	local ssppatch
+	local sspdocs
+
+	if [[ -n ${PP_FVER} ]] ; then
+		# Etoh keeps changing where files are and what the patch is named
+		if tc_version_is_at_least 3.4.1 ; then
+			# >3.4.1 uses version in patch name, and also includes docs
+			ssppatch="${S}/gcc_${PP_VER}.dif"
+			sspdocs="yes"
+		fi
+	fi
+	if [[ -n ${PP_VER} ]] ; then
+		# Just start packaging the damn thing ourselves
+		if [[ ${GCCMAJOR}.${GCCMINOR} -lt 4.2 ]] ; then
+			mw "${WORKDIR}"/ssp/protector.{c,h} "${S}"/gcc/
+		fi
+		ssppatch=${WORKDIR}/ssp/gcc-${PP_GCC_VER}-ssp.patch
+		# allow boundschecking and ssp to get along
+		(want_boundschecking && [[ -e ${WORKDIR}/ssp/htb-ssp.patch ]]) \
+		    && patch -s "${ssppatch}" "${WORKDIR}"/ssp/htb-ssp.patch
 		fi
 
-		local ssppatch
-		local sspdocs
-
-		if [[ -n ${PP_FVER} ]] ; then
-			# Etoh keeps changing where files are and what the patch is named
-			if tc_version_is_at_least 3.4.1 ; then
-				# >3.4.1 uses version in patch name, and also includes docs
-				ssppatch="${S}/gcc_${PP_VER}.dif"
-				sspdocs="yes"
-			elif tc_version_is_at_least 3.4.0 ; then
-				# >3.4 put files where they belong and 3_4 uses old patch name
-				ssppatch="${S}/protector.dif"
-				sspdocs="no"
-			elif tc_version_is_at_least 3.2.3 ; then
-				# earlier versions have no directory structure or docs
-				mv "${S}"/protector.{c,h} "${S}"/gcc
-				ssppatch="${S}/protector.dif"
-				sspdocs="no"
-			fi
-		else
-			# Just start packaging the damn thing ourselves
-			mv "${WORKDIR}"/ssp/protector.{c,h} "${S}"/gcc/
-			ssppatch=${WORKDIR}/ssp/gcc-${PP_GCC_VER}-ssp.patch
-			# allow boundschecking and ssp to get along
-			(want_boundschecking && [[ -e ${WORKDIR}/ssp/htb-ssp.patch ]]) \
-				&& patch -s "${ssppatch}" "${WORKDIR}"/ssp/htb-ssp.patch
-		fi
-
-		[[ -z ${ssppatch} ]] && die "Sorry, SSP is not supported in this version"
+	if [[ -n ${ssppatch} ]] ; then
 		epatch ${ssppatch}
+	else
+		! gcc_has_native_ssp && die "Sorry, SSP is not supported in this version"
+	fi
 
-		if [[ ${PN} == "gcc" && ${sspdocs} == "no" ]] ; then
-			epatch "${GCC_FILESDIR}"/pro-police-docs.patch
-		fi
+	if [[ ${PN} == "gcc" && ${sspdocs} == "no" ]] ; then
+		epatch "${GCC_FILESDIR}"/pro-police-docs.patch
 	fi
 
 	# Don't build crtbegin/end with ssp
-	sed -e 's|^CRTSTUFF_CFLAGS = |CRTSTUFF_CFLAGS = -fno-stack-protector |' \
-		-i gcc/Makefile.in || die "Failed to update crtstuff!"
-
+	if tc_version_is_at_least 4.2 ; then
+		sed -e 's|^CRTSTUFF_CFLAGS = |CRTSTUFF_CFLAGS = -fno-stack-protector -U_FORTIFY_SOURCE |' \
+			-i gcc/Makefile.in || die "Failed to update crtstuff!"
+	else
+		sed -e 's|^CRTSTUFF_CFLAGS = |CRTSTUFF_CFLAGS = -fno-stack-protector |' \
+			-i gcc/Makefile.in || die "Failed to update crtstuff!"
+	fi
 	# if gcc in a stage3 defaults to ssp, is version 3.4.0 and a stage1 is built
 	# the build fails building timevar.o (3.4.x) or ggc-common.o (4.x) w/:
 	# cc1: stack smashing attack in function ix86_split_to_parts()
@@ -2010,19 +2045,20 @@ do_gcc_SSP_patches() {
 	# this should be moved out of do_GCC_ssp_patches(), because it fails if gcc
 	# is hardened, but we build w/ nossp as well
 	if tc_version_is_at_least 3.4.0 ; then
-		if tc_version_is_at_least 4.0.0 ; then
-			if [[ ${GCCMINOR} -lt 2 ]] ; then
-				epatch "${GCC_FILESDIR}"/4.0.2/gcc-4.0.2-cc1-no-stack-protector.patch
-			else
-				epatch "${GCC_FILESDIR}"/4.2.0/gcc-4.2.0-cc1-no-stack-protector.patch
-			fi
+		if tc_version_is_at_least 4.2 ; then
+			epatch "${GCC_FILESDIR}"/4.2.0/gcc-4.2.0-cc1-no-stack-protector.patch
 		else
 			epatch "${GCC_FILESDIR}"/3.4.0/gcc-3.4.0-cc1-no-stack-protector.patch
 		fi
 	fi
 
-	if ! gcc_has_native_ssp ; then
+	if [[ -z ${sspatch} ]] ; then
+		BRANDING_GCC_PKGVERSION="${BRANDING_GCC_PKGVERSION}, ssp-builtin"
+	else
 		BRANDING_GCC_PKGVERSION="${BRANDING_GCC_PKGVERSION}, ssp-${PP_FVER:-${PP_GCC_VER}-${PP_VER}}"
+	fi
+
+	if ! gcc_has_native_ssp ; then
 		if want_libssp ; then
 			update_gcc_for_libssp
 		else
@@ -2030,9 +2066,15 @@ do_gcc_SSP_patches() {
 		fi
 	fi
 
+
 	# Don't build libgcc with ssp
-	sed -e 's|^LIBGCC2_CFLAGS = |LIBGCC2_CFLAGS = -fno-stack-protector |' \
-		-i gcc/Makefile.in || die "Failed to update libgcc2!"
+	if tc_version_is_at_least 4.2 ; then
+		sed -e 's|^LIBGCC2_CFLAGS = |LIBGCC2_CFLAGS = -fno-stack-protector -U_FORTIFY_SORUCE|' \
+			-i gcc/Makefile.in || die "Failed to update libgcc2!"
+	else
+		sed -e 's|^\(LIBGCC2_CFLAGS.*\)$|\1 -fno-stack-protector|' \
+			-i gcc/Makefile.in || die "Failed to update gcc!"
+	fi
 }
 
 # If glibc or uclibc has been patched to provide the necessary symbols itself,

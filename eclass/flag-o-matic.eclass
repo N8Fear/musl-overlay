@@ -51,6 +51,7 @@ setup-allowed-flags() {
 		-mflat -mno-flat -mno-faster-structs -mfaster-structs \
 		-m32 -m64 -mabi -mlittle-endian -mbig-endian -EL -EB -fPIC \
 		-mlive-g0 -mcmodel -mstack-bias -mno-stack-bias \
+		-U_FORTIFY_SOURCE \
 		-msecure-plt -D*"
 
 	# C[XX]FLAGS that we are think is ok, but needs testing
@@ -60,7 +61,7 @@ setup-allowed-flags() {
 }
 
 # Return true if the HFILTER_CONTROL permits the requested filter
-# _hfilter_allowed <category/pf> <pie|ssp|relro|now>
+# _hfilter_allowed <category/pf> <pie|ssp|relro|now|fortify>
 _hfilter_allowed() {
 	[[ -z ${HFILTER_CONTROL} ]] && return 0
 	[[ $(awk -v CPF="$1" -v TYPE="$2" 'BEGIN { ok=0 }
@@ -149,6 +150,9 @@ _filter-hardened() {
 			-relro|-Wl,-z,relro)
 				gcc-specs-now &&
 					_manage-hardened ${f} nozrelro -norelro ;;
+			-D_FORTIFY_SOURCE=2)
+				gcc-specs-fortify &&
+				_manage-hardened ${f} nofortify -U_FORTIFY_SOURCE ;;
 		esac
 	done
 }
