@@ -1,0 +1,18 @@
+===================================================================
+RCS file: /cvs/glibc/libc/stdlib/strtod_l.c,v
+retrieving revision 1.27
+retrieving revision 1.28
+diff -u -r1.27 -r1.28
+--- libc/stdlib/strtod_l.c	2008/03/08 04:18:15	1.27
++++ libc/stdlib/strtod_l.c	2008/03/08 21:31:55	1.28
+@@ -594,6 +594,9 @@
+ 		  mant = STRTOULL (startp + 1, &endp, 0);
+ 		  if (endp == cp)
+ 		    SET_MANTISSA (retval, mant);
++
++		  /* Consume the closing brace.  */
++		  ++cp;
+ 		}
+ 	    }
+ 
+

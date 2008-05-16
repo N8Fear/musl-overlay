@@ -62,9 +62,9 @@ is_crosscompile() {
 tc_version_is_at_least() { version_is_at_least "$1" "${2:-${GCC_PV}}" ; }
 
 gcc_has_native_ssp() {
-	[[ ${GCCMAJOR} -lt 4 ]] && ! use hardened && return 1
+	[[ ${GCCMAJOR} -lt 4 ]] && return 1
         # gcc 4.2 and above have native ssp support
-        tc_version_is_at_least "4.2" && return 0
+        tc_version_is_at_least 4.2 && [[ -z ${PP_VER} ]] && return 0
         return 1
 }
 
@@ -475,14 +475,21 @@ _want_stuff() {
 	use ${flag} && return 0
 	return 1
 }
-want_boundschecking() { _want_stuff HTB_VER boundschecking ; }
-want_pie() { _want_stuff PIE_VER !nopie ; }
-want_ssp() { gcc_has_native_ssp || _want_stuff PP_VER !nossp ; }
-want_minispecs() { version_is_at_least "9.0.5" ${PIE_VER} && want_pie ; }
-
-want_split_specs() {
-	[[ ${SPLIT_SPECS} == "true" ]] && want_pie
-}
+	if tc_version_is_at_least 4.2 ; then
+		want_boundschecking() { _want_stuff HTB_VER boundschecking ; }
+#		want_pie() { use hardened && _want_stuff PIE_VER !nopie ; }
+#		want_ssp() { use hardened && gcc_has_native_ssp || _want_stuff PP_VER !nossp ; }
+		want_pie() { _want_stuff PIE_VER !nopie ; }
+		want_ssp() { gcc_has_native_ssp || _want_stuff PP_VER !nossp ; }
+		want_minispecs() { version_is_at_least "9.0.9" ${PIE_VER} && want_pie ; }
+		want_split_specs() { [[ ${SPLIT_SPECS} == "true" ]] && want_pie ; }
+	else
+		want_boundschecking() { _want_stuff HTB_VER boundschecking ; }
+		want_pie() { _want_stuff PIE_VER !nopie ; }
+		want_ssp() { _want_stuff PP_VER !nossp ; }
+		want_minispecs() { version_is_at_least "9.0.9" ${PIE_VER} && want_pie ; }
+		want_split_specs() { [[ ${SPLIT_SPECS} == "true" ]] && want_pie ; }
+	fi
 
 # This function checks whether or not glibc has the support required to build
 # Position Independant Executables with gcc.
@@ -1121,8 +1128,7 @@ gcc-compiler-configure() {
 			;;
 		# Enable sjlj exceptions for backward compatibility on hppa
 		hppa)
-			[[ ${GCCMAJOR} == "3" ]] && \
-			confgcc="${confgcc} --enable-sjlj-exceptions"
+			[[ ${GCCMAJOR} == "3" ]] && confgcc="${confgcc} --enable-sjlj-exceptions"
 			;;
 	esac
 
@@ -1253,24 +1259,17 @@ gcc_do_configure() {
 	[[ ${CTARGET} == *-elf ]] && confgcc="${confgcc} --with-newlib"
 	# __cxa_atexit is "essential for fully standards-compliant handling of
 	# destructors", but apparently requires glibc.
-	# --enable-sjlj-exceptions : currently the unwind stuff seems to work
-	# for statically linked apps but not dynamic
-	# so use setjmp/longjmp exceptions by default
 	if [[ ${CTARGET} == *-uclibc* ]] ; then
-		[[ ${GCCMAJOR} < 4 ]] && confgcc="${confgcc} --enable-sjlj-exceptions"
-		confgcc="${confgcc} --enable-__cxa_atexit --enable-target-optspace"
-		[[ ${GCCMAJOR}.${GCCMINOR} == 3.3 ]] && \
-			confgcc="${confgcc} --enable-sjlj-exceptions"
-		[[ ${GCCMAJOR}.${GCCMINOR} > 3.3 ]] && \ 
-			confgcc="${confgcc} --enable-clocale=uclibc"
+		confgcc="${confgcc} --disable-__cxa_atexit --enable-target-optspace"
+		[[ ${GCCMAJOR}.${GCCMINOR} == 3.3 ]] && confgcc="${confgcc} --enable-sjlj-exceptions"
+		[[ ${GCCMAJOR}.${GCCMINOR} > 3.3 ]] && confgcc="${confgcc} --enable-clocale=uclibc"
 	elif [[ ${CTARGET} == *-gnu* ]] ; then
 		confgcc="${confgcc} --enable-__cxa_atexit"
 		confgcc="${confgcc} --enable-clocale=gnu"
 	elif [[ ${CTARGET} == *-freebsd* ]]; then
 		confgcc="${confgcc} --enable-__cxa_atexit"
 	fi
-	[[ ${CTARGET} == *-uclibc* ]] && [[ ${GCCMAJOR}.${GCCMINOR} > 3.3 ]] \
-		&& confgcc="${confgcc} --enable-clocale=uclibc"
+	[[ ${GCCMAJOR}.${GCCMINOR} < 3.4 ]] && confgcc="${confgcc} --disable-libunwind-exceptions"
 
 	tc_version_is_at_least 4.3 && set -- "$@" \
 		--with-bugurl=http://bugs.gentoo.org/ \
@@ -1287,12 +1286,6 @@ gcc_do_configure() {
 	echo
 	einfo "Configuring GCC with: ${@//--/\n\t--}"
 	echo
-
-	if ! ( use build || use nocxx ) && [[ ${CTARGET} == *-uclibc* ]] ; then
-		pushd ${S}/libstdc++-v3
-		[[ ${GCCMAJOR}.${GCCMINOR} < 3.4 ]] && autoconf
-		popd
-	fi
 
 	# Build in a separate build tree
 	mkdir -p "${WORKDIR}"/build
@@ -1526,7 +1519,7 @@ gcc_src_compile() {
 	gcc_do_make ${GCC_MAKE_TARGET}
 
 	# Do not create multiple specs files for PIE+SSP if boundschecking is in
-	# USE, as we disable PIE+SSP when it is (comment is obsolete).
+	# USE, as we disable PIE+SSP when it is.
 	if [[ ${ETYPE} == "gcc-compiler" ]] && want_split_specs ; then
 		split_out_specs_files || die "failed to split out specs"
 	fi
@@ -1618,16 +1611,14 @@ gcc-compiler_src_install() {
 	if want_split_specs ; then
 		if use hardened ; then
 			create_gcc_env_entry vanilla
-		elif hardened_gcc_works ; then
-			create_gcc_env_entry hardened
 		fi
-
-		hardened_gcc_works pie &&
+		! use hardened && hardened_gcc_works && create_gcc_env_entry hardened
+		if hardened_gcc_works || hardened_gcc_works pie ; then
 			create_gcc_env_entry hardenednossp
-
-		hardened_gcc_works ssp &&
+		fi
+		if hardened_gcc_works || hardened_gcc_works ssp ; then
 			create_gcc_env_entry hardenednopie
-
+		fi
 		create_gcc_env_entry hardenednopiessp
 
 		insinto ${LIBPATH}
@@ -1913,11 +1904,12 @@ gcc_quick_unpack() {
 			pushd "${S}" > /dev/null
 			unpack protector-${PP_FVER}.tar.gz
 			popd > /dev/null
-		elif
-			tc_version_is_at_least "4.2" && use hardened || [[ -n ${PP_VER} ]] ; then
-			    einfo "No need for ssp patch using the built in ssp."
-		else
+		fi
+		if [[ -n ${PP_VER} ]] ; then
 			unpack gcc-${PP_GCC_VER}-ssp-${PP_VER}.tar.bz2
+		fi
+		if gcc_has_native_ssp && use hardened ; then
+			    einfo "No need for ssp patch using the built in ssp"
 		fi
 	fi
 
@@ -1931,6 +1923,7 @@ gcc_quick_unpack() {
 
 	want_boundschecking && \
 		unpack "bounds-checking-gcc-${HTB_GCC_VER}-${HTB_VER}.patch.bz2"
+
 	popd > /dev/null
 }
 
@@ -2007,12 +2000,22 @@ do_gcc_SSP_patches() {
 			# >3.4.1 uses version in patch name, and also includes docs
 			ssppatch="${S}/gcc_${PP_VER}.dif"
 			sspdocs="yes"
+		elif tc_version_is_at_least 3.4.0 ; then
+			# >3.4 put files where they belong and 3_4 uses old patch name
+			ssppatch="${S}/protector.dif"
+			sspdocs="no"
+		elif tc_version_is_at_least 3.2.3 ; then
+			# earlier versions have no directory structure or docs
+			mv "${S}"/protector.{c,h} "${S}"/gcc
+			ssppatch="${S}/protector.dif"
+			sspdocs="no"
 		fi
 	fi
+
 	if [[ -n ${PP_VER} ]] ; then
 		# Just start packaging the damn thing ourselves
-		if [[ ${GCCMAJOR}.${GCCMINOR} -lt 4.2 ]] ; then
-			mw "${WORKDIR}"/ssp/protector.{c,h} "${S}"/gcc/
+		if [[ ${GCCMAJOR}.${GCCMINOR} < 4.0 ]] ; then
+			mv "${WORKDIR}"/ssp/protector.{c,h} "${S}"/gcc/
 		fi
 		ssppatch=${WORKDIR}/ssp/gcc-${PP_GCC_VER}-ssp.patch
 		# allow boundschecking and ssp to get along
@@ -2035,7 +2038,7 @@ do_gcc_SSP_patches() {
 		sed -e 's|^CRTSTUFF_CFLAGS = |CRTSTUFF_CFLAGS = -fno-stack-protector -U_FORTIFY_SOURCE |' \
 			-i gcc/Makefile.in || die "Failed to update crtstuff!"
 	else
-		sed -e 's|^CRTSTUFF_CFLAGS = |CRTSTUFF_CFLAGS = -fno-stack-protector |' \
+		sed -e 's|^CRTSTUFF_CFLAGS = |CRTSTUFF_CFLAGS = -fno-stack-protector |'\
 			-i gcc/Makefile.in || die "Failed to update crtstuff!"
 	fi
 	# if gcc in a stage3 defaults to ssp, is version 3.4.0 and a stage1 is built
@@ -2048,11 +2051,13 @@ do_gcc_SSP_patches() {
 		if tc_version_is_at_least 4.2 ; then
 			epatch "${GCC_FILESDIR}"/4.2.0/gcc-4.2.0-cc1-no-stack-protector.patch
 		else
-			epatch "${GCC_FILESDIR}"/3.4.0/gcc-3.4.0-cc1-no-stack-protector.patch
+			if gcc -dumpspecs | grep -q "fno-stack-protector:" ; then
+				epatch "${GCC_FILESDIR}"/3.4.0/gcc-3.4.0-cc1-no-stack-protector.patch
+			fi
 		fi
 	fi
 
-	if [[ -z ${sspatch} ]] ; then
+	if gcc_has_native_ssp ; then
 		BRANDING_GCC_PKGVERSION="${BRANDING_GCC_PKGVERSION}, ssp-builtin"
 	else
 		BRANDING_GCC_PKGVERSION="${BRANDING_GCC_PKGVERSION}, ssp-${PP_FVER:-${PP_GCC_VER}-${PP_VER}}"
@@ -2083,7 +2088,7 @@ do_gcc_SSP_patches() {
 update_gcc_for_libc_ssp() {
 	if libc_has_ssp ; then
 		einfo "Updating gcc to use SSP from libc ..."
-		sed -e 's|^LIBGCC2_CFLAGS = |LIBGCC2_CFLAGS = -D_LIBC_PROVIDES_SSP_|' \
+		sed -e 's|^\(LIBGCC2_CFLAGS.*\)$|\1 -D_LIBC_PROVIDES_SSP_|' \
 			-i "${S}"/gcc/Makefile.in || die "Failed to update gcc!"
 	fi
 }
@@ -2099,7 +2104,7 @@ update_gcc_for_libssp() {
 # do various updates to PIE logic
 do_gcc_PIE_patches() {
 	if ! want_pie || \
-		(want_boundschecking && [[ ${HTB_EXCLUSIVE} == "true" ]])
+	   (want_boundschecking && [[ ${HTB_EXCLUSIVE} == "true" ]])
 	then
 		return 0
 	fi
@@ -2108,7 +2113,7 @@ do_gcc_PIE_patches() {
 		&& rm -f "${WORKDIR}"/piepatch/*/*-boundschecking-no.patch* \
 		|| rm -f "${WORKDIR}"/piepatch/*/*-boundschecking-yes.patch*
 
-	(use vanilla || [[ -z ${UCLIBC_VER} ]]) && rm -f "${WORKDIR}"/piepatch/*/*uclibc*
+	use vanilla && rm -f "${WORKDIR}"/piepatch/*/*uclibc*
 
 	guess_patch_type_in_dir "${WORKDIR}"/piepatch/upstream
 

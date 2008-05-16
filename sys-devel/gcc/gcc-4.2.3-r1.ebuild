@@ -1,9 +1,9 @@
-# Copyright 1999-2007 Gentoo Foundation
+# Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: /var/cvsroot/gentoo-x86/sys-devel/gcc/gcc-4.2.0.ebuild,v 1.1 2007/05/19 03:22:33 vapier Exp $
 
 PATCH_VER="1.0"
-#UCLIBC_VER="1.0"
+UCLIBC_VER="1.0"
 PIE_VER="9.0.9"
 PIE_GCC_VER="4.2.0"
 #PP_VER="1.0"
@@ -45,10 +45,10 @@ inherit toolchain
 DESCRIPTION="The GNU Compiler Collection.  Includes C/C++, java compilers, pie+ssp extensions, Haj Ten Brugge runtime bounds checking"
 
 LICENSE="GPL-2 LGPL-2.1"
-KEYWORDS="~x86"
+KEYWORDS="~x86 ~amd64"
 
 RDEPEND=">=sys-libs/zlib-1.1.4
-	>=sys-devel/gcc-config-1.3.12-r4
+	>=sys-devel/gcc-config-1.4
 	virtual/libiconv
 	fortran? (
 		>=dev-libs/gmp-4.2.1
@@ -66,6 +66,8 @@ RDEPEND=">=sys-libs/zlib-1.1.4
 				x11-libs/pango
 			)
 			>=media-libs/libart_lgpl-2.1
+			app-arch/zip
+			app-arch/unzip
 		)
 		>=sys-libs/ncurses-5.2-r2
 		nls? ( sys-devel/gettext )
@@ -81,7 +83,7 @@ DEPEND="${RDEPEND}
 	ppc? ( >=${CATEGORY}/binutils-2.17 )
 	ppc64? ( >=${CATEGORY}/binutils-2.17 )
 	>=${CATEGORY}/binutils-2.15.94"
-PDEPEND="sys-devel/gcc-config"
+PDEPEND=">=sys-devel/gcc-config-1.4"
 if [[ ${CATEGORY} != cross-* ]] ; then
 	PDEPEND="${PDEPEND} elibc_glibc? ( >=sys-libs/glibc-2.6.1 )"
 fi
