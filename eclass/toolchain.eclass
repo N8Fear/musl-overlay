@@ -2049,7 +2049,9 @@ do_gcc_SSP_patches() {
 	# is hardened, but we build w/ nossp as well
 	if tc_version_is_at_least 3.4.0 ; then
 		if tc_version_is_at_least 4.2 ; then
-			epatch "${GCC_FILESDIR}"/4.2.0/gcc-4.2.0-cc1-no-stack-protector.patch
+			if gcc -dumpspecs | grep -q "cc1_ssp:" ; then
+				epatch "${GCC_FILESDIR}"/4.2.0/gcc-4.2.0-cc1-no-stack-protector.patch
+			fi
 		else
 			if gcc -dumpspecs | grep -q "fno-stack-protector:" ; then
 				epatch "${GCC_FILESDIR}"/3.4.0/gcc-3.4.0-cc1-no-stack-protector.patch
