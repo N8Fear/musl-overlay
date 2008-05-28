@@ -33,12 +33,12 @@ setup-allowed-flags() {
 		export ALLOWED_FLAGS="-pipe"
 		export ALLOWED_FLAGS="${ALLOWED_FLAGS} -O -O0 -O1 -O2 -mcpu -march -mtune"
 		export ALLOWED_FLAGS="${ALLOWED_FLAGS} -fstack-protector -fstack-protector-all"
-		export ALLOWED_FLAGS="${ALLOWED_FLAGS} -D_FORTIFY_SOURCE=2"
 		export ALLOWED_FLAGS="${ALLOWED_FLAGS} -fbounds-checking"
 		export ALLOWED_FLAGS="${ALLOWED_FLAGS} -fno-PIE -fno-pie -fno-unit-at-a-time"
 		export ALLOWED_FLAGS="${ALLOWED_FLAGS} -g -g[0-9] -ggdb -ggdb[0-9] -gstabs -gstabs+"
 		export ALLOWED_FLAGS="${ALLOWED_FLAGS} -fno-ident"
 		export ALLOWED_FLAGS="${ALLOWED_FLAGS} -W* -w"
+		export ALLOWED_FLAGS="${ALLOWED_FLAGS} -D_FORTIFY_SOURCE=2"
 	fi
 	# allow a bunch of flags that negate features / control ABI
 	ALLOWED_FLAGS="${ALLOWED_FLAGS} -fno-stack-protector -fno-stack-protector-all \
@@ -137,22 +137,22 @@ _filter-hardened() {
 			# not -fPIC or -fpic, but too many places filter -fPIC without
 			# thinking about -fPIE.
 			-fPIC|-fpic|-fPIE|-fpie|-Wl,pie|-pie)
-				gcc-specs-pie &&
+				gcc-specs-pie || continue
 					_manage-hardened ${f} nopie -nopie ;;
 			-fstack-protector)
-				gcc-specs-ssp &&
+				gcc-specs-ssp || continue
 					_manage-hardened ${f} nossp -fno-stack-protector ;;
 			-fstack-protector-all)
-				gcc-specs-ssp-to-all &&
+				gcc-specs-ssp-to-all || continue
 					_manage-hardened ${f} nosspall -fno-stack-protector-all ;;
 			-now|-Wl,-z,now)
-				gcc-specs-now &&
+				gcc-specs-now || continue
 					_manage-hardened ${f} noznow -nonow ;;
 			-relro|-Wl,-z,relro)
-				gcc-specs-now &&
+				gcc-specs-now || continue
 					_manage-hardened ${f} nozrelro -norelro ;;
 			-D_FORTIFY_SOURCE=2)
-				gcc-specs-fortify &&
+				gcc-specs-fortify || continue
 				_manage-hardened ${f} nofortify -U_FORTIFY_SOURCE ;;
 		esac
 	done

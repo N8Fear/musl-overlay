@@ -1,6 +1,6 @@
 # Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/eclass/toolchain.eclass,v 1.352 2008/04/12 22:54:40 vapier Exp $
+# $Header: /var/cvsroot/gentoo-x86/eclass/toolchain.eclass,v 1.354 2008/04/22 19:26:52 vapier Exp $
 #
 # Maintainer: Toolchain Ninjas <toolchain@gentoo.org>
 
@@ -791,7 +791,6 @@ gcc-compiler_pkg_preinst() {
 }
 
 gcc-compiler_pkg_postinst() {
-
 	do_gcc_config
 
 	if ! is_crosscompile ; then
@@ -2035,7 +2034,7 @@ do_gcc_SSP_patches() {
 
 	# Don't build crtbegin/end with ssp
 	if tc_version_is_at_least 4.2 ; then
-		sed -e 's|^CRTSTUFF_CFLAGS = |CRTSTUFF_CFLAGS = -fno-stack-protector -U_FORTIFY_SOURCE |' \
+		sed -e 's|^CRTSTUFF_CFLAGS = |CRTSTUFF_CFLAGS = -fno-stack-protector -U_FORTIFY_SOURCE |'\
 			-i gcc/Makefile.in || die "Failed to update crtstuff!"
 	else
 		sed -e 's|^CRTSTUFF_CFLAGS = |CRTSTUFF_CFLAGS = -fno-stack-protector |'\
@@ -2049,7 +2048,7 @@ do_gcc_SSP_patches() {
 	# is hardened, but we build w/ nossp as well
 	if tc_version_is_at_least 3.4.0 ; then
 		if tc_version_is_at_least 4.2 ; then
-			if gcc -dumpspecs | grep -q "cc1_ssp:" ; then
+			if gcc -dumpspecs | grep -q "cc1_ssp:" ; then #must redo to acctually pick up a real spec
 				epatch "${GCC_FILESDIR}"/4.2.0/gcc-4.2.0-cc1-no-stack-protector.patch
 			fi
 		else
@@ -2076,7 +2075,7 @@ do_gcc_SSP_patches() {
 
 	# Don't build libgcc with ssp
 	if tc_version_is_at_least 4.2 ; then
-		sed -e 's|^LIBGCC2_CFLAGS = |LIBGCC2_CFLAGS = -fno-stack-protector -U_FORTIFY_SORUCE|' \
+		sed -e 's|^LIBGCC2_CFLAGS = |LIBGCC2_CFLAGS = -fno-stack-protector -U_FORTIFY_SORUCE|'\
 			-i gcc/Makefile.in || die "Failed to update libgcc2!"
 	else
 		sed -e 's|^\(LIBGCC2_CFLAGS.*\)$|\1 -fno-stack-protector|' \
