@@ -1,6 +1,11 @@
 # Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/sys-boot/grub/grub-0.97-r5.ebuild,v 1.8 2008/04/07 08:14:09 robbat2 Exp $
+# $Header: /var/cvsroot/gentoo-x86/sys-boot/grub/grub-0.97-r5.ebuild,v 1.12 2008/05/10 09:00:56 vapier Exp $
+
+# XXX: we need to review menu.lst vs grub.conf handling.  We've been converting
+#      all systems to grub.conf (and symlinking menu.lst to grub.conf), but
+#      we never updated any of the source code (it still all wants menu.lst),
+#      and there is no indication that upstream is making the transition.
 
 inherit mount-boot eutils flag-o-matic toolchain-funcs autotools
 
@@ -14,7 +19,7 @@ SRC_URI="mirror://gentoo/${P}.tar.gz
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="~amd64 ~x86 ~x86-fbsd"
+KEYWORDS="amd64 x86 ~x86-fbsd"
 IUSE="custom-cflags ncurses netboot static"
 
 DEPEND="ncurses? (
@@ -81,6 +86,12 @@ src_compile() {
 
 	export grub_cv_prog_objcopy_absolute=yes #79734
 	use static && append-ldflags -static
+
+	# Per bug 216625, the emul packages do not provide .a libs for performing
+	# suitable static linking
+	if use amd64 && use static ; then
+		die "You must use the grub-static package if you want a static Grub on amd64!"
+	fi
 
 	# build the net-bootable grub first, but only if "netboot" is set
 	if use netboot ; then
@@ -156,6 +167,11 @@ setup_boot_dir() {
 		ewarn
 		ewarn "*** IMPORTANT NOTE: menu.lst has been renamed to grub.conf"
 		ewarn
+	fi
+
+	if [[ ! -e ${dir}/menu.lst ]]; then
+		einfo "Linking from new grub.conf name to menu.lst"
+		ln -snf grub.conf "${dir}"/menu.lst
 	fi
 
 	if [[ -e ${dir}/stage2 ]] ; then
