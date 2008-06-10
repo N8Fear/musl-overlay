@@ -1,6 +1,6 @@
 # Copyright 1999-2007 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/sys-libs/glibc/files/eblits/src_unpack.eblit,v 1.4 2007/11/11 20:12:38 vapier Exp $
+# $Header: /var/cvsroot/gentoo-x86/sys-libs/glibc/files/eblits/src_unpack.eblit,v 1.5 2008/06/08 00:49:09 vapier Exp $
 
 check_kheader_version() {
 	local version=$(
@@ -44,26 +44,29 @@ check_nptl_support() {
 	fi
 }
 
-unpack_addon() {
-	local addon=$1 ver=${2:-${RELEASE_VER}}
-	unpack glibc-${addon}-${ver}.tar.bz2
-	mv glibc-${addon}-${ver} ${addon} || die
+unpack_pkg() {
+	local a=${PN}
+	[[ -n ${SNAP_VER} ]] && a="${a}-${RELEASE_VER}"
+	[[ -n $1 ]] && a="${a}-$1"
+	[[ -n ${SNAP_VER} ]] && a="${a}-${SNAP_VER}" || a="${a}-${RELEASE_VER}"
+	unpack ${a}.tar.bz2
+	[[ -n $1 ]] && mv ${a} $1
 }
 
 toolchain-glibc_src_unpack() {
 	# Check NPTL support _before_ we unpack things to save some time
 	want_nptl && check_nptl_support
 
-	unpack glibc-${RELEASE_VER}.tar.bz2
+	unpack_pkg
 
 	cd "${S}"
-	[[ -n ${LT_VER} ]] && unpack glibc-linuxthreads-${LT_VER}.tar.bz2
-	[[ -n ${PORTS_VER} ]] && unpack_addon ports ${PORTS_VER}
-	unpack_addon libidn
+	[[ -n ${LT_VER}     ]] && unpack_pkg linuxthreads ${LT_VER}
+	[[ -n ${PORTS_VER}  ]] && unpack_pkg ports ${PORTS_VER}
+	[[ -n ${LIBIDN_VER} ]] && unpack_pkg libidn
 
 	if [[ -n ${PATCH_VER} ]] ; then
 		cd "${WORKDIR}"
-		unpack glibc-${PATCH_GLIBC_VER}-patches-${PATCH_VER}.tar.bz2
+		unpack glibc-${RELEASE_VER}-patches-${PATCH_VER}.tar.bz2
 		# pull out all the addons
 		local d
 		for d in extra/*/configure ; do
@@ -95,17 +98,19 @@ toolchain-glibc_src_unpack() {
 		unpack glibc-infopages-${INFOPAGE_VER}.tar.bz2
 	fi
 
+	# tag, glibc is it
+	cd "${S}"
+	[[ -e csu/Banner ]] && die "need new banner location"
+	[[ -n ${SNAP_VER} ]] && echo "Gentoo snapshot ${SNAP_VER}" >> csu/Banner
+	[[ -n ${BRANCH_UPDATE} ]] && echo "Gentoo branch ${BRANCH_UPDATE}" >> csu/Banner
 	if [[ -n ${PATCH_VER} ]] && ! use vanilla ; then
 		cd "${S}"
-		EPATCH_MULTI_MSG="Applying Gentoo Glibc Patchset ${PATCH_GLIBC_VER}-${PATCH_VER} ..." \
+		EPATCH_MULTI_MSG="Applying Gentoo Glibc Patchset ${RELEASE_VER}-${PATCH_VER} ..." \
 		EPATCH_EXCLUDE=${GLIBC_PATCH_EXCLUDE} \
 		EPATCH_SUFFIX="patch" \
 		ARCH=$(tc-arch) \
 		epatch "${WORKDIR}"/patches
-
-		# tag, glibc is it
-		[[ -e csu/Banner ]] && die "need new banner location"
-		echo "Gentoo patchset ${PATCH_VER}" > csu/Banner
+		echo "Gentoo patchset ${PATCH_VER}" >> csu/Banner
 	fi
 
 	gnuconfig_update
