@@ -137,22 +137,22 @@ _filter-hardened() {
 			# not -fPIC or -fpic, but too many places filter -fPIC without
 			# thinking about -fPIE.
 			-fPIC|-fpic|-fPIE|-fpie|-Wl,pie|-pie)
-				gcc-specs-pie || continue
+				gcc-specs-pie &&
 					_manage-hardened ${f} nopie -nopie ;;
 			-fstack-protector)
-				gcc-specs-ssp || continue
+				gcc-specs-ssp &&
 					_manage-hardened ${f} nossp -fno-stack-protector ;;
 			-fstack-protector-all)
-				gcc-specs-ssp-to-all || continue
+				gcc-specs-ssp-to-all &&
 					_manage-hardened ${f} nosspall -fno-stack-protector-all ;;
 			-now|-Wl,-z,now)
-				gcc-specs-now || continue
+				gcc-specs-now &&
 					_manage-hardened ${f} noznow -nonow ;;
 			-relro|-Wl,-z,relro)
-				gcc-specs-now || continue
+				gcc-specs-now &&
 					_manage-hardened ${f} nozrelro -norelro ;;
 			-D_FORTIFY_SOURCE=2)
-				gcc-specs-fortify || continue
+				gcc-specs-fortify &&
 				_manage-hardened ${f} nofortify -U_FORTIFY_SOURCE ;;
 		esac
 	done
@@ -678,6 +678,11 @@ replace-sparc64-flags() {
 # Add extra <flags> to the current LDFLAGS.
 append-ldflags() {
 	[[ -z $* ]] && return 0
+	local flag
+	for flag in "$@"; do
+		[[ ${flag} == -l* ]] && \
+			ewarn "Appending a library link instruction (${flag}); libraries to link to should not be passed through LDFLAGS"
+	done
 	export LDFLAGS="${LDFLAGS} $*"
 	return 0
 }
