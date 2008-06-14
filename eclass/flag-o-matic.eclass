@@ -230,7 +230,8 @@ _append-flag() {
 	[[ -z "$1" ]] && return 0
 	case "$1" in
 	-fno-stack-protector-all)
-		_manage-hardened -fno-stack-protector-all nosspall.specs -fno-stack-protector-all ;;
+	    gcc-specs-ssp-to-all || continue
+		_manage-hardened -fstack-protector-all nosspall "$1" ;;
 	*)
 		_raw_append_flag "$1"
 	esac
