@@ -8,7 +8,7 @@ DESCRIPTION="GNU libc6 (also called glibc2) C library"
 HOMEPAGE="http://www.gnu.org/software/libc/libc.html"
 
 LICENSE="LGPL-2"
-KEYWORDS="~amd64 hppa ~ia64 ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86"
+KEYWORDS="~amd64 hppa ~ia64 ~ppc ppc64 ~s390 sh ~sparc ~x86"
 RESTRICT="strip" # strip ourself #46186
 EMULTILIB_PKG="true"
 
@@ -20,6 +20,7 @@ INFOPAGE_VER=""                                # pregenerated infopages
 PATCH_VER="1.7"                                # Gentoo patchset
 PATCH_GLIBC_VER=${RELEASE_VER}                 # glibc version in patchset
 PORTS_VER=${RELEASE_VER}                       # version of glibc ports addon
+LIBIDN_VER=${RELEASE_VER}                      # version of libidn addon
 LT_VER=""                                      # version of linuxthreads addon
 NPTL_KERN_VER=${NPTL_KERN_VER:-"2.6.9"}        # min kernel version nptl requires
 #LT_KERN_VER=${LT_KERN_VER:-"2.4.1"}           # min kernel version linuxthreads requires

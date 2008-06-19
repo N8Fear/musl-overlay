@@ -24,7 +24,7 @@ SNAP_VER=""
 fi
 MANPAGE_VER=""                                 # pregenerated manpages
 INFOPAGE_VER=""                                # pregenerated infopages
-PATCH_VER="1"                                  # Gentoo patchset
+PATCH_VER="2"                                  # Gentoo patchset
 PORTS_VER=${RELEASE_VER}                       # version of glibc ports addon
 LIBIDN_VER=""                                  # version of libidn addon
 LT_VER=""                                      # version of linuxthreads addon
