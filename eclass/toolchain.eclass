@@ -2075,7 +2075,7 @@ do_gcc_SSP_patches() {
 
 	# Don't build libgcc with ssp
 	if tc_version_is_at_least 4.2 ; then
-		sed -e 's|^LIBGCC2_CFLAGS = |LIBGCC2_CFLAGS = -fno-stack-protector -U_FORTIFY_SORUCE|'\
+		sed -e 's|^LIBGCC2_CFLAGS = |LIBGCC2_CFLAGS = -fno-stack-protector -U_FORTIFY_SOURCE|'\
 			-i gcc/Makefile.in || die "Failed to update libgcc2!"
 	else
 		sed -e 's|^\(LIBGCC2_CFLAGS.*\)$|\1 -fno-stack-protector|' \
