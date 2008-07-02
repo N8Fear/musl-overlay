@@ -1,6 +1,6 @@
-This overlay is based on the pieworld work done by former gentoo developer kevquinn.
+This overlay is based on the pieworld work done by former gentoo developer kevquinn and psm.
 Changes by Xake and zorry.
 For questions there is email or pm me over @ forums.gentoo.org
 
-This overlay has support for -fPIE, -fstack-protector{,-all} and -D_FORTIFY_SOURCE=2 trough splitted minispecs for GCC-4.2.x.
+This overlay has support for -fPIE, -fstack-protector{,-all} and -D_FORTIFY_SOURCE=0,1,2 trough splitted minispecs for GCC-4.2.x.
 Support for GCC-4.3.x may turn up when GCC-4.3.1 comes out.

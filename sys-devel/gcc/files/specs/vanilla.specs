@@ -1,6 +1,6 @@
 %include <nopie.specs>
 %include <nossp.specs>
 %include <nosspall.specs>
-%include <nozrelro.specs>
-%include <noznow.specs>
+%include <zrelro.specs>
+%include <znow.specs>
 %include <nofortify.specs>

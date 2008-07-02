@@ -55,7 +55,9 @@ src_unpack() {
 		-e "/^#define.*EXTENDED_MEMSIZE/s,3,${GRUB_MAX_KERNEL_SIZE},g" \
 		"${S}"/grub/asmstub.c \
 		|| die "Failed to hack memory size"
-
+	# Ticket 20 https://hardened.gentooexperimental.org/secure/report/1
+	epatch "$FILESDIR}"/grub-0.97-gcc4-hardened.patch
+	
 	if [[ -n ${PATCHVER} ]] ; then
 		EPATCH_SUFFIX="patch"
 		epatch "${WORKDIR}"/patch
@@ -64,7 +66,7 @@ src_unpack() {
 }
 
 src_compile() {
-	filter-flags -fPIE -fstack-protector #168834
+	filter-flags -fPIE #168834
 
 	use amd64 && multilib_toolchain_setup x86
 

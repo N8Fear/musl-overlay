@@ -38,7 +38,7 @@ setup-allowed-flags() {
 		export ALLOWED_FLAGS="${ALLOWED_FLAGS} -g -g[0-9] -ggdb -ggdb[0-9] -gstabs -gstabs+"
 		export ALLOWED_FLAGS="${ALLOWED_FLAGS} -fno-ident"
 		export ALLOWED_FLAGS="${ALLOWED_FLAGS} -W* -w"
-		export ALLOWED_FLAGS="${ALLOWED_FLAGS} -D_FORTIFY_SOURCE=2"
+		export ALLOWED_FLAGS="${ALLOWED_FLAGS} -D_FORTIFY_SOURCE=0 -D_FORTIFY_SOURCE=1 -D_FORTIFY_SOURCE=2"
 	fi
 	# allow a bunch of flags that negate features / control ABI
 	ALLOWED_FLAGS="${ALLOWED_FLAGS} -fno-stack-protector -fno-stack-protector-all \

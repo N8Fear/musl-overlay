@@ -1,0 +1,12 @@
+diff -Nur /var/tmp/portage/sys-fs/e2fsprogs-1.40.11-r1/work/e2fsprogs-1.40.11/lib/uuid/Makefile.in /root/hardened/e2fsprogs-1.40.11/lib/uuid/Makefile.in
+--- /e2fsprogs-1.40.11/lib/uuid/Makefile.in	2008-06-26 04:03:05.000000000 +0200
++++ /e2fsprogs-1.40.11/lib/uuid/Makefile.in	2008-06-26 04:04:19.000000000 +0200
+@@ -78,7 +78,7 @@
+ 
+ tst_uuid: tst_uuid.o $(DEPSTATIC_LIBUUID)
+ 	@echo "	LD $@"
+-	@$(CC) $(ALL_LDFLAGS) -o tst_uuid tst_uuid.o $(STATIC_LIBUUID)
++	@$(CC) $(ALL_LDFLAGS) -fno-PIE -o tst_uuid tst_uuid.o $(STATIC_LIBUUID)
+ 
+ uuid_time: $(srcdir)/uuid_time.c $(DEPLIBUUID)
+ 	@echo "	LD $@"

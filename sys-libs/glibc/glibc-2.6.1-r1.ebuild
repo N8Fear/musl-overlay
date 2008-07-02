@@ -1,6 +1,6 @@
 # Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/sys-libs/glibc/glibc-2.8_p20080602.ebuild,v 1.1 2008/06/08 00:49:09 vapier Exp $
+# $Header: /var/cvsroot/gentoo-x86/sys-libs/glibc/glibc-2.6.1.ebuild,v 1.26 2008/06/23 01:39:12 vapier Exp $
 
 inherit eutils versionator libtool toolchain-funcs flag-o-matic gnuconfig multilib
 
@@ -8,31 +8,27 @@ DESCRIPTION="GNU libc6 (also called glibc2) C library"
 HOMEPAGE="http://www.gnu.org/software/libc/libc.html"
 
 LICENSE="LGPL-2"
-KEYWORDS="~amd64 ~ppc ~ppc64 ~x86"
+KEYWORDS="alpha amd64 arm ia64 ~mips ppc ppc64 sh sparc x86"
 RESTRICT="strip" # strip ourself #46186
 EMULTILIB_PKG="true"
 
 # Configuration variables
-if [[ ${PV} == *_p* ]] ; then
-RELEASE_VER=${PV%_p*}
-BRANCH_UPDATE=""
-SNAP_VER=${PV#*_p}
-else
-RELEASE_VER=${PV}
-BRANCH_UPDATE=""
-SNAP_VER=""
-fi
+RELEASE_VER=$(get_version_component_range 1-3) # major glibc version
+BRANCH_UPDATE=$(get_version_component_range 4) # upstream cvs snaps
 MANPAGE_VER=""                                 # pregenerated manpages
 INFOPAGE_VER=""                                # pregenerated infopages
-PATCH_VER="2"                                  # Gentoo patchset
+PATCH_VER="1.2"                                # Gentoo patchset
+PATCH_GLIBC_VER=${RELEASE_VER}                 # glibc version in patchset
 PORTS_VER=${RELEASE_VER}                       # version of glibc ports addon
-LIBIDN_VER=""                                  # version of libidn addon
+LIBIDN_VER=${RELEASE_VER}                      # version of libidn addon
 LT_VER=""                                      # version of linuxthreads addon
 NPTL_KERN_VER=${NPTL_KERN_VER:-"2.6.9"}        # min kernel version nptl requires
 #LT_KERN_VER=${LT_KERN_VER:-"2.4.1"}           # min kernel version linuxthreads requires
 
-IUSE="debug gd glibc-omitfp glibc-compat20 hardened multilib nls selinux profile vanilla ${LT_VER:+glibc-compat20 nptl nptlonly}"
-S=${WORKDIR}/glibc-${RELEASE_VER}${SNAP_VER+-${SNAP_VER}}
+[[ ${CTARGET} == hppa* ]] && NPTL_KERN_VER=${NPTL_KERN_VER:-2.6.20}
+
+IUSE="debug gd nls hardened multilib selinux glibc-omitfp profile vanilla crosscompile_opts_headers-only ${LT_VER:+glibc-compat20 nptl nptlonly}"
+S=${WORKDIR}/glibc-${RELEASE_VER}
 
 # Here's how the cross-compile logic breaks down ...
 #  CTARGET - machine that will target the binaries
@@ -55,8 +51,6 @@ if [[ ${CTARGET} == ${CHOST} ]] ; then
 		export CTARGET=${CATEGORY/cross-}
 	fi
 fi
-
-[[ ${CTARGET} == hppa* ]] && NPTL_KERN_VER=${NPTL_KERN_VER/2.6.9/2.6.20}
 
 is_crosscompile() {
 	[[ ${CHOST} != ${CTARGET} ]]
@@ -90,7 +84,6 @@ DEPEND=">=sys-devel/gcc-3.4.4
 	>=app-misc/pax-utils-0.1.10
 	virtual/os-headers
 	nls? ( sys-devel/gettext )
-	>=sys-apps/sandbox-1.2.18.1-r2
 	>=sys-apps/portage-2.1.2
 	selinux? ( sys-libs/libselinux )"
 RDEPEND="nls? ( sys-devel/gettext )
@@ -106,7 +99,7 @@ fi
 
 SRC_URI=$(
 	upstream_uris() {
-		echo mirror://gnu/glibc/$1 ftp://sources.redhat.com/pub/glibc/{releases,snapshots}/$1 mirror://gentoo/$1
+		echo mirror://gnu/glibc/$1 ftp://sources.redhat.com/pub/glibc/{releases,snapshots}/$1
 	}
 	gentoo_uris() {
 		local devspace="HTTP~vapier/dist/URI HTTP~azarah/glibc/URI"
@@ -114,19 +107,13 @@ SRC_URI=$(
 		echo mirror://gentoo/$1 ${devspace//URI/$1}
 	}
 
-	TARNAME=${PN}
-	if [[ -n ${SNAP_VER} ]] ; then
-		TARNAME="${PN}-${RELEASE_VER}"
-		[[ -n ${PORTS_VER} ]] && PORTS_VER=${SNAP_VER}
-		upstream_uris ${TARNAME}-${SNAP_VER}.tar.bz2
-	else
-		upstream_uris ${TARNAME}-${RELEASE_VER}.tar.bz2
-	fi
-	[[ -n ${LIBIDN_VER}    ]] && upstream_uris glibc-libidn-${LIBIDN_VER}.tar.bz2
-	[[ -n ${PORTS_VER}     ]] && upstream_uris ${TARNAME}-ports-${PORTS_VER}.tar.bz2
-	[[ -n ${LT_VER}        ]] && upstream_uris ${TARNAME}-linuxthreads-${LT_VER}.tar.bz2
+	upstream_uris glibc-${RELEASE_VER}.tar.bz2
+	upstream_uris glibc-libidn-${RELEASE_VER}.tar.bz2
+
+	[[ -n ${PORTS_VER}     ]] && upstream_uris glibc-ports-${PORTS_VER}.tar.bz2
+	[[ -n ${LT_VER}        ]] && upstream_uris glibc-linuxthreads-${LT_VER}.tar.bz2
 	[[ -n ${BRANCH_UPDATE} ]] && gentoo_uris glibc-${RELEASE_VER}-branch-update-${BRANCH_UPDATE}.patch.bz2
-	[[ -n ${PATCH_VER}     ]] && gentoo_uris glibc-${RELEASE_VER}-patches-${PATCH_VER}.tar.bz2
+	[[ -n ${PATCH_VER}     ]] && gentoo_uris glibc-${PATCH_GLIBC_VER}-patches-${PATCH_VER}.tar.bz2
 	[[ -n ${MANPAGE_VER}   ]] && gentoo_uris glibc-manpages-${MANPAGE_VER}.tar.bz2
 	[[ -n ${INFOPAGE_VER}  ]] && gentoo_uris glibc-infopages-${INFOPAGE_VER}.tar.bz2
 )
@@ -168,7 +155,7 @@ eblit-run() {
 src_unpack()  { eblit-run src_unpack  ; }
 src_compile() { eblit-run src_compile ; }
 src_test()    { eblit-run src_test    ; }
-src_install() { eblit-run src_install ; }
+src_install() { eblit-run src_install 2.6 ; }
 
 eblit-src_unpack-post() {
 	if use hardened ; then
@@ -176,7 +163,7 @@ eblit-src_unpack-post() {
 		einfo "Patching to get working PIE binaries on PIE (hardened) platforms"
 		gcc-specs-pie && epatch "${FILESDIR}"/2.5/glibc-2.5-hardened-pie.patch
 		epatch "${FILESDIR}"/2.5/glibc-2.5-hardened-configure-picdefault.patch
-		epatch "${FILESDIR}"/2.7/glibc-2.7-hardened-inittls-nosysenter.patch
+		epatch "${FILESDIR}"/2.6/glibc-2.6-hardened-inittls-nosysenter.patch
 
 		einfo "Installing Hardened Gentoo SSP handler"
 		cp -f "${FILESDIR}"/2.6/glibc-2.6-gentoo-stack_chk_fail.c \
@@ -198,24 +185,6 @@ eblit-src_unpack-post() {
 			nscd/Makefile \
 			|| die "Failed to ensure nscd builds with ssp-all"
 	fi
-}
-
-maint_pkg_create() {
-	local base="/usr/local/src/gnu/glibc/glibc-${PV:0:1}_${PV:2:1}"
-	cd ${base}
-	local stamp=$(date +%Y%m%d)
-	local d
-	for d in libc ports ; do
-		#(cd ${d} && cvs up)
-		case ${d} in
-			libc)  tarball="${P}";;
-			ports) tarball="${PN}-ports-${PV}";;
-		esac
-		rm -f ${tarball}*
-		ln -sf ${d} ${tarball}
-		tar hcf - ${tarball} --exclude-vcs | lzma > "${T}"/${tarball}.tar.lzma
-		du -b "${T}"/${tarball}.tar.lzma
-	done
 }
 
 pkg_setup() {
@@ -295,6 +264,9 @@ fix_lib64_symlinks() {
 }
 
 pkg_preinst() {
+	# nothing to do if just installing headers
+	just_headers && return
+
 	# PPC64+others may want to eventually be added to this logic if they
 	# decide to be multilib compatible and FHS compliant. note that this
 	# chunk of FHS compliance only applies to 64bit archs where 32bit
@@ -321,6 +293,7 @@ pkg_preinst() {
 	# they will fail.  also, skip if this glibc is a cross compiler.
 	[[ ${ROOT} != "/" ]] && return 0
 	[[ -d ${D}/$(get_libdir) ]] || return 0
+	cd / #228809
 	local x striptest
 	for x in date env ls true uname ; do
 		x=$(type -p ${x})
@@ -336,6 +309,9 @@ pkg_preinst() {
 }
 
 pkg_postinst() {
+	# nothing to do if just installing headers
+	just_headers && return
+
 	if ! tc-is-cross-compiler && [[ -x ${ROOT}/usr/sbin/iconvconfig ]] ; then
 		# Generate fastloading iconv module configuration file.
 		"${ROOT}"/usr/sbin/iconvconfig --prefix="${ROOT}"
