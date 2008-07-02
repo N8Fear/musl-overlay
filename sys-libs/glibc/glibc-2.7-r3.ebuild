@@ -1,6 +1,6 @@
 # Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/sys-libs/glibc/glibc-2.7-r2.ebuild,v 1.3 2008/03/27 17:17:20 jer Exp $
+# $Header: /var/cvsroot/gentoo-x86/sys-libs/glibc/glibc-2.7-r2.ebuild,v 1.10 2008/06/23 01:39:12 vapier Exp $
 
 inherit eutils versionator libtool toolchain-funcs flag-o-matic gnuconfig multilib
 
@@ -8,7 +8,7 @@ DESCRIPTION="GNU libc6 (also called glibc2) C library"
 HOMEPAGE="http://www.gnu.org/software/libc/libc.html"
 
 LICENSE="LGPL-2"
-KEYWORDS="~amd64 hppa ~ia64 ~ppc ppc64 ~s390 sh ~sparc ~x86"
+KEYWORDS="~amd64 ~arm hppa ~ia64 ~ppc ppc64 ~s390 sh ~sparc ~x86"
 RESTRICT="strip" # strip ourself #46186
 EMULTILIB_PKG="true"
 
@@ -25,7 +25,7 @@ LT_VER=""                                      # version of linuxthreads addon
 NPTL_KERN_VER=${NPTL_KERN_VER:-"2.6.9"}        # min kernel version nptl requires
 #LT_KERN_VER=${LT_KERN_VER:-"2.4.1"}           # min kernel version linuxthreads requires
 
-IUSE="debug gd glibc-omitfp glibc-compat20 hardened multilib nls selinux profile vanilla ${LT_VER:+glibc-compat20 nptl nptlonly}"
+IUSE="debug gd glibc-omitfp glibc-compat20 hardened multilib nls selinux profile vanilla crosscompile_opts_headers-only ${LT_VER:+glibc-compat20 nptl nptlonly}"
 S=${WORKDIR}/glibc-${RELEASE_VER}
 
 # Here's how the cross-compile logic breaks down ...
@@ -165,8 +165,8 @@ eblit-src_unpack-post() {
 		gcc-specs-pie && epatch "${FILESDIR}"/2.5/glibc-2.5-hardened-pie.patch
 		epatch "${FILESDIR}"/2.5/glibc-2.5-hardened-configure-picdefault.patch
 		epatch "${FILESDIR}"/2.7/glibc-2.7-hardened-inittls-nosysenter.patch
-		epatch "${FILESDIR}"/2.7/glibc-2.7-non.patch
-
+		epatch "${FILESDIR}"/2.7/glibc-2.6-no__guard_local.patch
+			
 		einfo "Installing Hardened Gentoo SSP handler"
 		cp -f "${FILESDIR}"/2.6/glibc-2.6-gentoo-stack_chk_fail.c \
 			debug/stack_chk_fail.c || die
@@ -266,6 +266,9 @@ fix_lib64_symlinks() {
 }
 
 pkg_preinst() {
+	# nothing to do if just installing headers
+	just_headers && return
+
 	# PPC64+others may want to eventually be added to this logic if they
 	# decide to be multilib compatible and FHS compliant. note that this
 	# chunk of FHS compliance only applies to 64bit archs where 32bit
@@ -292,6 +295,7 @@ pkg_preinst() {
 	# they will fail.  also, skip if this glibc is a cross compiler.
 	[[ ${ROOT} != "/" ]] && return 0
 	[[ -d ${D}/$(get_libdir) ]] || return 0
+	cd / #228809
 	local x striptest
 	for x in date env ls true uname ; do
 		x=$(type -p ${x})
@@ -307,6 +311,9 @@ pkg_preinst() {
 }
 
 pkg_postinst() {
+	# nothing to do if just installing headers
+	just_headers && return
+
 	if ! tc-is-cross-compiler && [[ -x ${ROOT}/usr/sbin/iconvconfig ]] ; then
 		# Generate fastloading iconv module configuration file.
 		"${ROOT}"/usr/sbin/iconvconfig --prefix="${ROOT}"
