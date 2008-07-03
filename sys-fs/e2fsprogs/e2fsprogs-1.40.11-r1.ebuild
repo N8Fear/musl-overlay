@@ -31,7 +31,7 @@ src_unpack() {
 	epatch "${FILESDIR}"/${PN}-1.40-fbsd.patch
 
 	# ticket 15 https://hardened.gentooexperimental/secure
-	epatch "${FILESDIR}"/${PN}-tst_uuid-nopie.patch
+	epatch "${FILESDIR}"/${PN}-build-libuuid-fpic.patch
 	    
 	# kernel headers use the same defines as e2fsprogs and can cause issues #48829
 	sed -i \
