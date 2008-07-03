@@ -736,18 +736,6 @@ create_gcc_env_entry() {
 gcc_pkg_setup() {
 	[[ -z ${ETYPE} ]] && die "Your ebuild needs to set the ETYPE variable"
 
-	# Building a fully hardened compiler with a compiler that doesn't generate 
-	# PIEs by default causes conflicts between normal and PIE objects generated 
-	# at various stages in the build process.  All stages of the build process 
-	# must build the same type of objects. 
-	if use hardened && ! gcc-specs-pie && [[ ${GCCMAJOR}.${GCCMINOR}.${GCCMICRO} < 4.2.0 ]] ; then 
-		eerror "You have requested USE=hardened, but you are not using a hardened (PIE)" 
-		eerror "spec compiler.  Select a hardened-pie-spec compiler with gcc-config," 
-		eerror "and try again.  If you do not have a hardened-spec compiler (see the" 
-		eerror "output of gcc-config -l), emerge with USE='-hardened' first, then select" 
-		eerror "the hardened-spec compiler and emerge again with USE=hardened." 
-		die "You must build full hardened compilers with hardened-spec compilers" 
-	fi 
 	# The situation is similar when trying to build a non-hardened compiler with a 
 	# hardened compiler. 
 	if gcc-specs-pie && ! use hardened; then 
