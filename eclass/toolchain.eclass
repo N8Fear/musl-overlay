@@ -436,7 +436,7 @@ hardened_gcc_is_stable() {
 			tocheck="${tocheck} ${FORTIFY_STABLE}"
 		fi
 	else
-		die "hardened_gcc_stable needs to be called with pie or ssp"
+		die "hardened_gcc_stable needs to be called with pie, ssp or fortify"
 	fi
 
 	hasq $(tc-arch) ${tocheck} && return 0
