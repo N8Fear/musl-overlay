@@ -1,6 +1,6 @@
 # Copyright 1999-2007 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/sys-libs/glibc/files/eblits/src_install-2.6.eblit,v 1.1 2008/03/24 19:45:15 vapier Exp $
+# $Header: /var/cvsroot/gentoo-x86/sys-libs/glibc/files/eblits/src_install-2.6.eblit,v 1.2 2008/06/29 16:39:23 vapier Exp $
 
 toolchain-glibc_src_install() {
 	# These should not be set, else the
@@ -217,6 +217,11 @@ src_strip() {
 }
 
 eblit-glibc-src_install() {
+	if just_headers ; then
+		toolchain-glibc_headers_install
+		return
+	fi
+
 	setup_env
 
 	if [[ -z ${OABI} ]] ; then
@@ -240,10 +245,6 @@ eblit-glibc-src_install() {
 		fi
 	fi
 
-	if just_headers ; then
-		toolchain-glibc_headers_install
-	else
-		toolchain-glibc_src_install
-	fi
+	toolchain-glibc_src_install
 	[[ -z ${OABI} ]] && src_strip
 }

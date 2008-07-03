@@ -1,6 +1,6 @@
 # Copyright 1999-2007 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/sys-libs/glibc/files/eblits/common.eblit,v 1.5 2007/11/18 03:28:02 vapier Exp $
+# $Header: /var/cvsroot/gentoo-x86/sys-libs/glibc/files/eblits/common.eblit,v 1.6 2008/06/22 14:05:56 bluebird Exp $
 
 # We need to be able to set alternative headers for
 # compiling for non-native platform
@@ -146,7 +146,7 @@ setup_flags() {
 	# to the glibc build process. See bug #94325
 	filter-flags -fstack-protector
 	filter-flags -D_FORTIFY_SOURCE=2
-
+	
 	if use hardened && gcc-specs-pie ; then
 		# Force PIC macro definition for all compilations since they're all
 		# either -fPIC or -fPIE with the default-PIE compiler.
@@ -221,7 +221,7 @@ want__thread() {
 
 use_multilib() {
 	case ${CTARGET} in
-		sparc64*|mips64*|x86_64*|powerpc64*|s390x*)
+		sparc*|mips64*|x86_64*|powerpc64*|s390x*)
 			has_multilib_profile || use multilib ;;
 		*)  false ;;
 	esac
