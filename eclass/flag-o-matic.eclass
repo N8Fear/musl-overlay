@@ -151,7 +151,7 @@ _filter-hardened() {
 			-relro|-Wl,-z,relro)
 				gcc-specs-now &&
 					_manage-hardened ${f} nozrelro -norelro ;;
-			-D_FORTIFY_SOURCE=2)
+			-D_FORTIFY_SOURCE=2|-D_FORTIFY_SOURCE=1|-D_FORTIFY_SOURCE=0)
 				gcc-specs-fortify &&
 				_manage-hardened ${f} nofortify -U_FORTIFY_SOURCE ;;
 		esac
