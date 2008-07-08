@@ -1,6 +1,6 @@
 # Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/sys-fs/e2fsprogs/e2fsprogs-1.40.11.ebuild,v 1.1 2008/06/18 09:33:56 vapier Exp $
+# $Header: /var/cvsroot/gentoo-x86/sys-fs/e2fsprogs/e2fsprogs-1.40.9.ebuild,v 1.8 2008/06/18 09:23:58 vapier Exp $
 
 inherit eutils flag-o-matic toolchain-funcs multilib
 
@@ -10,7 +10,7 @@ SRC_URI="mirror://sourceforge/e2fsprogs/${P}.tar.gz"
 
 LICENSE="GPL-2 BSD"
 SLOT="0"
-KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~x86-fbsd"
+KEYWORDS="alpha amd64 arm hppa ia64 m68k ~mips ppc ppc64 s390 sh sparc x86 ~x86-fbsd"
 IUSE="nls static elibc_FreeBSD"
 
 RDEPEND="~sys-libs/com_err-${PV}
@@ -29,10 +29,8 @@ src_unpack() {
 	epatch "${FILESDIR}"/e2fsprogs-1.39-makefile.patch
 	epatch "${FILESDIR}"/${PN}-1.40.5-libintl.patch #122368
 	epatch "${FILESDIR}"/${PN}-1.40-fbsd.patch
-
-	# ticket 15 https://hardened.gentooexperimental/secure
-	epatch "${FILESDIR}"/${PN}-build-libuuid-fpic.patch
-	    
+	epatch "${FILESDIR}"/${PN}-build-libuuid-fpic.patch #Ticket 15
+	
 	# kernel headers use the same defines as e2fsprogs and can cause issues #48829
 	sed -i \
 		-e 's:CONFIG_JBD_DEBUG:__CONFIG_JBD_DEBUG__E2FS:g' \
@@ -47,17 +45,12 @@ src_unpack() {
 
 	# since we've split out com_err/ss into their own ebuilds, we
 	# need to fake out the local files.  let the toolchain find them.
-	mkdir tc || die
-	echo "GROUP ( libcom_err.a )" > tc/libcom_err.a
-	echo "GROUP ( libcom_err.so )" > tc/libcom_err.so
-	echo "GROUP ( libss.a )" > tc/libss.a
-	echo "GROUP ( libss.so )" > tc/libss.so
-	sed -i \
-		-e '/^LIB\(SS\|COM_ERR\)/s:$(LIB):$(top_builddir)/tc:' \
-		MCONFIG.in || die
+	echo "GROUP ( /usr/$(get_libdir)/libcom_err.a )" > lib/libcom_err.a
+	echo "GROUP ( /usr/$(get_libdir)/libcom_err.so )" > lib/libcom_err.so
+	echo "GROUP ( /usr/$(get_libdir)/libss.a )" > lib/libss.a
+	echo "GROUP ( /usr/$(get_libdir)/libss.so )" > lib/libss.so
 	echo '#include_next <ss/ss_err.h>' > lib/ss/ss_err.h
-	ln -s $(type -P mk_cmds) lib/ss/mk_cmds
-	ln -s $(type -P compile_et) lib/et/compile_et
+	ln -s /usr/bin/mk_cmds lib/ss/mk_cmds
 
 	# sanity check for Bug 105304
 	if [[ -z ${USERLAND} ]] ; then
@@ -69,7 +62,6 @@ src_unpack() {
 
 src_compile() {
 	# Keep the package from doing silly things
-	addwrite /var/cache/fonts
 	export LDCONFIG=:
 	export CC=$(tc-getCC)
 	export STRIP=:
