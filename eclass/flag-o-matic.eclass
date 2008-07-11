@@ -1,6 +1,6 @@
 # Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/eclass/flag-o-matic.eclass,v 1.122 2008/02/18 18:20:47 swegener Exp $
+# $Header: /var/cvsroot/gentoo-x86/eclass/flag-o-matic.eclass,v 1.124 2008/07/03 05:30:54 dberkholz Exp $
 
 # @ECLASS: flag-o-matic.eclass
 # @MAINTAINER:
@@ -26,7 +26,7 @@ inherit eutils toolchain-funcs multilib
 # has_ssp
 
 
-# C[XX]FLAGS that we allow in strip-flags
+# {C,CXX,F,FC}FLAGS that we allow in strip-flags
 # Note: shell globs and character lists are allowed
 setup-allowed-flags() {
 	if [[ -z ${ALLOWED_FLAGS} ]] ; then
@@ -55,7 +55,7 @@ setup-allowed-flags() {
 		-U_FORTIFY_SOURCE \
 		-msecure-plt -D*"
 
-	# C[XX]FLAGS that we are think is ok, but needs testing
+	# {C,CXX,F,FC}FLAGS that we are think is ok, but needs testing
 	# NOTE:  currently -Os have issues with gcc3 and K6* arch's
 	export UNSTABLE_FLAGS="-Os -O3 -freorder-blocks"
 	return 0
@@ -181,12 +181,14 @@ _filter-var() {
 # @FUNCTION: filter-flags
 # @USAGE: <flags>
 # @DESCRIPTION:
-# Remove particular <flags> from {C,CPP,CXX}FLAGS.  Accepts shell globs.
+# Remove particular <flags> from {C,CPP,CXX,F,FC}FLAGS.  Accepts shell globs.
 filter-flags() {
 	_filter-hardened "$@"
 	_filter-var CFLAGS "$@"
 	_filter-var CPPFLAGS "$@"
 	_filter-var CXXFLAGS "$@"
+	_filter-var FFLAGS "$@"
+	_filter-var FCFLAGS "$@"
 	return 0
 }
 
@@ -208,6 +210,17 @@ append-cppflags() {
 	return 0
 }
 
+# @FUNCTION: append-fflags
+# @USAGE: <flags>
+# @DESCRIPTION:
+# Add extra <flags> to the current {F,FC}FLAGS.
+append-fflags() {
+	[[ -z $* ]] && return 0
+	export FFLAGS="${FFLAGS} $*"
+	export FCFLAGS="${FCFLAGS} $*"
+	return 0
+}
+
 # @FUNCTION: append-lfs-flags
 # @DESCRIPTION:
 # Add flags that enable Large File Support.
@@ -215,13 +228,16 @@ append-lfs-flags() {
 	[[ -n $@ ]] && die "append-lfs-flags takes no arguments"
 	append-cppflags -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE
 }
-
 # Append flag if the compiler doesn't barf it
 _raw_append_flag() {
 	test-flag-CC "$1" &&
 		export CFLAGS="${CFLAGS} $1"
 	test-flag-CXX "$1" &&
 		export CXXFLAGS="${CXXFLAGS} $1"
+	test-flag-F77 "$1" &&
+		export FFLAGS="${FFLAGS} $1"
+	test-flag-FC "$1" &&
+		export FCFLAGS="${FCFLAGS} $1" 
 }
 
 # Special case: -fno-stack-protector-all needs special management
@@ -240,7 +256,7 @@ _append-flag() {
 # @FUNCTION: append-flags
 # @USAGE: <flags>
 # @DESCRIPTION:
-# Add extra <flags> to your current C[XX]FLAGS.
+# Add extra <flags> to your current {C,CXX,F,FC}FLAGS.
 append-flags() {
 	local f
 	[[ -z "$@" ]] && return 0
@@ -262,7 +278,7 @@ replace-flags() {
 	local f fset
 	declare -a new_CFLAGS new_CXXFLAGS
 
-	for fset in CFLAGS CXXFLAGS; do
+	for fset in CFLAGS CXXFLAGS FFLAGS FCFLAGS; do
 		# Looping over the flags instead of using a global
 		# substitution ensures that we're working with flag atoms.
 		# Otherwise globs like -O* have the potential to wipe out the
@@ -307,16 +323,16 @@ _is_flagq() {
 # @FUNCTION: is-flagq
 # @USAGE: <flag>
 # @DESCRIPTION:
-# Returns shell true if <flag> is in C[XX]FLAGS, else returns shell false.  Accepts shell globs.
+# Returns shell true if <flag> is in {C,CXX,F,FC}FLAGS, else returns shell false.  Accepts shell globs.
 is-flagq() {
 	[[ -n $2 ]] && die "Usage: is-flag <flag>"
-	_is_flagq CFLAGS $1 || _is_flagq CXXFLAGS $1
+	_is_flagq CFLAGS $1 || _is_flagq CXXFLAGS $1 || _is_flagq FFLAGS $1 || _is_flagq FCFLAGS $1
 }
 
 # @FUNCTION: is-flag
 # @USAGE: <flag>
 # @DESCRIPTION:
-# Echo's "true" if flag is set in C[XX]FLAGS.  Accepts shell globs.
+# Echo's "true" if flag is set in {C,CXX,F,FC}FLAGS.  Accepts shell globs.
 is-flag() {
 	is-flagq "$@" && echo true
 }
@@ -376,12 +392,14 @@ filter-mfpmath() {
 # @DESCRIPTION:
 # Strip C[XX]FLAGS of everything except known good/safe flags.
 strip-flags() {
-	local x y flag NEW_CFLAGS NEW_CXXFLAGS
+	local x y flag NEW_CFLAGS NEW_CXXFLAGS NEW_FFLAGS NEW_FCFLAGS
 
 	setup-allowed-flags
 
 	local NEW_CFLAGS=""
 	local NEW_CXXFLAGS=""
+	local NEW_FFLAGS=""
+	local NEW_FCFLAGS=""
 
 	# Allow unstable C[XX]FLAGS if we are using unstable profile ...
 	if has ~$(tc-arch) ${ACCEPT_KEYWORDS} ; then
@@ -410,6 +428,26 @@ strip-flags() {
 		done
 	done
 
+	for x in ${FFLAGS}; do
+		for y in ${ALLOWED_FLAGS}; do
+			flag=${x%%=*}
+			if [ "${flag%%${y}}" = "" ] ; then
+				NEW_FFLAGS="${NEW_FFLAGS} ${x}"
+				break
+			fi
+		done
+	done
+
+	for x in ${FCFLAGS}; do
+		for y in ${ALLOWED_FLAGS}; do
+			flag=${x%%=*}
+			if [ "${flag%%${y}}" = "" ] ; then
+				NEW_FCFLAGS="${NEW_FCFLAGS} ${x}"
+				break
+			fi
+		done
+	done
+
 	# In case we filtered out all optimization flags fallback to -O2
 	if [ "${CFLAGS/-O}" != "${CFLAGS}" -a "${NEW_CFLAGS/-O}" = "${NEW_CFLAGS}" ]; then
 		NEW_CFLAGS="${NEW_CFLAGS} -O2"
@@ -417,11 +455,19 @@ strip-flags() {
 	if [ "${CXXFLAGS/-O}" != "${CXXFLAGS}" -a "${NEW_CXXFLAGS/-O}" = "${NEW_CXXFLAGS}" ]; then
 		NEW_CXXFLAGS="${NEW_CXXFLAGS} -O2"
 	fi
+	if [ "${FFLAGS/-O}" != "${FFLAGS}" -a "${NEW_FFLAGS/-O}" = "${NEW_FFLAGS}" ]; then
+		NEW_FFLAGS="${NEW_FFLAGS} -O2"
+	fi
+	if [ "${FCFLAGS/-O}" != "${FCFLAGS}" -a "${NEW_FCFLAGS/-O}" = "${NEW_FCFLAGS}" ]; then
+		NEW_FCFLAGS="${NEW_FCFLAGS} -O2"
+	fi
 
 	set +f	# re-enable pathname expansion
 
 	export CFLAGS="${NEW_CFLAGS}"
 	export CXXFLAGS="${NEW_CXXFLAGS}"
+	export FFLAGS="${NEW_FFLAGS}"
+	export FCFLAGS="${NEW_FCFLAGS}"
 	return 0
 }
 
@@ -448,6 +494,18 @@ test-flag-CC() { test-flag-PROG "CC" "$1"; }
 # @DESCRIPTION:
 # Returns shell true if <flag> is supported by the C++ compiler, else returns shell false.
 test-flag-CXX() { test-flag-PROG "CXX" "$1"; }
+
+# @FUNCTION: test-flag-F77
+# @USAGE: <flag>
+# @DESCRIPTION:
+# Returns shell true if <flag> is supported by the Fortran 77 compiler, else returns shell false.
+test-flag-F77() { test-flag-PROG "F77" "$1"; }
+
+# @FUNCTION: test-flag-FC
+# @USAGE: <flag>
+# @DESCRIPTION:
+# Returns shell true if <flag> is supported by the Fortran 90 compiler, else returns shell false.
+test-flag-FC() { test-flag-PROG "FC" "$1"; }
 
 test-flags-PROG() {
 	local comp=$1
@@ -481,6 +539,18 @@ test-flags-CC() { test-flags-PROG "CC" "$@"; }
 # Returns shell true if <flags> are supported by the C++ compiler, else returns shell false.
 test-flags-CXX() { test-flags-PROG "CXX" "$@"; }
 
+# @FUNCTION: test-flags-F77
+# @USAGE: <flags>
+# @DESCRIPTION:
+# Returns shell true if <flags> are supported by the Fortran 77 compiler, else returns shell false.
+test-flags-F77() { test-flags-PROG "F77" "$@"; }
+
+# @FUNCTION: test-flags-FC
+# @USAGE: <flags>
+# @DESCRIPTION:
+# Returns shell true if <flags> are supported by the Fortran 90 compiler, else returns shell false.
+test-flags-FC() { test-flags-PROG "FC" "$@"; }
+
 # @FUNCTION: test-flags
 # @USAGE: <flags>
 # @DESCRIPTION:
@@ -512,10 +582,12 @@ test_version_info() {
 
 # @FUNCTION: strip-unsupported-flags
 # @DESCRIPTION:
-# Strip C[XX]FLAGS of any flags not supported by the active toolchain.
+# Strip {C,CXX,F,FC}FLAGS of any flags not supported by the active toolchain.
 strip-unsupported-flags() {
 	export CFLAGS=$(test-flags-CC ${CFLAGS})
 	export CXXFLAGS=$(test-flags-CXX ${CXXFLAGS})
+	export FFLAGS=$(test-flags-F77 ${FFLAGS})
+	export FCFLAGS=$(test-flags-FC ${FCFLAGS})
 }
 
 # @FUNCTION: get-flag
@@ -530,7 +602,7 @@ get-flag() {
 	# for example, if CFLAGS="-march=i686":
 	# `get-flag -march` == "-march=i686"
 	# `get-flag march` == "i686"
-	for f in ${CFLAGS} ${CXXFLAGS} ; do
+	for f in ${CFLAGS} ${CXXFLAGS} ${FFLAGS} ${FCFLAGS} ; do
 		if [ "${f/${findflag}}" != "${f}" ] ; then
 			printf "%s\n" "${f/-${findflag}=}"
 			return 0
