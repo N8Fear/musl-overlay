@@ -38,6 +38,7 @@ setup-allowed-flags() {
 		export ALLOWED_FLAGS="${ALLOWED_FLAGS} -g -g[0-9] -ggdb -ggdb[0-9] -gstabs -gstabs+"
 		export ALLOWED_FLAGS="${ALLOWED_FLAGS} -fno-ident"
 		export ALLOWED_FLAGS="${ALLOWED_FLAGS} -W* -w"
+		export ALLOWED_FLAGS="${ALLOWED_FLAGS} -fno-strict-overflow"
 		export ALLOWED_FLAGS="${ALLOWED_FLAGS} -D_FORTIFY_SOURCE=0 -D_FORTIFY_SOURCE=1 -D_FORTIFY_SOURCE=2"
 	fi
 	# allow a bunch of flags that negate features / control ABI
@@ -52,7 +53,7 @@ setup-allowed-flags() {
 		-mflat -mno-flat -mno-faster-structs -mfaster-structs \
 		-m32 -m64 -mabi -mlittle-endian -mbig-endian -EL -EB -fPIC \
 		-mlive-g0 -mcmodel -mstack-bias -mno-stack-bias \
-		-U_FORTIFY_SOURCE \
+		-U_FORTIFY_SOURCE -fstrict-overflow \
 		-msecure-plt -D*"
 
 	# {C,CXX,F,FC}FLAGS that we are think is ok, but needs testing
@@ -154,6 +155,9 @@ _filter-hardened() {
 			-D_FORTIFY_SOURCE=2|-D_FORTIFY_SOURCE=1|-D_FORTIFY_SOURCE=0)
 				gcc-specs-fortify &&
 				_manage-hardened ${f} nofortify -U_FORTIFY_SOURCE ;;
+			-fno-strict-overflow)
+				gcc-specs-strict-overflow &&
+					_manage-hardened ${f} strict -fstrict-overflow ;;
 		esac
 	done
 }

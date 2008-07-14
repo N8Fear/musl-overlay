@@ -380,6 +380,12 @@ gcc-specs-fortify() {
 	directive=$(gcc-specs-directive cc1)
 	return $([[ ${directive/\{!U_FORTIFY_SOURCE:} != ${directive} ]])
 }
+# Returns true if gcc builds with the fno-strict-overflow
+gcc-specs-strict-overflow() {
+	local directive
+	directive=$(gcc-specs-directive cc1)
+	return $([[ ${directive/\{!fstrict-overflow:} != ${directive} ]])
+}
 
 # @FUNCTION: gen_usr_ldscript
 # @USAGE: <list of libs to create linker scripts for>
