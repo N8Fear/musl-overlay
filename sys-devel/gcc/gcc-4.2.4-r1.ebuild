@@ -4,10 +4,9 @@
 
 PATCH_VER="1.0"
 UCLIBC_VER="1.0"
-PIE_VER="9.0.10"
+PIE_VER="9.0.11"
 PIE_GCC_VER="4.2.0"
 
-#GCC_LIBSSP_SUPPORT="true"
 ETYPE="gcc-compiler"
 
 # arch/libc configurations known to be stable with {PIE,SSP,FORTIFY}-by-default
@@ -84,7 +83,6 @@ PDEPEND=">=sys-devel/gcc-config-1.4"
 if [[ ${CATEGORY} != cross-* ]] ; then
 	PDEPEND="${PDEPEND} elibc_glibc? ( >=sys-libs/glibc-2.6.1 )"
 fi
-
 src_unpack() {
 	gcc_src_unpack
 

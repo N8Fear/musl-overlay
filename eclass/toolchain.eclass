@@ -1537,7 +1537,7 @@ gcc_src_compile() {
         	    cat "${GCC_FILESDIR}"/specs/${s}.specs >> "${WORKDIR}"/build.specs
                 done
 	    fi
-	    for s in znow zrelro; do
+	    for s in nostrict znow zrelro; do
                 cat "${GCC_FILESDIR}"/specs/${s}.specs >> "${WORKDIR}"/build.specs
             done
 	    export GCC_SPECS="${WORKDIR}"/build.specs
@@ -1660,7 +1660,7 @@ gcc-compiler_src_install() {
 	dodir /etc/env.d/gcc
 	create_gcc_env_entry
 
-	if want_split_specs || want_minispecs ; then
+	if want_split_specs ; then
 		if use hardened ; then
 			create_gcc_env_entry vanilla
 		fi
@@ -1674,16 +1674,25 @@ gcc-compiler_src_install() {
 		create_gcc_env_entry hardenednopiessp
 
 		insinto ${LIBPATH}
-		if want_minispecs ; then
-		    doins "${GCC_FILESDIR}"/specs/*.specs || die "failed to install specs"
-		    if hardened_gcc_works fortify ; then
-			create_gcc_env_entry hardenednofortify
-		    fi	
-		else
-		    doins "${WORKDIR}"/build/*.specs || die "failed to install specs"
-		fi
+		doins "${WORKDIR}"/build/*.specs || die "failed to install specs"
 	fi
-
+	
+	if want_minispecs ; then
+		insinto ${LIBPATH}    
+		doins "${GCC_FILESDIR}"/specs/*.specs || die "failed to install specs"
+		if hardened_gcc_works pie ; then
+		    create_gcc_env_entry nopie
+		fi
+		if hardened_gcc_works ssp ; then
+		    create_gcc_env_entry nossp-all
+		fi
+		if hardened_gcc_works fortify ; then
+		    create_gcc_env_entry nofortify
+		fi
+		create_gcc_env_entry strict
+		create_gcc_env_entry vanilla
+	fi
+	
 	# Make sure we dont have stuff lying around that
 	# can nuke multiple versions of gcc
 	cd "${D}"${LIBPATH}
@@ -1840,7 +1849,7 @@ gcc-compiler_src_install() {
             		cat "${GCC_FILESDIR}"/specs/${s}.specs >> "${WORKDIR}"/build/specs
                     done
 		fi
-		for s in znow zrelro; do
+		for s in nostrict znow zrelro; do
             	    cat "${GCC_FILESDIR}"/specs/${s}.specs >> "${WORKDIR}"/build/specs
                 done
                 insinto ${LIBPATH}
