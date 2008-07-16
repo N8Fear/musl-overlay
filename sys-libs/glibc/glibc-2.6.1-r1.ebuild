@@ -169,6 +169,8 @@ eblit-src_unpack-post() {
 		einfo "Installing Hardened Gentoo SSP handler"
 		cp -f "${FILESDIR}"/2.6/glibc-2.6-gentoo-stack_chk_fail.c \
 			debug/stack_chk_fail.c || die
+		cp -f "${FILESDIR}"/2.6/glibc-2.6-gentoo-chk_fail.c \
+			debug/chk_fail.c || die
 
 		if use debug ; then
 			# When using Hardened Gentoo stack handler, have smashes dump core for
@@ -178,6 +180,10 @@ eblit-src_unpack-post() {
 				-e '/^CFLAGS-backtrace.c/ iCFLAGS-stack_chk_fail.c = -DSSP_SMASH_DUMPS_CORE' \
 				debug/Makefile \
 				|| die "Failed to modify debug/Makefile for debug stack handler"
+			sed -i \
+				-e '/^CFLAGS-backtrace.c/ iCFLAGS-chk_fail.c = -DSSP_SMASH_DUMPS_CORE' \
+				debug/Makefile \
+				|| die "Failed to modify debug/Makefile for debug fortify handler"	
 		fi
 
 		# Build nscd with ssp-all
