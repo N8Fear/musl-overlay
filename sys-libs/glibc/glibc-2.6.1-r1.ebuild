@@ -164,9 +164,8 @@ eblit-src_unpack-post() {
 		gcc-specs-pie && epatch "${FILESDIR}"/2.5/glibc-2.5-hardened-pie.patch
 		epatch "${FILESDIR}"/2.5/glibc-2.5-hardened-configure-picdefault.patch
 		epatch "${FILESDIR}"/2.6/glibc-2.6-hardened-inittls-nosysenter.patch
-#		epatch "${FILESDIR}"/2.6/glibc-2.6-no__guard_local.patch
-		
-		einfo "Installing Hardened Gentoo SSP handler"
+	
+		einfo "Installing Hardened Gentoo SSP and FORTIFY handler"
 		cp -f "${FILESDIR}"/2.6/glibc-2.6-gentoo-stack_chk_fail.c \
 			debug/stack_chk_fail.c || die
 		cp -f "${FILESDIR}"/2.6/glibc-2.6-gentoo-chk_fail.c \
