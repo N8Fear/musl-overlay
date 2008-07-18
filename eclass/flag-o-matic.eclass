@@ -234,14 +234,10 @@ append-lfs-flags() {
 }
 # Append flag if the compiler doesn't barf it
 _raw_append_flag() {
-	test-flag-CC "$1" &&
-		export CFLAGS="${CFLAGS} $1"
-	test-flag-CXX "$1" &&
-		export CXXFLAGS="${CXXFLAGS} $1"
-	test-flag-F77 "$1" &&
-		export FFLAGS="${FFLAGS} $1"
-	test-flag-FC "$1" &&
-		export FCFLAGS="${FCFLAGS} $1" 
+	export CFLAGS="${CFLAGS} $1"
+	export CXXFLAGS="${CXXFLAGS} $1"
+	export FFLAGS="${FFLAGS} $1"
+	export FCFLAGS="${FCFLAGS} $1" 
 }
 
 # Special case: -fno-stack-protector-all needs special management
