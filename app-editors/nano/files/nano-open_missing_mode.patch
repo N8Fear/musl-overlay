@@ -1,0 +1,21 @@
+diff -Nru /var/tmp/portage/app-editors/nano-2.1.1-r2/work/nano-2.1.1/src/files.c /root/hardened/nano-2.1.1/src/files.c
+--- /var/tmp/portage/app-editors/nano-2.1.1-r2/work/nano-2.1.1/src/files.c	2008-03-31 08:25:18.000000000 +0200
++++ /root/hardened/nano-2.1.1/src/files.c	2008-06-16 17:54:13.000000000 +0200
+@@ -1572,7 +1572,7 @@
+ 	}
+ 
+ 	if (f_open == NULL) {
+-	    fd_source = open(realname, O_RDONLY | O_CREAT);
++	    fd_source = open(realname, O_RDONLY | O_CREAT, S_IRUSR | S_IWUSR);
+ 
+ 	    if (fd_source != -1) {
+ 		f_source = fdopen(fd_source, "rb");
+@@ -1691,7 +1691,7 @@
+ 	int fd_source;
+ 	FILE *f_source = NULL;
+ 
+-	fd_source = open(tempname, O_RDONLY | O_CREAT);
++	fd_source = open(tempname, O_RDONLY | O_CREAT, S_IRUSR | S_IWUSR);
+ 
+ 	if (fd_source != -1) {
+ 	    f_source = fdopen(fd_source, "rb");
