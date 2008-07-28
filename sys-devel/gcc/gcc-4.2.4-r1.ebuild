@@ -91,7 +91,8 @@ src_unpack() {
 	[[ ${CHOST} == ${CTARGET} ]] && epatch "${FILESDIR}"/gcc-spec-env.patch
 
 	[[ ${CTARGET} == *-softfloat-* ]] && epatch "${FILESDIR}"/4.0.2/gcc-4.0.2-softfloat.patch
-	
+	epatch "${FILESDIR}"/libiberty.h-asprintf-glibc-2.8.patch #232968
+		
 	einfo "Hardened toolchain for GCC 4 is made by kevquinn, psm, zorry and xake"
 	einfo "http://forum.gentoo.org/viewtopic-t-668885.html"
 	einfo "https://hardened.gentooexperimental.org/secure"
