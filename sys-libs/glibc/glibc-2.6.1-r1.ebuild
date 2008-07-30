@@ -164,13 +164,13 @@ eblit-src_unpack-post() {
 		gcc-specs-pie && epatch "${FILESDIR}"/2.5/glibc-2.5-hardened-pie.patch
 		epatch "${FILESDIR}"/2.5/glibc-2.5-hardened-configure-picdefault.patch
 		epatch "${FILESDIR}"/2.6/glibc-2.6-hardened-inittls-nosysenter.patch
-	
-		einfo "Installing Hardened Gentoo SSP and FORTIFY handler"
+
+		einfo "Installing Hardened Gentoo SSP and FORTIFY_SOURCE handler"
 		cp -f "${FILESDIR}"/2.6/glibc-2.6-gentoo-stack_chk_fail.c \
 			debug/stack_chk_fail.c || die
 		cp -f "${FILESDIR}"/2.6/glibc-2.6-gentoo-chk_fail.c \
 			debug/chk_fail.c || die
-
+		
 		if use debug ; then
 			# When using Hardened Gentoo stack handler, have smashes dump core for
 			# analysis - debug only, as core could be an information leak
@@ -182,7 +182,7 @@ eblit-src_unpack-post() {
 			sed -i \
 				-e '/^CFLAGS-backtrace.c/ iCFLAGS-chk_fail.c = -DSSP_SMASH_DUMPS_CORE' \
 				debug/Makefile \
-				|| die "Failed to modify debug/Makefile for debug fortify handler"	
+				|| die "Failed to modify debug/Makefile for debug fortify handler"
 		fi
 
 		# Build nscd with ssp-all

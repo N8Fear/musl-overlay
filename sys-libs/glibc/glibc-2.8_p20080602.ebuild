@@ -178,14 +178,14 @@ eblit-src_unpack-post() {
 		epatch "${FILESDIR}"/2.5/glibc-2.5-hardened-configure-picdefault.patch
 		epatch "${FILESDIR}"/2.7/glibc-2.7-hardened-inittls-nosysenter.patch
 
-		einfo "Installing Hardened Gentoo SSP and Fortify handler"
+		einfo "Installing Hardened Gentoo SSP and FORTIFY_SOURCE handler"
 		cp -f "${FILESDIR}"/2.6/glibc-2.6-gentoo-stack_chk_fail.c \
 			debug/stack_chk_fail.c || die
 		cp -f "${FILESDIR}"/2.6/glibc-2.6-gentoo-chk_fail.c \
 			debug/chk_fail.c || die
-
+		
 		if use debug ; then
-			# When using Hardened Gentoo stack and fortify handler, have smach and buffer dump core for
+			# When using Hardened Gentoo stack handler, have smashes dump core for
 			# analysis - debug only, as core could be an information leak
 			# (paranoia).
 			sed -i \
