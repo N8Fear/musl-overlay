@@ -1697,7 +1697,7 @@ gcc-compiler_src_install() {
 		    create_gcc_env_entry nopie
 		fi
 		if hardened_gcc_works ssp ; then
-		    create_gcc_env_entry nossp-all
+		    create_gcc_env_entry nossp_all
 		fi
 		if hardened_gcc_works fortify ; then
 		    create_gcc_env_entry nofortify
