@@ -4,7 +4,7 @@
 <overlay
         type = "git"
         src  = "git://github.com/Xake/toolchain-overlay.git"
-        name = "xaka-toolchain"
+        name = "xake-toolchain"
 	status = "unoffcial"
         contact = "zorry@ume.nu">
 	<description>Unofficial Gentoo overlay for Hardened Gcc 4.x Toolchain</description>
