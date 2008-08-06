@@ -5,4 +5,4 @@ This overlay has support for -fPIE, -fstack-protector{,-all} and -D_FORTIFY_SOUR
 We have disable -fstrict-overflow flag.
 Support for GCC-4.3.x is in the testing branch.
 
-
+Notice: pieworld.README is not up-to-date, it is mostly here for reference since it is the work we based this overlay on.
