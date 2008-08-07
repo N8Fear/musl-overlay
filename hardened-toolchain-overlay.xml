@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<layman>
+<overlays>
+<overlay
+        type = "git"
+        src  = "git://github.com/Xake/toolchain-overlay.git"
+        name = "Hardened GCC 4 Toolchain"
+        contact = "zorry@ume.nu">
+        <description>Unofficial Gentoo overlay for Hardened Gcc 4.x Toolchain</description>
+</overlay>
+</overlays> 
+</layman>
