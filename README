@@ -1,8 +1,14 @@
 This overlay is based on the pieworld work done by former gentoo developer kevquinn and psm.
 Changes by Xake and zorry.
-For questions there is thead @ forums.gentoo.org
-This overlay has support for -fPIE, -fstack-protector{,-all} and -D_FORTIFY_SOURCE=0,1,2 trough splitted minispecs for GCC-4.2.x.
+Thanks KernelOfTruth, dw and everyone else helping testing, suggesting fixes and other things we have missed.
+For questions there is a tread @ forums.gentoo.org
+This overlay has support for -fPIE, -fstack-protector{,-all} and -D_FORTIFY_SOURCE=0,1,2 trough splitted minispecs for GCC-4.x
 We have disable -fstrict-overflow flag.
-Support for GCC-4.3.x is in the testing branch.
-
+uclibc is not supported yet.
+if u want GCC 4.3 then use the testing branch
+For /etc/portages/packages.* files read packages.README
 Notice: pieworld.README is not up-to-date, it is mostly here for reference since it is the work we based this overlay on.
+
+
+
+
