@@ -38,21 +38,19 @@ src_compile() {
 		*-darwin*) libtype=bsd;;
 		*)         libtype=elf;;
 	esac
+
 	# Added to fix bug #232601
-	if [[ gcc-fullversion > 4.2.4 ]] && gcc-specs-pie ; then 
-		econf \
-			--enable-${libtype}-shlibs \
-			$(use_enable !elibc_uclibc tls) \
-			$(use_enable nls) \
-			--with-ccopts=-fPIC \
-			|| die
-	else
-		econf \
-                	--enable-${libtype}-shlibs \
-                	$(use_enable !elibc_uclibc tls) \
-                	$(use_enable nls) \
-                	|| die
+	local myconf
+	if [[ $(gcc-fullversion) > 4.2.3 ]] && gcc-specs-pie ; then 
+		myconf="--with-ccopts=-fPIC"
 	fi
+	
+	econf \
+		--enable-${libtype}-shlibs \
+		$(use_enable !elibc_uclibc tls) \
+		$(use_enable nls) \
+		${myconf} \
+		|| die
 	emake || die
 }
 
