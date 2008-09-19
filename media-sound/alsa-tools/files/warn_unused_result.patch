@@ -1,0 +1,29 @@
+--- /ac3dec/tools/extract_ac3.c.orig	2008-07-14 08:57:54.000000000 +0000
++++ /ac3dec/tools/extract_ac3.c	2008-09-18 12:40:45.000000000 +0000
+@@ -160,7 +160,12 @@
+    size = (long)(end_pos - cur_pos);
+    if(size > count)
+    {
+-      write(outfd, cur_pos, count);
++      if(write(outfd, cur_pos, count) != count)
++      {
++       fprintf(stderr, "Error: unexpected end of stream\n");
++	return;	
++      }
++      
+       cur_pos +=count;
+       if(cur_pos == end_pos)
+       {
+@@ -171,7 +176,11 @@
+    }
+    else if(size > 0)
+    {
+-      write(outfd, cur_pos, size);
++      if(write(outfd, cur_pos, size) != count)
++      {
++	fprintf(stderr, "Error: unexpected end of stream\n");
++       return;
++      }
+    }
+ 
+    while(count)
