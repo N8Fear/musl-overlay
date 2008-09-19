@@ -19,7 +19,7 @@
     else if(size > 0)
     {
 -      write(outfd, cur_pos, size);
-+      if(write(outfd, cur_pos, size) != count)
++      if(write(outfd, cur_pos, size) != size)
 +      {
 +	fprintf(stderr, "Error: unexpected end of stream\n");
 +       return;
