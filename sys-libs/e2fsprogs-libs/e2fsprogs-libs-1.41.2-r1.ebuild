@@ -1,8 +1,8 @@
 # Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/sys-libs/e2fsprogs-libs/e2fsprogs-libs-1.41.1.ebuild,v 1.1 2008/09/01 22:29:36 vapier Exp $
+# $Header: /var/cvsroot/gentoo-x86/sys-libs/e2fsprogs-libs/e2fsprogs-libs-1.41.2.ebuild,v 1.1 2008/10/02 18:13:34 vapier Exp $
 
-inherit eutils flag-o-matic toolchain-funcs
+inherit flag-o-matic toolchain-funcs
 
 DESCRIPTION="e2fsprogs libraries (common error, subsystem, uuid, block id)"
 HOMEPAGE="http://e2fsprogs.sourceforge.net/"
@@ -19,13 +19,6 @@ RDEPEND="!sys-libs/com_err
 DEPEND="nls? ( sys-devel/gettext )
 	sys-devel/bc"
 
-src_unpack() {
-	unpack ${A}
-	cd "${S}"
-	epatch "${FILESDIR}"/${PN}-1.41.0-makefile.patch
-	epatch "${FILESDIR}"/${PN}-1.41.1-subs.patch
-}
-
 src_compile() {
 	export LDCONFIG=/bin/true
 	export CC=$(tc-getCC)
@@ -40,18 +33,18 @@ src_compile() {
 	esac
 
 	# Added to fix bug #232601
-	local myconf
-	if [[ $(gcc-fullversion) > 4.2.3 ]] && gcc-specs-pie ; then 
-		myconf="--with-ccopts=-fPIC"
-	fi
-	
-	econf \
-		--enable-${libtype}-shlibs \
-		$(use_enable !elibc_uclibc tls) \
-		$(use_enable nls) \
-		${myconf} \
-		|| die
-	emake || die
+        local myconf
+        if [[ $(gcc-fullversion) > 4.2.3 ]] && gcc-specs-pie ; then
+                myconf="--with-ccopts=-fPIC"
+        fi
+
+        econf \
+                --enable-${libtype}-shlibs \
+                $(use_enable !elibc_uclibc tls) \
+                $(use_enable nls) \
+                ${myconf} \
+                || die
+        emake || die
 }
 
 src_install() {
