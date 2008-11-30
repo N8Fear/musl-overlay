@@ -1,0 +1,78 @@
+# ChangeLog for net-misc/dhcdbd
+# Copyright 1999-2008 Gentoo Foundation; Distributed under the GPL v2
+# $Header: /var/cvsroot/gentoo-x86/net-misc/dhcdbd/ChangeLog,v 1.15 2008/02/29 03:12:57 ranger Exp $
+
+  29 Feb 2008; Brent Baude <ranger@gentoo.org> dhcdbd-3.0.ebuild:
+  keyworded ~arch for ppc64, bug 211783
+
+  25 Dec 2007; Christian Heim <phreak@gentoo.org> metadata.xml:
+  Removing metalgod from metadata.xml as per #99350.
+
+  08 Sep 2007; Joseph Jezak <josejx@gentoo.org> dhcdbd-3.0.ebuild:
+  Marked ppc stable for bug #191302.
+
+  05 Sep 2007; <tester@gentoo.org> dhcdbd-3.0.ebuild:
+  Stable on x86 per bug #191302
+
+  05 Sep 2007; Wulf C. Krueger <philantrop@gentoo.org> dhcdbd-3.0.ebuild:
+  Marked stable on amd64 as per bug 191302 to make sure stable systems
+  actually work.
+
+  04 Sep 2007; Steev Klimaszewski <steev@gentoo.org>
+  +files/dhcdbd-3.0-daemon.patch, +files/dhcdbd-3.0-dbus.patch,
+  -dhcdbd-2.7.ebuild, +dhcdbd-3.0.ebuild:
+  Add patch so that 3.0 works with dbus 1.0.2, reported by rbu while testing.
+
+*dhcdbd-3.0 (04 Sep 2007)
+
+  04 Sep 2007; Steev Klimaszewski <steev@gentoo.org>
+  +files/dhcdbd-3.0-daemon.patch, -dhcdbd-2.7.ebuild, +dhcdbd-3.0.ebuild:
+  New upstream release, works with dhcp 3.1+ as well as lower. This should fix
+  stable from being broken once we stablize it
+
+  28 Aug 2007; nixnut <nixnut@gentoo.org> dhcdbd-2.8-r1.ebuild:
+  Stable on ppc wrt bug 189781
+
+  26 Aug 2007; Wulf C. Krueger <philantrop@gentoo.org> dhcdbd-2.8-r1.ebuild:
+  Marked stable on amd64 as per bug 189781.
+
+  24 Aug 2007; Christian Faulhammer <opfer@gentoo.org> dhcdbd-2.8-r1.ebuild:
+  stable x86, bug 189781
+
+*dhcdbd-2.8-r1 (16 Jul 2007)
+
+  16 Jul 2007; Roy Marples <uberlord@gentoo.org>
+  +files/dhcdbd-2.8-daemon.patch, +dhcdbd-2.8-r1.ebuild:
+  Create a pidfile immediately after daemonizing so we're more robust
+  with baselayout-2
+
+*dhcdbd-2.8 (14 Jun 2007)
+
+  14 Jun 2007; Steev Klimaszewski <steev@gentoo.org> +dhcdbd-2.8.ebuild:
+  New upstream release, closes bug #182033. Thanks to Tim Harder
+  <thorium90@gmail.com> for reporting.
+
+  15 May 2007; Thilo Bangert <bangert@gentoo.org> metadata.xml:
+  add <herd>no-herd</herd>
+
+*dhcdbd-2.7 (14 May 2007)
+
+  14 May 2007; Steev Klimaszewski <steev@gentoo.org>
+  -files/dhcdbd-1.14-dbus_close.patch,
+  -files/dhcdbd-1.14-enable_debug.patch,
+  -files/dhcdbd-1.14-fix_dhclientconf.patch, +files/dhcdbd-2.5-fixes.patch,
+  -dhcdbd-1.14-r1.ebuild, +dhcdbd-2.7.ebuild:
+  New upstream release, version 2.7, was testing locally, with no issues.  Fixes
+  bug #178523.  Thanks to Davide Pesavento <davidepesa@gmail.com> for reporting.
+  Remove the dhcdbd-1.14 line.
+
+  14 Jan 2007; Markus Rothe <corsair@gentoo.org> dhcdbd-1.14-r1.ebuild:
+  Added ~ppc64
+
+*dhcdbd-1.14-r1 (28 Oct 2006)
+*dhcdbd-1.12-r3 (28 Oct 2006)
+
+  28 Oct 2006; Luis Medinas <metalgod@gentoo.org> +metadata.xml,
+  +dhcdbd-1.12-r3.ebuild, +dhcdbd-1.14-r1.ebuild:
+  Inital commit. This application is a dependency for NetworkManager.
+

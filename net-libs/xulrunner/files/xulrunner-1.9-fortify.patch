@@ -1,0 +1,50 @@
+
+# HG changeset patch
+# User Dmitry Potapov <dpotapov@gmail.com>
+# Date 1224561357 18000
+# Node ID adf33dbb59d04461121d236451dc8b5973b96fab
+# Parent 6e9a29a235ce506b4ca35fabefa34b48033beb69
+Bug 412610 - "MAXPATHLEN too small for glibc's realpath()" (define MAXPATHLEN as PATH_MAX when PATH_MAX is available) [r=bsmedberg]
+
+--- a/toolkit/mozapps/update/src/updater/updater.cpp	Tue Oct 21 16:36:29 2008 +1300
++++ b/toolkit/mozapps/update/src/updater/updater.cpp	Mon Oct 20 22:55:57 2008 -0500
+@@ -118,7 +118,9 @@
+ #endif
+ 
+ #ifndef MAXPATHLEN
+-# ifdef MAX_PATH
++# ifdef PATH_MAX
++#  define MAXPATHLEN PATH_MAX
++# elif defined(_MAX_PATH)
+ #  define MAXPATHLEN MAX_PATH
+ # elif defined(_MAX_PATH)
+ #  define MAXPATHLEN _MAX_PATH
+--- a/toolkit/xre/nsAppRunner.h	Tue Oct 21 16:36:29 2008 +1300
++++ b/toolkit/xre/nsAppRunner.h	Mon Oct 20 22:55:57 2008 -0500
+@@ -40,10 +40,14 @@
+ 
+ #ifdef XP_WIN
+ #include <windows.h>
++#else
++#include <limits.h>
+ #endif
+ 
+ #ifndef MAXPATHLEN
+-#ifdef _MAX_PATH
++#ifdef PATH_MAX
++#define MAXPATHLEN PATH_MAX
++#elif defined(_MAX_PATH)
+ #define MAXPATHLEN _MAX_PATH
+ #elif defined(CCHMAXPATH)
+ #define MAXPATHLEN CCHMAXPATH
+--- a/xpcom/build/nsXPCOMPrivate.h	Tue Oct 21 16:36:29 2008 +1300
++++ b/xpcom/build/nsXPCOMPrivate.h	Mon Oct 20 22:55:57 2008 -0500
+@@ -231,6 +231,7 @@
+ #define XUL_DLL   "libxul"MOZ_DLL_SUFFIX
+ 
+ #else // Unix
++#include <limits.h> // for PATH_MAX
+ 
+ #define XPCOM_DLL "libxpcom"MOZ_DLL_SUFFIX
+ 
+

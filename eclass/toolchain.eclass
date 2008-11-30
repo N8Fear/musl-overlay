@@ -1,6 +1,6 @@
 # Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/eclass/toolchain.eclass,v 1.361 2008/08/20 03:15:38 viper Exp $
+# $Header: /var/cvsroot/gentoo-x86/eclass/toolchain.eclass,v 1.366 2008/11/09 20:27:43 solar Exp $
 #
 # Maintainer: Toolchain Ninjas <toolchain@gentoo.org>
 
@@ -161,6 +161,7 @@ else
 			tc_version_is_at_least "4.0" && IUSE="${IUSE} objc-gc mudflap"
 			tc_version_is_at_least "4.1" && IUSE="${IUSE} objc++"
 			tc_version_is_at_least "4.2" && IUSE="${IUSE} openmp"
+			tc_version_is_at_least "4.3" && IUSE="${IUSE} fixed-point"
 		fi
 	fi
 
@@ -350,10 +351,10 @@ get_gcc_src_uri() {
 
 	# >= gcc-4.3 uses ecj.jar and we only add gcj as a use flag under certain
 	# conditions
-  	if [[ ${PN} != "kgcc64" && ${PN} != gcc-* ]] ; then
-	tc_version_is_at_least "4.3" && \
-		GCC_SRC_URI="${GCC_SRC_URI}
-		gcj? ( ftp://sourceware.org/pub/java/ecj-${GCC_BRANCH_VER}.jar )"
+	if [[ ${PN} != "kgcc64" && ${PN} != gcc-* ]] ; then
+		tc_version_is_at_least "4.3" && \
+			GCC_SRC_URI="${GCC_SRC_URI}
+			gcj? ( ftp://sourceware.org/pub/java/ecj-${GCC_BRANCH_VER}.jar )"
 	fi
 
 	echo "${GCC_SRC_URI}"
@@ -985,6 +986,15 @@ do_gcc_rename_java_bins() {
 			die "Failed to fixup file ${jfile} for rename to grmic"
 	done
 }
+unbreak_arm() {
+	[[ ${CTARGET} == *eabi* ]] || return
+	[[ ${CTARGET} == arm* ]] || return
+	[[ ${CTARGET} == armv5* ]] && return
+	[[ -e "${S}"/gcc/config/arm/linux-eabi.h ]] || return
+	#armv4tl can do ebai as well. http://www.nabble.com/Re:--crosstool-ng--ARM-EABI-problem-p17164547.html
+	#http://sourceware.org/ml/crossgcc/2008-05/msg00009.html
+	sed -i -e s/'define SUBTARGET_CPU_DEFAULT TARGET_CPU_arm10tdmi'/'define SUBTARGET_CPU_DEFAULT TARGET_CPU_arm9tdmi'/g "${S}"/gcc/config/arm/linux-eabi.h
+}
 gcc_src_unpack() {
 	export BRANDING_GCC_PKGVERSION="Gentoo ${GCC_PVR}"
 
@@ -1068,6 +1078,8 @@ gcc_src_unpack() {
 		do_gcc_rename_java_bins
 	fi
 
+	unbreak_arm
+
 	# Fixup libtool to correctly generate .la files with portage
 	cd "${S}"
 	elibtoolize --portage --shallow --no-uclibc
@@ -1124,6 +1136,10 @@ gcc-compiler-configure() {
 		else
 			export gcc_cv_libc_provides_ssp=yes
 			confgcc="${confgcc} --disable-libssp"
+		fi
+
+		if tc_version_is_at_least "4.2" ; then
+			confgcc="${confgcc} $(use_enable openmp libgomp)"
 		fi
 
 		# enable the cld workaround until we move things to stable.
@@ -1232,6 +1248,12 @@ gcc_do_configure() {
 	# ppc altivec support
 	confgcc="${confgcc} $(use_enable altivec)"
 
+	# gcc has fixed-point arithmetic support in 4.3 for mips targets that can
+	# significantly increase compile time by several hours.  This will allow
+	# users to control this feature in the event they need the support.
+	tc_version_is_at_least "4.3" && confgcc="${confgcc} $(use_enable fixed-point)"
+
+
 	[[ $(tc-is-softfloat) == "yes" ]] && confgcc="${confgcc} --with-float=soft"
 
 	# Native Language Support
@@ -1285,7 +1307,9 @@ gcc_do_configure() {
 		if [[ ${GCCMAJOR}.${GCCMINOR} > 4.1 ]] ; then
 			confgcc="${confgcc} --disable-bootstrap --disable-libgomp"
 		fi
-	elif [[ ${CHOST} != mingw* ]] && [[ ${CHOST} != *-mingw* ]] ; then
+	elif [[ ${CHOST} == mingw* ]] || [[ ${CHOST} == *-mingw* ]] ; then
+		confgcc="${confgcc} --enable-shared --enable-threads=win32"
+	else
 		confgcc="${confgcc} --enable-shared --enable-threads=posix"
 	fi
 	[[ ${CTARGET} == *-elf ]] && confgcc="${confgcc} --with-newlib"
@@ -1422,11 +1446,11 @@ gcc_do_make() {
 	if ! is_crosscompile && ! use nocxx && use doc ; then
 		if type -p doxygen > /dev/null ; then
 			if tc_version_is_at_least 4.3 ; then
-  	                	cd "${CTARGET}"/libstdc++-v3/doc
+				cd "${CTARGET}"/libstdc++-v3/doc
 				emake doc-man-doxygen || ewarn "failed to make docs"
 			elif tc_version_is_at_least 3.0 ; then
-			cd "${CTARGET}"/libstdc++-v3
-			emake doxygen-man || ewarn "failed to make docs"
+				cd "${CTARGET}"/libstdc++-v3
+				emake doxygen-man || ewarn "failed to make docs"
 			fi
 		else
 			ewarn "Skipping libstdc++ manpage generation since you don't have doxygen installed"
@@ -2414,7 +2438,7 @@ is_gcj() {
 }
 
 is_libffi() {
-	has libffi ${USE} || return 1
+	has libffi ${IUSE} || return 1
 	use libffi
 }
 

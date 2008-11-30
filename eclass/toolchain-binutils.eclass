@@ -163,7 +163,7 @@ tc-binutils_apply_patches() {
 			eend $?
 		done
 	fi
-		    
+
 	# Fix po Makefile generators
 	sed -i \
 		-e '/^datadir = /s:$(prefix)/@DATADIRNAME@:@datadir@:' \

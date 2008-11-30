@@ -1,0 +1,46 @@
+diff -ruN dhcdbd-3.0.orig/src/dhcdbd.c dhcdbd-3.0/src/dhcdbd.c
+--- dhcdbd-3.0.orig/src/dhcdbd.c	2007-09-04 10:31:45.000000000 -0500
++++ dhcdbd-3.0/src/dhcdbd.c	2007-09-04 10:35:52.000000000 -0500
+@@ -2769,9 +2769,6 @@
+         char path[1024];
+         int fd, l;
+ 
+-        if (dhcdbd_daemonize && (daemon (0, 0) == -1))
+-                return errno;
+-
+         openlog ("dhcdbd", LOG_NDELAY | LOG_CONS, LOG_USER);
+ 
+         dbus = dbus_svc_init (bus, dhcdbd_destination, dhcdbd_log, 0L);
+@@ -2812,6 +2809,17 @@
+                 (dbus, dhcdbd_object_path, path, dhcdbd_if_subscribe, dhco))
+                 return (1);
+ 
++        /* Daemonize and write the pidfile write away, to avoid races */
++        if (dhcdbd_daemonize && (daemon (0, 0) == -1))
++                return errno;
++               unlink (DHCDBD_PID_FILE);
++        if ((fd = open (DHCDBD_PID_FILE, O_WRONLY | O_CREAT)) == -1)
++                exit (errno);
++        l = sprintf (path, "%u", getpid ());
++        l = write (fd, path, l);
++        fsync (fd);
++        close (fd);
++
+         memset (&sa, '\0', sizeof (struct sigaction));
+         sa.sa_sigaction = dhc_reaper;
+         sa.sa_flags = SA_SIGINFO;       /* NO RESTART, NO DEFER, CLDSTOP */
+@@ -2819,13 +2827,7 @@
+                 dhcdbd_log ("sigaction failed: %s\n", strerror (errno));
+                 return (1);
+         }
+-        unlink (DHCDBD_PID_FILE);
+-        if ((fd = open (DHCDBD_PID_FILE, O_WRONLY | O_CREAT, 0644)) == -1)
+-                exit (errno);
+-        l = sprintf (path, "%u", getpid ());
+-        l = write (fd, path, l);
+-        fsync (fd);
+-        close (fd);
++
+         dhcdbd_log ("Started up.");
+         dbus_svc_main_loop (dbus, dhcdbd_work);
+         dhcdbd_debug ("Main Loop Exited.");

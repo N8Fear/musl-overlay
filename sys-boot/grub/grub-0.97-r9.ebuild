@@ -1,6 +1,6 @@
 # Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/sys-boot/grub/grub-0.97-r6.ebuild,v 1.2 2008/06/04 20:44:15 robbat2 Exp $
+# $Header: /var/cvsroot/gentoo-x86/sys-boot/grub/grub-0.97-r8.ebuild,v 1.1 2008/11/06 01:28:56 robbat2 Exp $
 
 # XXX: we need to review menu.lst vs grub.conf handling.  We've been converting
 #      all systems to grub.conf (and symlinking menu.lst to grub.conf), but
@@ -9,7 +9,7 @@
 
 inherit mount-boot eutils flag-o-matic toolchain-funcs autotools
 
-PATCHVER="1.7"
+PATCHVER="1.8" # Should match the revision ideally
 DESCRIPTION="GNU GRUB Legacy boot loader"
 HOMEPAGE="http://www.gnu.org/software/grub/"
 SRC_URI="mirror://gentoo/${P}.tar.gz
@@ -55,6 +55,7 @@ src_unpack() {
 		-e "/^#define.*EXTENDED_MEMSIZE/s,3,${GRUB_MAX_KERNEL_SIZE},g" \
 		"${S}"/grub/asmstub.c \
 		|| die "Failed to hack memory size"
+
 	# Ticket 20 https://hardened.gentooexperimental.org/secure/report/1
 	epatch "${FILESDIR}"/grub-0.97-gcc4-hardened.patch
 	
@@ -92,7 +93,15 @@ src_compile() {
 	# Per bug 216625, the emul packages do not provide .a libs for performing
 	# suitable static linking
 	if use amd64 && use static ; then
-		die "You must use the grub-static package if you want a static Grub on amd64!"
+		if [ -z "${GRUB_STATIC_PACKAGE_BUILDING}" ]; then
+			die "You must use the grub-static package if you want a static Grub on amd64!"
+		else
+			eerror "You have set GRUB_STATIC_PACKAGE_BUILDING. This"
+			eerror "is specifically intended for building the tarballs for the"
+			eerror "grub-static package via USE='static -ncurses'."
+			eerror "All bets are now off."
+			ebeep 10
+		fi
 	fi
 
 	# build the net-bootable grub first, but only if "netboot" is set
@@ -148,6 +157,12 @@ src_install() {
 	dodoc AUTHORS BUGS ChangeLog NEWS README THANKS TODO
 	newdoc docs/menu.lst grub.conf.sample
 	dodoc "${FILESDIR}"/grub.conf.gentoo
+	prepalldocs
+
+	[ -n "${GRUB_STATIC_PACKAGE_BUILDING}" ] && \
+		mv \
+		"${D}"/usr/share/doc/${PF} \
+		"${D}"/usr/share/doc/grub-static-${PF/grub-}
 
 	insinto /usr/share/grub
 	doins "${DISTDIR}"/splash.xpm.gz
@@ -184,6 +199,9 @@ setup_boot_dir() {
 		ewarn "stage1 and stage2 will still be the old version, but"
 		ewarn "later stages will be the new version, which could"
 		ewarn "cause problems such as an unbootable system."
+		ewarn "This means you must use either grub-install or perform"
+		ewarn "root/setup manually! For more help, see the handbook:"
+		ewarn "http://www.gentoo.org/doc/en/handbook/handbook-${ARCH}.xml?part=1&chap=10#grub-install-auto"
 		ebeep
 	fi
 
@@ -220,18 +238,36 @@ setup_boot_dir() {
 	if [[ ! -e ${dir}/default ]] ; then
 		grub-set-default --root-directory="${boot_dir}" default
 	fi
+	einfo "Grub has been installed to ${boot_dir} successfully."
 }
 
 pkg_postinst() {
-	[[ -n ${DONT_MOUNT_BOOT} ]] && return 0
-	setup_boot_dir "${ROOT}"/boot
-	einfo "To install grub files to another device (like a usb stick), just run:"
-	einfo "   emerge --config =${PF}"
+	if [[ -n ${DONT_MOUNT_BOOT} ]]; then
+		elog "WARNING: you have DONT_MOUNT_BOOT in effect, so you must apply"
+		elog "the following instructions for your /boot!"
+		elog "Neglecting to do so may cause your system to fail to boot!"
+		elog
+	else
+		setup_boot_dir "${ROOT}"/boot
+		# Trailing output because if this is run from pkg_postinst, it gets mixed into
+		# the other output.
+		einfo ""
+	fi
+	elog "To interactively install grub files to another device such as a USB"
+	elog "stick, just run the following and specify the directory as prompted:"
+	elog "   emerge --config =${PF}"
+	elog "Alternately, you can export GRUB_ALT_INSTALLDIR=/path/to/use to tell"
+	elog "grub where to install in a non-interactive way."
+
 }
 
 pkg_config() {
 	local dir
-	einfo "Enter the directory where you want to setup grub:"
-	read dir
+	if [ ! -d "${GRUB_ALT_INSTALLDIR}" ]; then
+		einfo "Enter the directory where you want to setup grub:"
+		read dir
+	else
+		dir="${GRUB_ALT_INSTALLDIR}"
+	fi
 	setup_boot_dir "${dir}"
 }

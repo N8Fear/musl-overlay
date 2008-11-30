@@ -1,0 +1,82 @@
+diff -ruN dhcdbd-3.0.orig/src/dbus_service.c dhcdbd-3.0/src/dbus_service.c
+--- dhcdbd-3.0.orig/src/dbus_service.c	2007-09-04 11:08:45.000000000 -0500
++++ dhcdbd-3.0/src/dbus_service.c	2007-09-04 12:00:38.000000000 -0500
+@@ -1024,7 +1024,11 @@
+ 
+ static void set_watch_fds(DBusWatch * watch, DBusConnectionState * cs) {
+     uint8_t flags = dbus_watch_get_flags(watch);
++#if (DBUS_VERSION_MAJOR == 1 && DBUS_VERSION_MINOR == 1 && DBUS_VERSION_MICRO >= 1) || (DBUS_VERSION_MAJOR == 1 && DBUS_VERSION_MAJOR > 1) || (DBUS_VERSION_MAJOR > 1)
+     int fd = dbus_watch_get_unix_fd(watch);
++#else
++    int fd = dbus_watch_get_fd(watch);
++#endif
+ 
+     if (cs->n <= fd)
+         cs->n = fd + 1;
+@@ -1057,7 +1061,11 @@
+     dbus_watch_set_data(watch, cs, no_free);
+ 
+     if (cs->dh != 0L)
++#if (DBUS_VERSION_MAJOR == 1 && DBUS_VERSION_MINOR == 1 && DBUS_VERSION_MICRO >= 1) || (DBUS_VERSION_MAJOR == 1 && DBUS_VERSION_MAJOR > 1) || (DBUS_VERSION_MAJOR > 1)
+         (*(cs->dh)) ("add_watch: %d", dbus_watch_get_unix_fd (watch));
++#else
++        (*(cs->dh)) ("add_watch: %d", dbus_watch_get_fd(watch));
++#endif
+ 
+     if (tsearch((const void *) watch, &(cs->watches), ptr_key_comparator) == 0L) {
+         if (cs->eh != 0L)
+@@ -1074,14 +1082,22 @@
+ static void remove_watch(DBusWatch * watch, void *csp)
+ {
+     DBusConnectionState *cs = csp;
++#if (DBUS_VERSION_MAJOR == 1 && DBUS_VERSION_MINOR == 1 && DBUS_VERSION_MICRO >= 1) || (DBUS_VERSION_MAJOR == 1 && DBUS_VERSION_MAJOR > 1) || (DBUS_VERSION_MAJOR > 1)
+     int fd = dbus_watch_get_unix_fd(watch);
++#else
++    int fd = dbus_watch_get_fd(watch);
++#endif
+ 
+     if (tdelete((const void *) watch, &(cs->watches), ptr_key_comparator) == 0L)
+         if (cs->eh != 0L)
+             (*(cs->eh)) ("remove_watch: can't happen?!?: watch not found");
+ 
+     if (cs->dh != 0L)
++#if (DBUS_VERSION_MAJOR == 1 && DBUS_VERSION_MINOR == 1 && DBUS_VERSION_MICRO >= 1) || (DBUS_VERSION_MAJOR == 1 && DBUS_VERSION_MAJOR > 1) || (DBUS_VERSION_MAJOR > 1)
+         (*(cs->dh)) ("remove_watch: %d", dbus_watch_get_unix_fd(watch));
++#else
++        (*(cs->dh)) ("remove_watch: %d", dbus_watch_get_fd(watch));
++#endif
+ 
+     FD_CLR(fd, &(cs->r_fds));
+     FD_CLR(fd, &(cs->w_fds));
+@@ -1092,7 +1108,11 @@
+     DBusConnectionState *cs = csp;
+ 
+     if (cs->dh != 0L)
++#if (DBUS_VERSION_MAJOR == 1 && DBUS_VERSION_MINOR == 1 && DBUS_VERSION_MICRO >= 1) || (DBUS_VERSION_MAJOR == 1 && DBUS_VERSION_MAJOR > 1) || (DBUS_VERSION_MAJOR > 1)
+         (*(cs->dh)) ("toggle_watch: %d", dbus_watch_get_unix_fd(watch));
++#else
++        (*(cs->dh)) ("toggle_watch: %d", dbus_watch_get_fd(watch));
++#endif
+ 
+     set_watch_fds(watch, cs);
+ }
+@@ -1114,11 +1134,19 @@
+         if (!dbus_watch_get_enabled(w))
+             return;
+ 
++#if (DBUS_VERSION_MAJOR == 1 && DBUS_VERSION_MINOR == 1 && DBUS_VERSION_MICRO >= 1) || (DBUS_VERSION_MAJOR == 1 && DBUS_VERSION_MAJOR > 1) || (DBUS_VERSION_MAJOR > 1)
+         fd = dbus_watch_get_unix_fd(w);
++#else
++        fd = dbus_watch_get_fd(w);
++#endif
+         flags = dbus_watch_get_flags(w);
+ 
+         if (cs->dh != 0L)
++#if (DBUS_VERSION_MAJOR == 1 && DBUS_VERSION_MINOR == 1 && DBUS_VERSION_MICRO >= 1) || (DBUS_VERSION_MAJOR == 1 && DBUS_VERSION_MAJOR > 1) || (DBUS_VERSION_MAJOR > 1)
+             (*(cs->dh)) ("handle_watch: %d", dbus_watch_get_unix_fd(w));
++#else
++            (*(cs->dh)) ("handle_watch: %d", dbus_watch_get_fd(w));
++#endif
+ 
+         if ((flags & DBUS_WATCH_READABLE) && (FD_ISSET(fd, &(cs->s_r_fds))))
+             dbus_watch_handle(w, DBUS_WATCH_READABLE);

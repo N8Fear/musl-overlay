@@ -1,6 +1,6 @@
 # Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/eclass/flag-o-matic.eclass,v 1.124 2008/07/03 05:30:54 dberkholz Exp $
+# $Header: /var/cvsroot/gentoo-x86/eclass/flag-o-matic.eclass,v 1.126 2008/11/03 05:52:39 vapier Exp $
 
 # @ECLASS: flag-o-matic.eclass
 # @MAINTAINER:
@@ -54,7 +54,7 @@ setup-allowed-flags() {
 		-m32 -m64 -mabi -mlittle-endian -mbig-endian -EL -EB -fPIC \
 		-mlive-g0 -mcmodel -mstack-bias -mno-stack-bias \
 		-U_FORTIFY_SOURCE -fstrict-overflow \
-		-msecure-plt -D*"
+		-msecure-plt -m*-toc -D*"
 
 	# {C,CXX,F,FC}FLAGS that we are think is ok, but needs testing
 	# NOTE:  currently -Os have issues with gcc3 and K6* arch's
@@ -276,7 +276,7 @@ replace-flags() {
 		&& die "replace-flags takes 2 arguments, not $#"
 
 	local f fset
-	declare -a new_CFLAGS new_CXXFLAGS
+	declare -a new_CFLAGS new_CXXFLAGS new_FFLAGS new_FCFLAGS
 
 	for fset in CFLAGS CXXFLAGS FFLAGS FCFLAGS; do
 		# Looping over the flags instead of using a global
@@ -756,6 +756,7 @@ append-ldflags() {
 		[[ ${flag} == -l* ]] && \
 			ewarn "Appending a library link instruction (${flag}); libraries to link to should not be passed through LDFLAGS"
 	done
+
 	export LDFLAGS="${LDFLAGS} $*"
 	return 0
 }
