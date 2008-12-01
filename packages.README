@@ -1,2 +1,11 @@
-<sys-devel/gcc-4.3
+>sys-devel/gcc-4.3
+>sys-libs/glibc-2.8
+sys-devel/gettext
+sys-apps/net-tools
+sys-libs/gpm
 sys-devel/gdb
+app-editors/nano
+net-misc/netkit-rsh
+=sys-boot/grub-0.97-r7
+>=madia-sound/alsa-tools-1.0.17-r1
+
