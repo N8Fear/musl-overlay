@@ -1,6 +1,6 @@
 # Copyright 1999-2007 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/sys-libs/glibc/files/eblits/src_unpack.eblit,v 1.5 2008/06/08 00:49:09 vapier Exp $
+# $Header: /var/cvsroot/gentoo-x86/sys-libs/glibc/files/eblits/src_unpack.eblit,v 1.7 2008/12/08 01:30:49 vapier Exp $
 
 check_kheader_version() {
 	local version=$(
@@ -12,6 +12,9 @@ check_kheader_version() {
 }
 
 check_nptl_support() {
+	# don't care about the compiler here as we arent using it
+	just_headers && return
+
 	local min_kernel_version=$(KV_to_int "${NPTL_KERN_VER}")
 
 	ebegin "Checking gcc for __thread support"
@@ -33,8 +36,6 @@ check_nptl_support() {
 		fi
 	fi
 
-	# Building fails with too low linux-headers
-	just_headers && return
 	ebegin "Checking linux-headers version (>=${NPTL_KERN_VER})"
 	if ! eend $(check_kheader_version "${min_kernel_version}" ; echo $?) ; then
 		echo
@@ -60,6 +61,7 @@ toolchain-glibc_src_unpack() {
 	unpack_pkg
 
 	cd "${S}"
+	touch locale/C-translit.h #185476 #218003
 	[[ -n ${LT_VER}     ]] && unpack_pkg linuxthreads ${LT_VER}
 	[[ -n ${PORTS_VER}  ]] && unpack_pkg ports ${PORTS_VER}
 	[[ -n ${LIBIDN_VER} ]] && unpack_pkg libidn

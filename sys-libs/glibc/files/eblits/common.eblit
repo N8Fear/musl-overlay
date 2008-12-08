@@ -146,7 +146,7 @@ setup_flags() {
 	# to the glibc build process. See bug #94325
 	filter-flags -fstack-protector
 	filter-flags -D_FORTIFY_SOURCE=2
-	
+
 	if use hardened && gcc-specs-pie ; then
 		# Force PIC macro definition for all compilations since they're all
 		# either -fPIC or -fPIE with the default-PIE compiler.

@@ -1,6 +1,6 @@
 # Copyright 1999-2007 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/sys-libs/glibc/files/eblits/src_compile.eblit,v 1.5 2008/06/23 22:01:23 vapier Exp $
+# $Header: /var/cvsroot/gentoo-x86/sys-libs/glibc/files/eblits/src_compile.eblit,v 1.6 2008/11/29 21:05:49 vapier Exp $
 
 glibc_do_configure() {
 	local myconf
@@ -127,6 +127,12 @@ toolchain-glibc_headers_compile() {
 	local GBUILDDIR=${WORKDIR}/build-${ABI}-${CTARGET}-headers
 	mkdir -p "${GBUILDDIR}"
 	cd "${GBUILDDIR}"
+
+	# if we don't have a compiler yet, we cant really test it now
+	export \
+		libc_cv_mlong_double_128=yes \
+		libc_cv_mlong_double_128ibm=yes \
+		libc_cv_ppc_machine=yes
 
 	# Pick out the correct location for build headers
 	local ports="" myconf="--disable-sanity-checks --enable-hacker-mode"
