@@ -1,6 +1,6 @@
 # Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/net-libs/xulrunner/xulrunner-1.9.0.4-r1.ebuild,v 1.1 2008/11/15 18:25:24 armin76 Exp $
+# $Header: /var/cvsroot/gentoo-x86/net-libs/xulrunner/xulrunner-1.9.0.5.ebuild,v 1.1 2008/12/17 21:33:50 armin76 Exp $
 
 WANT_AUTOCONF="2.1"
 
@@ -62,8 +62,9 @@ src_unpack() {
 	EPATCH_FORCE="yes" \
 	epatch "${WORKDIR}"/patch
 
-	epatch "${FILESDIR}"/xulrunner-1.9-fortify.patch
-
+	# See bug #251818
+	epatch "${FILESDIR}"/xulrunner_path_max.patch
+	
 	eautoreconf || die "failed  running eautoreconf"
 
 	# We need to re-patch this because autoreconf overwrites it
@@ -81,6 +82,11 @@ src_compile() {
 
 	mozconfig_init
 	mozconfig_config
+
+	MEXTENSIONS="default"
+#	if use python; then
+#		MEXTENSIONS="${MEXTENSIONS},python/xpcom"
+#	fi
 
 	mozconfig_annotate '' --enable-extensions="${MEXTENSIONS}"
 	mozconfig_annotate '' --disable-mailnews
@@ -115,13 +121,14 @@ src_compile() {
 	# Finalize and report settings
 	mozconfig_final
 
+	# Removd the filtring see bug #251471 and #83511
 	# -fstack-protector breaks us
-	if gcc-version ge 4 1; then
-		gcc-specs-ssp && append-flags -fno-stack-protector
-	else
-		gcc-specs-ssp && append-flags -fno-stack-protector-all
-	fi
-	filter-flags -fstack-protector -fstack-protector-all
+#	if gcc-version ge 4 1; then
+#		gcc-specs-ssp && append-flags -fno-stack-protector
+#	else
+#		gcc-specs-ssp && append-flags -fno-stack-protector-all
+#	fi
+#	filter-flags -fstack-protector -fstack-protector-all
 
 	####################################
 	#
@@ -162,3 +169,4 @@ src_install() {
 	    rm -f "${D}"${MOZILLA_FIVE_HOME}/javaxpcom.jar
 	fi
 }
+
