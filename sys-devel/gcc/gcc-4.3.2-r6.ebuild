@@ -10,7 +10,7 @@ ETYPE="gcc-compiler"
 # Hardened gcc 4 stuff
 PIE_VER="10.1.4"
 PIE_GCC_VER="4.3.2"
-SPECS_VER="0.9.1"
+SPECS_VER="0.9.2"
 SPECS_GCC_VER="4.3.2"
 
 # arch/libc configurations known to be stable or untested with {PIE,SSP,FORTIFY}-by-default
