@@ -1,6 +1,6 @@
 # Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/eclass/flag-o-matic.eclass,v 1.126 2008/11/03 05:52:39 vapier Exp $
+# $Header: /var/cvsroot/gentoo-x86/eclass/flag-o-matic.eclass,v 1.127 2008/12/21 21:40:49 solar Exp $
 
 # @ECLASS: flag-o-matic.eclass
 # @MAINTAINER:
@@ -11,6 +11,8 @@
 # and safely manage toolchain flags in their builds.
 
 inherit eutils toolchain-funcs multilib
+___ECLASS_RECUR_FLAG_O_MATIC="yes"
+[[ -z ${___ECLASS_RECUR_HARDENED_FUNCS} ]] && inherit hardened-funcs
 
 ################ DEPRECATED functions ################
 # The following are still present to avoid breaking existing
@@ -25,6 +27,7 @@ inherit eutils toolchain-funcs multilib
 # has_ssp_all
 # has_ssp
 
+# _filter_hardened is moved to hardened-funcs
 
 # {C,CXX,F,FC}FLAGS that we allow in strip-flags
 # Note: shell globs and character lists are allowed
@@ -33,17 +36,15 @@ setup-allowed-flags() {
 		export ALLOWED_FLAGS="-pipe"
 		export ALLOWED_FLAGS="${ALLOWED_FLAGS} -O -O0 -O1 -O2 -mcpu -march -mtune"
 		export ALLOWED_FLAGS="${ALLOWED_FLAGS} -fstack-protector -fstack-protector-all"
-		export ALLOWED_FLAGS="${ALLOWED_FLAGS} -fbounds-checking"
+		export ALLOWED_FLAGS="${ALLOWED_FLAGS} -fbounds-checking -fno-strict-overflow"
 		export ALLOWED_FLAGS="${ALLOWED_FLAGS} -fno-PIE -fno-pie -fno-unit-at-a-time"
 		export ALLOWED_FLAGS="${ALLOWED_FLAGS} -g -g[0-9] -ggdb -ggdb[0-9] -gstabs -gstabs+"
 		export ALLOWED_FLAGS="${ALLOWED_FLAGS} -fno-ident"
 		export ALLOWED_FLAGS="${ALLOWED_FLAGS} -W* -w"
-		export ALLOWED_FLAGS="${ALLOWED_FLAGS} -fno-strict-overflow"
-		export ALLOWED_FLAGS="${ALLOWED_FLAGS} -D_FORTIFY_SOURCE=0 -D_FORTIFY_SOURCE=1 -D_FORTIFY_SOURCE=2"
 	fi
 	# allow a bunch of flags that negate features / control ABI
 	ALLOWED_FLAGS="${ALLOWED_FLAGS} -fno-stack-protector -fno-stack-protector-all \
-		-fno-strict-aliasing -fno-bounds-checking"
+		-fno-strict-aliasing -fno-bounds-checking -fstrict-overflow"
 	ALLOWED_FLAGS="${ALLOWED_FLAGS} -mregparm -mno-app-regs -mapp-regs \
 		-mno-mmx -mno-sse -mno-sse2 -mno-sse3 -mno-3dnow \
 		-mips1 -mips2 -mips3 -mips4 -mips32 -mips64 -mips16 \
@@ -53,113 +54,12 @@ setup-allowed-flags() {
 		-mflat -mno-flat -mno-faster-structs -mfaster-structs \
 		-m32 -m64 -mabi -mlittle-endian -mbig-endian -EL -EB -fPIC \
 		-mlive-g0 -mcmodel -mstack-bias -mno-stack-bias \
-		-U_FORTIFY_SOURCE -fstrict-overflow \
-		-msecure-plt -m*-toc -D*"
+		-msecure-plt -m*-toc -D* -U*"
 
 	# {C,CXX,F,FC}FLAGS that we are think is ok, but needs testing
 	# NOTE:  currently -Os have issues with gcc3 and K6* arch's
 	export UNSTABLE_FLAGS="-Os -O3 -freorder-blocks"
 	return 0
-}
-
-# Return true if the HFILTER_CONTROL permits the requested filter
-# _hfilter_allowed <category/pf> <pie|ssp|relro|now|fortify>
-_hfilter_allowed() {
-	[[ -z ${HFILTER_CONTROL} ]] && return 0
-	[[ $(awk -v CPF="$1" -v TYPE="$2" 'BEGIN { ok=0 }
-$1=="allow" && CPF~$2 && TYPE==$3 { ok=0 }
-$1=="deny" && CPF~$2 && TYPE==$3 { ok=1 }
-END { print ok }' ${HFILTER_CONTROL}) == 0 ]]
-}
-
-# Internal function for _filter-hardened
-# _manage_hardened <flag being filtered> <minispec to use> <cflag to use>
-_manage-hardened() {
-	local filter=$1 newspec=$2
-	[[ -z $3 ]] && die "Internal flag-o-matic error ($*) - please report"
-
-	if ! $(_hfilter_allowed ${CATEGORY}/${PF} ${newspec/no}); then
-		ewarn "Hardened compiler filter $1 requested by ebuild - ignored by request in ${HFILTER_CONTROL}"
-		return 0
-	fi
-
-	if _gcc-specs-exists ${newspec}.specs; then
-		[[ -z ${GCC_SPECS} ]] || newspec=":${newspec}"
-		export GCC_SPECS="${GCC_SPECS}${newspec}.specs"
-		elog "Hardened compiler filtered $1 - GCC_SPECS set to ${GCC_SPECS}"
-	else
-		local oldspec=${GCC_SPECS/*\/} newspec=""
-		case $2 in
-			"nopie")
-				case ${oldspec} in
-					"" | "hardened.specs")
-						newspec="hardenednopie.specs";;
-					"hardenednossp.specs")
-						newspec="hardenednopiessp.specs";;
-				esac
-				;;
-			"nossp" | "nosspall")
-				case ${oldspec} in
-					"" | "hardened.specs")
-						newspec="hardenednossp.specs";;
-					"hardenednopie.specs")
-						newspec="hardenednopiessp.specs";;
-				esac
-				;;
-			"noznow" | "nozrelro")
-				newspec="vanilla.specs";;
-			*)
-				die "Internal flag-o-matic.eclass error - unrecognised hardened filter $2"
-				;;
-		esac
-		if [[ -n ${newspec} ]]; then
-			if _gcc-specs-exists ${newspec}; then
-				export GCC_SPECS="${newspec}"
-				elog "Hardened compiler filtered $1 - GCC_SPECS set to ${GCC_SPECS}"
-			else
-				# This can happen if the compiler is not built with split-specs
-				#die "Internal flag-o-matic error ($*) - please report"
-				ewarn "Hardened compiler filter $1 requested by ebuild - ignored since neither $2 nor ${newspec} exist"
-			fi
-		else
-			_raw_append_flag $3
-			elog "Hardened compiler filtered $1 - CFLAGS set to ${CFLAGS}"
-		fi
-	fi
-}
-
-# inverted filters for hardened compiler.  This is trying to unpick
-# the hardened compiler defaults.
-_filter-hardened() {
-	local f
-	for f in "$@" ; do
-		case "${f}" in
-			# Ideally we should only concern ourselves with PIE flags,
-			# not -fPIC or -fpic, but too many places filter -fPIC without
-			# thinking about -fPIE.
-			-fPIC|-fpic|-fPIE|-fpie|-Wl,pie|-pie)
-				gcc-specs-pie &&
-					_manage-hardened ${f} nopie -nopie ;;
-			-fstack-protector)
-				gcc-specs-ssp &&
-					_manage-hardened ${f} nossp -fno-stack-protector ;;
-			-fstack-protector-all)
-				gcc-specs-ssp-to-all &&
-					_manage-hardened ${f} nosspall -fno-stack-protector-all ;;
-			-now|-Wl,-z,now)
-				gcc-specs-now &&
-					_manage-hardened ${f} noznow -nonow ;;
-			-relro|-Wl,-z,relro)
-				gcc-specs-now &&
-					_manage-hardened ${f} nozrelro -norelro ;;
-			-D_FORTIFY_SOURCE=2|-D_FORTIFY_SOURCE=1|-D_FORTIFY_SOURCE=0)
-				gcc-specs-fortify &&
-				_manage-hardened ${f} nofortify -U_FORTIFY_SOURCE ;;
-			-fno-strict-overflow)
-				gcc-specs-strict-overflow &&
-					_manage-hardened ${f} strict -fstrict-overflow ;;
-		esac
-	done
 }
 
 # Remove occurrences of strings from variable given in $1
@@ -232,6 +132,7 @@ append-lfs-flags() {
 	[[ -n $@ ]] && die "append-lfs-flags takes no arguments"
 	append-cppflags -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE
 }
+
 # Append flag if the compiler doesn't barf it
 _raw_append_flag() {
 	export CFLAGS="${CFLAGS} $1"
@@ -239,24 +140,12 @@ _raw_append_flag() {
 	export FFLAGS="${FFLAGS} $1"
 	export FCFLAGS="${FCFLAGS} $1" 
 }
-
-# Special case: -fno-stack-protector-all needs special management
-# on hardened gcc-4.
-_append-flag() {
-	[[ -z "$1" ]] && return 0
-	case "$1" in
-	-fno-stack-protector-all)
-	    gcc-specs-ssp-to-all || continue
-		_manage-hardened -fstack-protector-all nosspall "$1" ;;
-	*)
-		_raw_append_flag "$1"
-	esac
-}
-
 # @FUNCTION: append-flags
 # @USAGE: <flags>
 # @DESCRIPTION:
 # Add extra <flags> to your current {C,CXX,F,FC}FLAGS.
+# Call _append_flag in hardened-funcs. Check flag for
+# -fno-stack-protector-all and if not call _raw_append_flag.
 append-flags() {
 	local f
 	[[ -z "$@" ]] && return 0

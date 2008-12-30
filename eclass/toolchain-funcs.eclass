@@ -12,7 +12,7 @@
 # ugly things like cross-compiling and multilib.  All of this is done
 # in such a way that you can rely on the function always returning
 # something sane.
-
+inherit versionator
 ___ECLASS_RECUR_TOOLCHAIN_FUNCS="yes"
 [[ -z ${___ECLASS_RECUR_MULTILIB} ]] && inherit multilib
 
@@ -291,6 +291,7 @@ gcc-minor-version() {
 gcc-micro-version() {
 	gcc-fullversion "$@" | cut -f3 -d. | cut -f1 -d-
 }
+tc_version_is_at_least() { version_is_at_least "$1" "${2:-${GCC_PV}}" ; }
 
 # Returns the installation directory - internal toolchain
 # function for use by _gcc-specs-exists (for flag-o-matic).
