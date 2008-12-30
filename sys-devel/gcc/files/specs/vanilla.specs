@@ -1,7 +1,0 @@
-%include <nopie.specs>
-%include <nossp.specs>
-%include <nosspall.specs>
-%include <nofortify.specs>
-%include <strict.specs>
-%include <nozrelro.specs>
-%include <noznow.specs>

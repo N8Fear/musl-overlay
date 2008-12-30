@@ -1,3 +1,0 @@
-*cc1_strict:
-%{!fstrict-overflow:-fno-strict-overflow}
-

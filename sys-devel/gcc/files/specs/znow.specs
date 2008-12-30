@@ -1,3 +1,0 @@
-*link_now:
-%{!nonow:-z now}
-
