@@ -56,7 +56,7 @@ _manage-hardened() {
 						newspec="hardenednopiessp.specs";;
 				esac
 				;;
-			"noznow" | "nozrelro")
+			"noznow")
 				newspec="vanilla.specs";;
 			*)
 				die "Internal hardened-funcs.eclass error - unrecognised hardened filter $2"
@@ -99,9 +99,6 @@ _filter-hardened() {
 			-now|-Wl,-z,now)
 				gcc-specs-now &&
 					_manage-hardened ${f} noznow -nonow ;;
-			-relro|-Wl,-z,relro)
-				gcc-specs-now &&
-					_manage-hardened ${f} nozrelro -norelro ;;
 			-D_FORTIFY_SOURCE=2|-D_FORTIFY_SOURCE=1|-D_FORTIFY_SOURCE=0)
 				gcc-specs-fortify &&
 				_manage-hardened ${f} nofortify -U_FORTIFY_SOURCE ;;
@@ -553,7 +550,7 @@ setup_minispecs_gcc_build_specs() {
 		if hardened_gcc_works fortify ; then
 			cat "${WORKDIR}"/specs/fortify.specs >> "${WORKDIR}"/build.specs
 		fi
-		for s in nostrict znow zrelro; do
+		for s in nostrict znow ; do
 			cat "${WORKDIR}"/specs/${s}.specs >> "${WORKDIR}"/build.specs
 		done
 		export GCC_SPECS="${WORKDIR}"/build.specs
