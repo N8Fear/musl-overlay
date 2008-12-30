@@ -16,6 +16,34 @@
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
+/* Copyright (C) 2006-2008 Gentoo Foundation Inc.
+ * License terms as above.
+ *
+ * Hardened Gentoo SSP and FORTIFY handler
+ *
+ * An SSP failure handler that does not use functions from the rest of
+ * glibc; it uses the INTERNAL_SYSCALL methods directly.  This ensures
+ * no possibility of recursion into the handler.
+ *
+ * Direct all bug reports to http://bugs.gentoo.org/
+ *
+ * Re-written from the glibc-2.3 Hardened Gentoo SSP handler
+ * by Kevin F. Quinn - <kevquinn[@]gentoo.org>
+ *
+ * The following people contributed to the glibc-2.3 Hardened
+ * Gentoo SSP and FORTIFY handler, from which this implementation draws much:
+ *
+ * Ned Ludd - <solar[@]gentoo.org>
+ * Alexander Gabert - <pappy[@]gentoo.org>
+ * The PaX Team - <pageexec[@]freemail.hu>
+ * Peter S. Mazinger - <ps.m[@]gmx.net>
+ * Yoann Vandoorselaere - <yoann[@]prelude-ids.org>
+ * Robert Connolly - <robert[@]linuxfromscratch.org>
+ * Cory Visi <cory[@]visi.name>
+ * Mike Frysinger <vapier[@]gentoo.org>
+ * Magnus Granberg <zorry[@]ume.nu>
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>

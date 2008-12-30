@@ -1,6 +1,6 @@
 # Copyright 1999-2007 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/sys-libs/glibc/files/eblits/common.eblit,v 1.6 2008/06/22 14:05:56 bluebird Exp $
+# $Header: /var/cvsroot/gentoo-x86/sys-libs/glibc/files/eblits/common.eblit,v 1.7 2008/12/23 11:59:43 bluebird Exp $
 
 # We need to be able to set alternative headers for
 # compiling for non-native platform
@@ -99,12 +99,27 @@ setup_flags() {
 			append-flags "-fcall-used-g6"
 			filter-flags "-mvis"
 
+			GLIBCMAJOR=$(get_version_component_range 1 ${PV})
+			GLIBCMINOR=$(get_version_component_range 2 ${PV})
+
+			# set CTARGET_OPT so glibc can use cpu-specific .S files for better performance
+			# - UltraSPARC T1 (niagara) support requires >= glibc 2.8
+			# - UltraSPARC T2 (niagara2) support requires >= glibc 2.7
+
 			if is_crosscompile || [[ ${PROFILE_ARCH} == "sparc64" ]] || { has_multilib_profile && ! tc-is-cross-compiler; } ; then
 				case ${ABI} in
 					sparc64)
 						filter-flags -Wa,-xarch -Wa,-A
 
-						if is-flag "-mcpu=ultrasparc3"; then
+						if is-flagq "-mcpu=niagara2" && [[ ${GLIBCMAJOR}.${GLIBCMINOR} > 2.7 ]] ; then
+							CTARGET_OPT="sparc64v2-unknown-linux-gnu"
+							append-flags "-Wa,-xarch=v9b"
+							export ASFLAGS="${ASFLAGS} -Wa,-xarch=v9b"
+						elif { is-flagq "-mcpu=niagara" || is-flagq "-mcpu=niagara2" ; } && [[ ${GLIBCMAJOR}.${GLIBCMINOR} > 2.6 ]] ; then
+							CTARGET_OPT="sparc64v-unknown-linux-gnu"
+							append-flags "-Wa,-xarch=v9b"
+							export ASFLAGS="${ASFLAGS} -Wa,-xarch=v9b"
+						elif is-flagq "-mcpu=ultrasparc3" || is-flagq "-mcpu=niagara" || is-flagq "-mcpu=niagara2"; then
 							CTARGET_OPT="sparc64b-unknown-linux-gnu"
 							append-flags "-Wa,-xarch=v9b"
 							export ASFLAGS="${ASFLAGS} -Wa,-xarch=v9b"
@@ -115,7 +130,11 @@ setup_flags() {
 						fi
 					;;
 					*)
-						if is-flag "-mcpu=ultrasparc3"; then
+						if is-flagq "-mcpu=niagara2" && [[ ${GLIBCMAJOR}.${GLIBCMINOR} > 2.7 ]] ; then
+							CTARGET_OPT="sparcv9v2-unknown-linux-gnu"
+						elif { is-flagq "-mcpu=niagara" || is-flagq "-mcpu=niagara2" ; } && [[ ${GLIBCMAJOR}.${GLIBCMINOR} > 2.6 ]] ; then
+							CTARGET_OPT="sparcv9v-unknown-linux-gnu"
+						elif is-flagq "-mcpu=ultrasparc3" || is-flagq "-mcpu=niagara" || is-flagq "-mcpu=niagara2"; then
 							CTARGET_OPT="sparcv9b-unknown-linux-gnu"
 						else
 							CTARGET_OPT="sparcv9-unknown-linux-gnu"
@@ -123,9 +142,13 @@ setup_flags() {
 					;;
 				esac
 			else
-				if is-flag "-mcpu=ultrasparc3"; then
+				if is-flagq "-mcpu=niagara2" && [[ ${GLIBCMAJOR}.${GLIBCMINOR} > 2.7 ]] ; then
+					CTARGET_OPT="sparcv9v2-unknown-linux-gnu"
+				elif { is-flagq "-mcpu=niagara" || is-flagq "-mcpu=niagara2" ; } && [[ ${GLIBCMAJOR}.${GLIBCMINOR} > 2.6 ]] ; then
+					CTARGET_OPT="sparcv9v-unknown-linux-gnu"
+				elif is-flagq "-mcpu=ultrasparc3" || is-flagq "-mcpu=niagara" || is-flagq "-mcpu=niagara2"; then
 					CTARGET_OPT="sparcv9b-unknown-linux-gnu"
-				elif { is_crosscompile && want_nptl; } || is-flag "-mcpu=ultrasparc2" || is-flag "-mcpu=ultrasparc"; then
+				elif { is_crosscompile && want_nptl; } || is-flagq "-mcpu=ultrasparc2" || is-flagq "-mcpu=ultrasparc"; then
 					CTARGET_OPT="sparcv9-unknown-linux-gnu"
 				fi
 			fi
@@ -146,7 +169,7 @@ setup_flags() {
 	# to the glibc build process. See bug #94325
 	filter-flags -fstack-protector
 	filter-flags -D_FORTIFY_SOURCE=2
-
+	
 	if use hardened && gcc-specs-pie ; then
 		# Force PIC macro definition for all compilations since they're all
 		# either -fPIC or -fPIE with the default-PIE compiler.
