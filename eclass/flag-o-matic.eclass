@@ -146,6 +146,7 @@ _raw_append_flag() {
 # Add extra <flags> to your current {C,CXX,F,FC}FLAGS.
 # Call _append_flag in hardened-funcs. Check flag for
 # -fno-stack-protector-all and if not call _raw_append_flag.
+# GCC >4.1 don't support -fno-stack-protector
 append-flags() {
 	local f
 	[[ -z "$@" ]] && return 0
@@ -655,7 +656,6 @@ append-ldflags() {
 # @DESCRIPTION:
 # Remove particular <flags> from LDFLAGS.  Accepts shell globs.
 filter-ldflags() {
-	_filter-hardened "$@"
 	_filter-var LDFLAGS "$@"
 	return 0
 }

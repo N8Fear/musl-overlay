@@ -11,70 +11,19 @@ ___ECLASS_RECUR_HARDENED_FUNCS="yes"
 [[ -z ${___ECLASS_RECUR_FLAG_O_MATIC} ]] && inherit flag-o-matic
 
 # Stuff for flag-o-matic.eclass
-# Return true if the HFILTER_CONTROL permits the requested filter
-# _hfilter_allowed <category/pf> <pie|ssp|relro|now|fortify|strict>
-_hfilter_allowed() {
-	[[ -z ${HFILTER_CONTROL} ]] && return 0
-	[[ $(awk -v CPF="$1" -v TYPE="$2" 'BEGIN { ok=0 }
-$1=="allow" && CPF~$2 && TYPE==$3 { ok=0 }
-$1=="deny" && CPF~$2 && TYPE==$3 { ok=1 }
-END { print ok }' ${HFILTER_CONTROL}) == 0 ]]
-}
-
 # Internal function for _filter-hardened
 # _manage_hardened <flag being filtered> <minispec to use> <cflag to use>
 _manage-hardened() {
 	local filter=$1 newspec=$2
-	[[ -z $3 ]] && die "Internal hardened-funcs error ($*) - please report"
-
-	if ! $(_hfilter_allowed ${CATEGORY}/${PF} ${newspec/no}); then
-		ewarn "Hardened compiler filter $1 requested by ebuild - ignored by request in ${HFILTER_CONTROL}"
-		return 0
-	fi
-
+	[[ -z $3 ]] && die "Internal hardened-funcs error - please report"
 	if _gcc-specs-exists ${newspec}.specs; then
 		[[ ${GCC_SPECS} == *${newspec}* ]] && return 0
 		[[ -z ${GCC_SPECS} ]] || newspec=":${newspec}"
 		export GCC_SPECS="${GCC_SPECS}${newspec}.specs"
 		elog "Hardened compiler filtered $1 - GCC_SPECS set to ${GCC_SPECS}"
 	else
-		local oldspec=${GCC_SPECS/*\/} newspec=""
-		case $2 in
-			"nopie")
-				case ${oldspec} in
-					"" | "hardened.specs")
-						newspec="hardenednopie.specs";;
-					"hardenednossp.specs")
-						newspec="hardenednopiessp.specs";;
-				esac
-				;;
-			"nossp" | "nosspall")
-				case ${oldspec} in
-					"" | "hardened.specs")
-						newspec="hardenednossp.specs";;
-					"hardenednopie.specs")
-						newspec="hardenednopiessp.specs";;
-				esac
-				;;
-			"noznow")
-				newspec="vanilla.specs";;
-			*)
-				die "Internal hardened-funcs.eclass error - unrecognised hardened filter $2"
-				;;
-		esac
-		if [[ -n ${newspec} ]]; then
-			if _gcc-specs-exists ${newspec}; then
-				export GCC_SPECS="${newspec}"
-				elog "Hardened compiler filtered $1 - GCC_SPECS set to ${GCC_SPECS}"
-			else
-				# This can happen if the compiler is not built with split-specs
-				#die "Internal hardend-funcs error ($*) - please report"
-				ewarn "Hardened compiler filter $1 requested by ebuild - ignored since neither $2 nor ${newspec} exist"
-			fi
-		else
-			_raw_append_flag $3
-			elog "Hardened compiler filtered $1 - CFLAGS set to ${CFLAGS}"
-		fi
+		_raw_append_flag $3
+		elog "Hardened compiler filtered $1 - $3 Added to XXFLAGS"
 	fi
 }
 
@@ -88,23 +37,15 @@ _filter-hardened() {
 			# not -fPIC or -fpic, but too many places filter -fPIC without
 			# thinking about -fPIE.
 			-fPIC|-fpic|-fPIE|-fpie|-Wl,pie|-pie)
-				gcc-specs-pie &&
-					_manage-hardened ${f} nopie -nopie ;;
+				gcc-specs-pie && _manage-hardened ${f} nopie -nopie ;;
 			-fstack-protector)
-				gcc-specs-ssp &&
-					_manage-hardened ${f} nossp -fno-stack-protector ;;
+				gcc-specs-ssp && _manage-hardened ${f} nossp -fno-stack-protector ;;
 			-fstack-protector-all)
-				gcc-specs-ssp-to-all &&
-					_manage-hardened ${f} nosspall -fno-stack-protector-all ;;
-			-now|-Wl,-z,now)
-				gcc-specs-now &&
-					_manage-hardened ${f} noznow -nonow ;;
+				gcc-specs-ssp-to-all && _manage-hardened ${f} nosspall -fno-stack-protector-all ;;
 			-D_FORTIFY_SOURCE=2|-D_FORTIFY_SOURCE=1|-D_FORTIFY_SOURCE=0)
-				gcc-specs-fortify &&
-				_manage-hardened ${f} nofortify -U_FORTIFY_SOURCE ;;
+				gcc-specs-fortify && _manage-hardened ${f} nofortify -U_FORTIFY_SOURCE ;;
 			-fno-strict-overflow)
-				gcc-specs-strict-overflow &&
-					_manage-hardened ${f} strict -fstrict-overflow ;;
+				gcc-specs-strict-overflow && _manage-hardened ${f} strict -fstrict-overflow ;;
 		esac
 	done
 }
@@ -185,8 +126,8 @@ get_gcc_src_uri_hardened() {
 		)"
 	# gcc minispec for the hardened gcc 4 compiler
         [[ -n ${SPECS_VER} ]] && \
-                GCC_SRC_URI="${GCC_SRC_URI} !nopie? ( $(gentoo_urls gcc-${SPECS_GCC_VER}-default-specs-${SPECS_VER}.tar.bz2)
-			http://weaver.gentooenterprise.com/hardened/patches/gcc-${SPECS_GCC_VER}-default-specs-${SPECS_VER}.tar.bz2
+                GCC_SRC_URI="${GCC_SRC_URI} !nopie? ( $(gentoo_urls gcc-${SPECS_GCC_VER}-specs-${SPECS_VER}.tar.bz2)
+			http://weaver.gentooenterprise.com/hardened/patches/gcc-${SPECS_GCC_VER}-specs-${SPECS_VER}.tar.bz2
 		)"
 }
 # The gentoo piessp patches allow for 4 configurations:
@@ -635,7 +576,7 @@ hardened_gcc_quick_unpack() {
 			unpack gcc-${PIE_GCC_VER}-piepatches-v${PIE_VER}.tar.bz2
 		fi
 		[[ -n ${SPECS_VER} ]] && \
-			unpack gcc-${SPECS_GCC_VER}-default-specs-${SPECS_VER}.tar.bz2
+			unpack gcc-${SPECS_GCC_VER}-specs-${SPECS_VER}.tar.bz2
 	fi
 }
 # Try to apply some stub patches so that gcc won't error out when
@@ -720,7 +661,7 @@ do_gcc_SSP_patches() {
 	
 	if hardened_gcc_works ssp && use hardened ; then
 	    if gcc_has_native_ssp ; then
-	    	BRANDING_GCC_PKGVERSION="${BRANDING_GCC_PKGVERSION}, builtin ssp"
+	    	BRANDING_GCC_PKGVERSION="${BRANDING_GCC_PKGVERSION}, ssp"
 	    else
 		BRANDING_GCC_PKGVERSION="${BRANDING_GCC_PKGVERSION}, ssp-${PP_FVER:-${PP_GCC_VER}-${PP_VER}}"
 	    fi
@@ -759,12 +700,8 @@ update_gcc_for_libssp() {
 }
 # do various updates to FORTIFY
 do_gcc_FORTIFY_patches() {
-	if hardened_gcc_works fortify && hardened_gcc_works ssp && gcc_has_native_ssp && use hardened ; then
+	if hardened_gcc_works fortify ; then
 	BRANDING_GCC_PKGVERSION="${BRANDING_GCC_PKGVERSION}, fortify"
-	fi
-	
-	if hardened_gcc_works fortify && use hardened && ! gcc_has_native_ssp ; then
-	BRANDING_GCC_PKGVERSION="${BRANDING_GCC_PKGVERSION}, builtin fortify"
 	fi
 }
 # do various updates to PIE logic

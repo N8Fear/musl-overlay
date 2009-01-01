@@ -1648,7 +1648,7 @@ do_gcc_config() {
 # URL without needing to use patches.
 gcc_version_patch() {
 	# gcc-4.3+ has configure flags (whoo!)
-	tc_version_is_at_least 4.3 && einfo "Building${version_string} (${BRANDING_GCC_PKGVERSION})" && return 0
+	tc_version_is_at_least 4.3 && einfo "Building ${version_string} (${BRANDING_GCC_PKGVERSION})" && return 0
 	
 	local version_string=${GCC_CONFIG_VER}
 	[[ -n ${BRANCH_UPDATE} ]] && version_string="${version_string} ${BRANCH_UPDATE}"

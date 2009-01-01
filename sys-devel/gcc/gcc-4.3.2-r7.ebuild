@@ -8,9 +8,9 @@ UCLIBC_VER="1.0"
 ETYPE="gcc-compiler"
 
 # Hardened gcc 4 stuff
-PIE_VER="10.1.4"
+PIE_VER="10.2.0"
 PIE_GCC_VER="4.3.2"
-SPECS_VER="0.9.2"
+SPECS_VER="0.9.10"
 SPECS_GCC_VER="4.3.2"
 
 # arch/libc configurations known to be stable or untested with {PIE,SSP,FORTIFY}-by-default
@@ -20,11 +20,6 @@ PIE_GLIBC_STABLE="x86 amd64 ppc ppc64"
 PIE_UCLIBC_STABLE=""
 FORTIFY_STABLE="x86 amd64 ppc ppc64"
 FORTIFY_UCLIBC_STABLE=""
-
-# This patch is obsoleted by stricter control over how one builds a hardened
-# compiler from a vanilla compiler.  By forbidding changing from normal to
-# hardened between gcc stages, this is no longer necessary.
-GENTOO_PATCH_EXCLUDE="51_all_gcc-3.4-libiberty-pic.patch"
 # Hardened end
 
 inherit toolchain
