@@ -45,7 +45,7 @@ _filter-hardened() {
 			-D_FORTIFY_SOURCE=2|-D_FORTIFY_SOURCE=1|-D_FORTIFY_SOURCE=0)
 				gcc-specs-fortify && _manage-hardened ${f} nofortify -U_FORTIFY_SOURCE ;;
 			-fno-strict-overflow)
-				gcc-specs-strict-overflow && _manage-hardened ${f} strict -fstrict-overflow ;;
+				gcc-specs-strict && _manage-hardened ${f} strict -fstrict-overflow ;;
 		esac
 	done
 }
@@ -293,10 +293,10 @@ want_libssp() {
 	[[ -n ${PP_VER} ]] || return 1
 	return 0
 }
+# gcc 4.1 and above have native ssp support but we have started with 4.3.2 for hardened
 gcc_has_native_ssp() {
-	[[ ${GCCMAJOR} -lt 4 ]] && return 1
-        # gcc 4.1 and above have native ssp support but we have started with 4.3.2 for hardened
-        tc_version_is_at_least 4.3.2 && [[ -z ${PP_VER} ]] && return 0
+	tc_version_is_at_least 4.3.2 && use hardened || return 1
+        [[ -z ${PP_VER} ]] && [[ -n ${SPECS_VER} ]] && use !nossp && return 0
         return 1
 }
 _want_stuff() {
@@ -305,14 +305,14 @@ _want_stuff() {
 	use ${flag} && return 0
 	return 1
 }
-if tc_version_is_at_least 4.3.2 ; then
-	# We don't use SPLIT_SPECS and it only will applay to USE=hardened
-	# so we don't mess with default and vanilla
-	want_ssp() { use hardened && [[ -n ${SPECS_VER} ]] && gcc_has_native_ssp || _want_stuff PP_VER !nossp ; }
-else
-	# For hardened gcc 3.4
-	want_ssp() { _want_stuff PP_VER !nossp ; }
-fi
+want_ssp() { 
+	if tc_version_is_at_least 4.3.2 && use hardened ; then
+		gcc_has_native_ssp || _want_stuff PP_VER !nossp && return 0
+		return 1
+	else
+	_want_stuff PP_VER !nossp && return 0 || return 1
+	fi
+}
 want_pie() { _want_stuff PIE_VER !nopie ; }
 want_boundschecking() { _want_stuff HTB_VER boundschecking ; }
 want_split_specs() { [[ ${SPLIT_SPECS} == "true" ]] && want_pie ; }
@@ -320,11 +320,8 @@ want_split_specs() { [[ ${SPLIT_SPECS} == "true" ]] && want_pie ; }
 want_fortify() { use hardened && libc_has_fortify && tc_version_is_at_least 4.2 && [[ -n ${SPECS_VER} ]] ; }
 want_minispecs() { 
 	if tc_version_is_at_least 4.3.2 && use hardened ; then
-		if [[ -n ${SPECS_VER} ]] ; then
-			return 0 
-		else
-			die "For Hardend to work you need the minispecs files"
-		fi
+		[[ -n ${SPECS_VER} ]] && want_pie && return 0 
+		die "For Hardend to work you need the minispecs files and have the PIE patch"
 	fi
 	return 1	
 }
@@ -417,6 +414,9 @@ make_gcc_hard() {
 		ebeep
 		return 0
 	fi
+	
+	# Rebrand to make bug reports easier
+	BRANDING_GCC_PKGVERSION=${BRANDING_GCC_PKGVERSION/Gentoo/Gentoo Hardened}
 }
 
 # now we generate different spec files so that the user can select a compiler
@@ -470,10 +470,12 @@ hardened_compiler_src_unpack_setup() {
 	# the necessary support
 	want_pie && use hardened && glibc_have_pie
 
-	want_pie && use hardened && BRANDING_GCC_PKGVERSION=${BRANDING_GCC_PKGVERSION/Gentoo/Gentoo Hardened}
+	# Rebrand to make bug reports easier if we have minispecs enable
+	want_minispecs && BRANDING_GCC_PKGVERSION=${BRANDING_GCC_PKGVERSION/Gentoo/Gentoo Hardened}
+	
 	# For the old gcc < 3.4
-	if use hardened && ! want_minispecs ; then
-		einfo "updating configuration to build hardened GCC gcc-3 style"
+	if ! tc_version_is_at_least 4.0 && ! want_minispecs ; then
+		einfo "updating configuration to build GCC gcc-3 style"
 		make_gcc_hard || die "failed to make gcc hard"
 	fi
 }
@@ -563,10 +565,6 @@ hardened_gcc_quick_unpack() {
 		if [[ -n ${PP_VER} ]] ; then
 			unpack gcc-${PP_GCC_VER}-ssp-${PP_VER}.tar.bz2
 		fi
-		# GCC 4.1 have built in SSP so need to have patch
-		if gcc_has_native_ssp && use hardened && hardened_gcc_works ssp ; then
-			    einfo "No need for ssp patch for using the built in ssp"
-		fi
 	fi
 
 	if want_pie ; then
@@ -593,8 +591,10 @@ do_gcc_stub() {
 	done
 }
 # patch in ProPolice Stack Smashing protection
+# GCC >4.1 have built in SSP support but may need some patch later.
 do_gcc_SSP_patches() {
-	# PARISC has no love ... it's our stack :(
+if ! tc_version_is_at_least 4.3.2 ; then
+		# PARISC has no love ... it's our stack :(
 	if [[ $(tc-arch) == "hppa" ]] || \
 	   ! want_ssp || \
 	   (want_boundschecking && [[ ${HTB_EXCLUSIVE} == "true" ]])
@@ -622,66 +622,53 @@ do_gcc_SSP_patches() {
 			ssppatch="${S}/protector.dif"
 			sspdocs="no"
 		fi
-	fi
-
-	if [[ -n ${PP_VER} ]] ; then
+	else
 		# Just start packaging the damn thing ourselves
-		if [[ ${GCCMAJOR}.${GCCMINOR} < 4.0 ]] ; then
-			mv "${WORKDIR}"/ssp/protector.{c,h} "${S}"/gcc/
-		fi
+		mv "${WORKDIR}"/ssp/protector.{c,h} "${S}"/gcc/
 		ssppatch=${WORKDIR}/ssp/gcc-${PP_GCC_VER}-ssp.patch
 		# allow boundschecking and ssp to get along
 		(want_boundschecking && [[ -e ${WORKDIR}/ssp/htb-ssp.patch ]]) \
-		    && patch -s "${ssppatch}" "${WORKDIR}"/ssp/htb-ssp.patch
-		fi
-
-	if [[ -n ${ssppatch} ]] ; then
-		epatch ${ssppatch}
-	else
-		! gcc_has_native_ssp && die "Sorry, SSP is not supported in this version"
+			&& patch -s "${ssppatch}" "${WORKDIR}"/ssp/htb-ssp.patch
 	fi
+
+	[[ -z ${ssppatch} ]] && die "Sorry, SSP is not supported in this version"
+	epatch ${ssppatch}
 
 	if [[ ${PN} == "gcc" && ${sspdocs} == "no" ]] ; then
 		epatch "${GCC_FILESDIR}"/pro-police-docs.patch
 	fi
 
-	# Don't build crtbegin/end with ssp.
-	# On gcc >=4.3 it is moved to the piepatch.
-	if tc_version_is_at_least 3.4 && [[ ${GCCMAJOR}.${GCCMINOR} < 4.3 ]] ; then
-		sed -e 's|^CRTSTUFF_CFLAGS = |CRTSTUFF_CFLAGS = -fno-stack-protector |' \
-			-i gcc/Makefile.in || die "Failed to update crtstuff!"
-	fi
+	# Don't build crtbegin/end with ssp
+	sed -e 's|^CRTSTUFF_CFLAGS = |CRTSTUFF_CFLAGS = -fno-stack-protector |'\
+		-i gcc/Makefile.in || die "Failed to update crtstuff!"
+
 	# if gcc in a stage3 defaults to ssp, is version 3.4.0 and a stage1 is built
 	# the build fails building timevar.o w/:
 	# cc1: stack smashing attack in function ix86_split_to_parts()
-	# On gcc >=4.3 it is moved to the piepatch.
-	if tc_version_is_at_least 3.4.0 && [[ ${GCCMAJOR}.${GCCMINOR} < 4.3 ]] ; then
-		epatch "${GCC_FILESDIR}"/3.4.0/gcc-3.4.0-cc1-no-stack-protector.patch
-	fi
-	
-	if hardened_gcc_works ssp && use hardened ; then
-	    if gcc_has_native_ssp ; then
-	    	BRANDING_GCC_PKGVERSION="${BRANDING_GCC_PKGVERSION}, ssp"
-	    else
-		BRANDING_GCC_PKGVERSION="${BRANDING_GCC_PKGVERSION}, ssp-${PP_FVER:-${PP_GCC_VER}-${PP_VER}}"
-	    fi
-	fi
-	
-	# not needed for newer gcc 4
-	if  [[ ${GCCMAJOR}.${GCCMINOR} < 4.3 ]] ; then
-		if want_libssp ; then
-			update_gcc_for_libssp
-		else
-			update_gcc_for_libc_ssp
+	if use build && tc_version_is_at_least 3.4.0 ; then
+		if gcc -dumpspecs | grep -q "fno-stack-protector:" ; then
+			epatch "${GCC_FILESDIR}"/3.4.0/gcc-3.4.0-cc1-no-stack-protector.patch
 		fi
 	fi
 
-	# Don't build libgcc with ssp.
-	# On gcc >=4.3 it is moved to the piepatch
-	if tc_version_is_at_least 3.4 && [[ ${GCCMAJOR}.${GCCMINOR} < 4.3 ]] ; then
-		sed -e 's|^\(LIBGCC2_CFLAGS.*\)$|\1 -fno-stack-protector |' \
-			-i gcc/Makefile.in || die "Failed to update gcc!"
+	if want_libssp ; then
+		update_gcc_for_libssp
+	else
+		update_gcc_for_libc_ssp
 	fi
+
+	# Don't build libgcc with ssp
+	sed -e 's|^\(LIBGCC2_CFLAGS.*\)$|\1 -fno-stack-protector|' \
+		-i gcc/Makefile.in || die "Failed to update gcc!"
+else
+	if [[ -n ${PP_VER} ]] ; then
+		guess_patch_type_in_dir "${WORKDIR}"/ssp
+                EPATCH_MULTI_MSG="Applying ssp patches ..." \
+                epatch "${WORKDIR}"/ssp
+	fi
+fi
+	gcc_has_native_ssp && BRANDING_GCC_PKGVERSION="${BRANDING_GCC_PKGVERSION}, ssp"
+	[[ -n ${PP_VER} ]] || [[ -n ${PP_FVER} ]] && BRANDING_GCC_PKGVERSION="${BRANDING_GCC_PKGVERSION}, ssp-${PP_FVER:-${PP_GCC_VER}-${PP_VER}}"
 }
 # If glibc or uclibc has been patched to provide the necessary symbols itself,
 # then lets use those for SSP instead of libgcc.

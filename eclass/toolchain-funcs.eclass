@@ -383,7 +383,7 @@ gcc-specs-fortify() {
 	return $([[ ${directive/\{!U_FORTIFY_SOURCE:} != ${directive} ]])
 }
 # Returns true if gcc builds with the fno-strict-overflow
-gcc-specs-strict-overflow() {
+gcc-specs-strict() {
 	local directive
 	directive=$(gcc-specs-directive cc1)
 	return $([[ ${directive/\{!fstrict-overflow:} != ${directive} ]])

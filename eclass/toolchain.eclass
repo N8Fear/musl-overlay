@@ -141,7 +141,7 @@ else
 	if [[ ${PN} != "kgcc64" && ${PN} != gcc-* ]] ; then
 		IUSE="${IUSE} altivec build fortran nls nocxx"
 		[[ -n ${PIE_VER} ]] && IUSE="${IUSE} nopie"
-		[[ -n ${PP_VER}	 ]] && IUSE="${IUSE} nossp"
+		[[ -n ${PP_VER}	 ]] || [[ -n ${SPECS_VER} ]] && IUSE="${IUSE} nossp"
 		[[ -n ${HTB_VER} ]] && IUSE="${IUSE} boundschecking"
 		[[ -n ${D_VER}	 ]] && IUSE="${IUSE} d"
 
@@ -1024,10 +1024,6 @@ gcc_do_make() {
 		# 3 stage bootstrapping doesnt quite work when you cant run the
 		# resulting binaries natively ^^;
 		GCC_MAKE_TARGET=${GCC_MAKE_TARGET-all}
-	elif [[ $(tc-arch) == "x86" || $(tc-arch) == "amd64" ]] \
-		&& [[ ${GCCMAJOR}.${GCCMINOR} > 3.3 ]]
-	then
-		GCC_MAKE_TARGET=${GCC_MAKE_TARGET-profiledbootstrap}
 	else
 		GCC_MAKE_TARGET=${GCC_MAKE_TARGET-bootstrap-lean}
 	fi
