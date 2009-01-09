@@ -379,7 +379,7 @@ gcc-specs-ssp-to-all() {
 # Returns true if gcc builds with the FORTIFY_SOURCE's
 gcc-specs-fortify() {
 	local directive
-	directive=$(gcc-specs-directive cc1)
+	directive=$(gcc-specs-directive cpp_unique_options)
 	return $([[ ${directive/\{!U_FORTIFY_SOURCE:} != ${directive} ]])
 }
 # Returns true if gcc builds with the fno-strict-overflow
