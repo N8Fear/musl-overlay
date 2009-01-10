@@ -8,9 +8,9 @@ UCLIBC_VER="1.0"
 ETYPE="gcc-compiler"
 
 # Hardened gcc 4 stuff
-PIE_VER="10.2.1"
+PIE_VER="10.2.2"
 PIE_GCC_VER="4.3.2"
-SPECS_VER="0.9.11"
+SPECS_VER="0.9.12"
 SPECS_GCC_VER="4.3.2"
 
 # arch/libc configurations known to be stable or untested with {PIE,SSP,FORTIFY}-by-default

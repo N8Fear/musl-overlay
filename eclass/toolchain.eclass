@@ -755,15 +755,9 @@ gcc-compiler-configure() {
 		else
 			confgcc="${confgcc} --disable-libmudflap"
 		fi
-		# Call want_libssp in hardened-funcs
-		# If we want libssp support
-		if want_libssp ; then
-			confgcc="${confgcc} --enable-libssp"
-		else
-			export gcc_cv_libc_provides_ssp=yes
-			confgcc="${confgcc} --disable-libssp"
-		fi
-
+		# Call hardened_configure in hardened-funcs
+		hardened_configure
+		
 		if tc_version_is_at_least "4.2" ; then
 			confgcc="${confgcc} $(use_enable openmp libgomp)"
 		fi

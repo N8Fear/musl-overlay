@@ -23,7 +23,7 @@ _manage-hardened() {
 		elog "Hardened compiler filtered $1 - GCC_SPECS set to ${GCC_SPECS}"
 	else
 		_raw_append_flag $3
-		elog "Hardened compiler filtered $1 - $3 Added to XXFLAGS"
+		elog "Hardened compiler filtered $1 and $3 is added to XXFLAGS"
 	fi
 }
 
@@ -130,7 +130,7 @@ get_gcc_src_uri_hardened() {
 			http://weaver.gentooenterprise.com/hardened/patches/gcc-${SPECS_GCC_VER}-specs-${SPECS_VER}.tar.bz2
 		)"
 }
-# The gentoo piessp patches allow for 4 configurations:
+# The gentoo pie,ssp and fortify patches allow for 4 configurations:
 # 1) PIE+SSP by default
 # 2) PIE by default
 # 3) SSP by default
@@ -200,7 +200,7 @@ if tc_version_is_at_least 4.3.2 ; then
 	elif [[ $1 == "ssp" ]] ; then
 		if [[ ${CTARGET} == *-uclibc* ]] && has ~$(tc-arch) ${SSP_UCLIBC_STABLE} || has ~$(tc-arch) ${SSP_STABLE} ; then
 			ewarn "Allowing ssp-by-default for an untested arch $(tc-arch)" && return 0
-	elif [[ ${CTARGET} == *-uclibc* ]] && has $(tc-arch) ${SSP_UCLIBC_STABLE} || has $(tc-arch) ${SSP_STABLE} ; then
+		elif [[ ${CTARGET} == *-uclibc* ]] && has $(tc-arch) ${SSP_UCLIBC_STABLE} || has $(tc-arch) ${SSP_STABLE} ; then
 			return 0
 		else
 			return 1
@@ -296,8 +296,7 @@ want_libssp() {
 # gcc 4.1 and above have native ssp support but we have started with 4.3.2 for hardened
 gcc_has_native_ssp() {
 	tc_version_is_at_least 4.3.2 && use hardened || return 1
-        [[ -z ${PP_VER} ]] && [[ -n ${SPECS_VER} ]] && use !nossp && return 0
-        return 1
+        [[ -z ${PP_VER} ]] && [[ -n ${SPECS_VER} ]] && use !nossp && return 0 || return 1
 }
 _want_stuff() {
 	local var=$1 flag=$2
@@ -479,9 +478,24 @@ hardened_compiler_src_unpack_setup() {
 		make_gcc_hard || die "failed to make gcc hard"
 	fi
 }
+hardened_configure() {
+		# If we want hardened support
+		if want_minispecs ; then
+			confgcc="${confgcc} --enable-hardened"
+		else
+			confgcc="${confgcc} --disable-hardened"
+		fi
+		# If we want libssp support
+		if want_libssp ; then
+			confgcc="${confgcc} --enable-libssp"
+		else
+			export gcc_cv_libc_provides_ssp=yes
+			confgcc="${confgcc} --disable-libssp"
+		fi
+}
 setup_minispecs_gcc_build_specs() {
 	# Setup the "specs" file for gcc to use when building.
-	if use hardened && want_minispecs ; then
+	if want_minispecs ; then
 		if hardened_gcc_works pie ; then
         		cat "${WORKDIR}"/specs/pie.specs >> "${WORKDIR}"/build.specs
 		fi
@@ -511,11 +525,11 @@ copy_minispecs_gcc_specs() {
 	# Build system specs file which, if it exists, must be a complete set of
 	# specs as it completely and unconditionally overrides the builtin specs.
 	# For gcc 4
-	if use hardened && want_minispecs ; then
+	if want_minispecs ; then
 		$(XGCC) -dumpspecs > "${WORKDIR}"/specs/specs
 		cat "${WORKDIR}"/build.specs >> "${WORKDIR}"/specs/specs
 		insinto ${LIBPATH}
-		doins "${WORKDIR}"/specs/* || die "failed to install specs"
+		doins "${WORKDIR}"/specs/*.specs && doins "${WORKDIR}"/specs/specs || die "failed to install specs"
         fi
 }
 create_hardened_gcc_env_entry() {
@@ -594,7 +608,7 @@ do_gcc_stub() {
 # GCC >4.1 have built in SSP support but may need some patch later.
 do_gcc_SSP_patches() {
 if ! tc_version_is_at_least 4.3.2 ; then
-		# PARISC has no love ... it's our stack :(
+	# PARISC has no love ... it's our stack :(
 	if [[ $(tc-arch) == "hppa" ]] || \
 	   ! want_ssp || \
 	   (want_boundschecking && [[ ${HTB_EXCLUSIVE} == "true" ]])
