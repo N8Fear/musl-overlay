@@ -2,13 +2,15 @@ This overlay is based on the pieworld work done by former gentoo developer kevqu
 Changes by Xake and zorry.
 Thanks KernelOfTruth, dw and everyone else helping testing, suggesting fixes and other things we have missed.
 For questions there is a tread @ forums.gentoo.org
-This overlay has support for -fPIE, -fstack-protector{,-all} and -D_FORTIFY_SOURCE=0,1,2 trough splitted minispecs for GCC-4.x
+This overlay has support for PIE/PIC, -fstack-protector{,-all} and -D_FORTIFY_SOURCE=0,1,2 trough splitted minispecs for GCC-4.x
 We have disable -fstrict-overflow flag.
+-Wformat-security is on as default.
 uClibc is not supported yet. you will need 0.9.0.30 when we support it.
-If u want GCC 4.4 or the new piepatch then use the testing branch.
+If you want GCC 4.4 then use the testing branch.
 For /etc/portages/packages.* files read packages.README
 Notice: pieworld.README is not up-to-date, it is mostly here for reference since it is the work we based this overlay on.
-/zorry 2008-12-01
+The working gcc 4.3.2-r2 in portage only have PIE/PIC support yet.
+/zorry 2009-01-14
 
 
 
