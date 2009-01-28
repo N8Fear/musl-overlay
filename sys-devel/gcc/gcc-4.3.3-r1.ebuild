@@ -8,8 +8,8 @@ UCLIBC_VER="1.0"
 ETYPE="gcc-compiler"
 
 # Hardened gcc 4 stuff
-PIE_VER="10.2.3"
-PIE_GCC_VER="4.3.2"
+PIE_VER="10.2.0"
+PIE_GCC_VER="4.3.3"
 SPECS_VER="0.9.12"
 SPECS_GCC_VER="4.3.2"
 
