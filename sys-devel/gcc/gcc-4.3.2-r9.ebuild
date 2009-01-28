@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: /var/cvsroot/gentoo-x86/sys-devel/gcc/gcc-4.3.2-r2.ebuild,v 1.0 2008/12/06 05:57:35 zorry Exp $
 
-PATCH_VER="1.5"
+PATCH_VER="1.6"
 UCLIBC_VER="1.0"
 
 ETYPE="gcc-compiler"
