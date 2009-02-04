@@ -12,18 +12,14 @@ ___ECLASS_RECUR_HARDENED_FUNCS="yes"
 
 # Stuff for flag-o-matic.eclass
 # Internal function for _filter-hardened
-# _manage_hardened <flag being filtered> <minispec to use> <cflag to use>
+# _manage_hardened <flag being filtered> <cflag to use>
 _manage-hardened() {
-	local filter=$1 newspec=$2
-	[[ -z $3 ]] && die "Internal hardened-funcs error - please report"
-	if _gcc-specs-exists ${newspec}.specs; then
-		[[ ${GCC_SPECS} == *${newspec}* ]] && return 0
-		[[ -z ${GCC_SPECS} ]] || newspec=":${newspec}"
-		export GCC_SPECS="${GCC_SPECS}${newspec}.specs"
-		elog "Hardened compiler filtered $1 - GCC_SPECS set to ${GCC_SPECS}"
+	[[ -z $2 ]] && die "Internal hardened-funcs error - please report"
+	if test-flags "$2" > /dev/null ; then
+		elog "Hardened compiler will filter some flags"
+		_raw_append_flag $2
 	else
-		_raw_append_flag $3
-		elog "Hardened compiler filtered $1 and $3 is added to XXFLAGS"
+		ewarn "Compiler do not support $2" && return 0
 	fi
 }
 
@@ -37,15 +33,15 @@ _filter-hardened() {
 			# not -fPIC or -fpic, but too many places filter -fPIC without
 			# thinking about -fPIE.
 			-fPIC|-fpic|-fPIE|-fpie|-Wl,pie|-pie)
-				gcc-specs-pie && _manage-hardened ${f} nopie -nopie ;;
+				gcc-specs-pie && _manage-hardened ${f} -nopie ;;
 			-fstack-protector)
-				gcc-specs-ssp && _manage-hardened ${f} nossp -fno-stack-protector ;;
+				gcc-specs-ssp && _manage-hardened ${f} -fno-stack-protector ;;
 			-fstack-protector-all)
-				gcc-specs-ssp-to-all && _manage-hardened ${f} nosspall -fno-stack-protector-all ;;
+				gcc-specs-ssp-to-all && _manage-hardened ${f} -fno-stack-protector-all ;;
 			-D_FORTIFY_SOURCE=2|-D_FORTIFY_SOURCE=1|-D_FORTIFY_SOURCE=0)
-				gcc-specs-fortify && _manage-hardened ${f} nofortify -U_FORTIFY_SOURCE ;;
+				gcc-specs-fortify && _manage-hardened ${f} -U_FORTIFY_SOURCE ;;
 			-fno-strict-overflow)
-				gcc-specs-strict && _manage-hardened ${f} strict -fstrict-overflow ;;
+				gcc-specs-strict && _manage-hardened ${f} -fstrict-overflow ;;
 		esac
 	done
 }
@@ -56,7 +52,7 @@ _append-flag() {
 	case "$1" in
 	-fno-stack-protector-all)
 	    gcc-specs-ssp-to-all || continue
-		_manage-hardened -fstack-protector-all nosspall "$1" ;;
+		_manage-hardened -fstack-protector-all "$1" ;;
 	*)
 	_raw_append_flag "$1"
 	esac

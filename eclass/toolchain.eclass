@@ -606,15 +606,6 @@ do_gcc_rename_java_bins() {
 			die "Failed to fixup file ${jfile} for rename to grmic"
 	done
 }
-unbreak_arm() {
-	[[ ${CTARGET} == *eabi* ]] || return
-	[[ ${CTARGET} == arm* ]] || return
-	[[ ${CTARGET} == armv5* ]] && return
-	[[ -e "${S}"/gcc/config/arm/linux-eabi.h ]] || return
-	#armv4tl can do ebai as well. http://www.nabble.com/Re:--crosstool-ng--ARM-EABI-problem-p17164547.html
-	#http://sourceware.org/ml/crossgcc/2008-05/msg00009.html
-	sed -i -e s/'define SUBTARGET_CPU_DEFAULT TARGET_CPU_arm10tdmi'/'define SUBTARGET_CPU_DEFAULT TARGET_CPU_arm9tdmi'/g "${S}"/gcc/config/arm/linux-eabi.h
-}
 gcc_src_unpack() {
 	export BRANDING_GCC_PKGVERSION="Gentoo ${GCC_PVR}"
 
@@ -646,6 +637,7 @@ gcc_src_unpack() {
 	do_gcc_SSP_patches
 	do_gcc_FORTIFY_patches
 	do_gcc_PIE_patches
+	do_gcc_USER_patches
 
 	${ETYPE}_src_unpack || die "failed to ${ETYPE}_src_unpack"
 
@@ -674,11 +666,6 @@ gcc_src_unpack() {
 		fi
 	fi
 
-	# Misdesign in libstdc++ (Redhat)
-	if [[ ${GCCMAJOR} -ge 3 ]] && [[ -e ${S}/libstdc++-v3/config/cpu/i486/atomicity.h ]] ; then
-		cp -pPR "${S}"/libstdc++-v3/config/cpu/i{4,3}86/atomicity.h
-	fi
-
 	# >= gcc-4.3 doesn't bundle ecj.jar, so copy it
 	if [[ ${GCCMAJOR}.${GCCMINOR} > 4.2 ]] &&
 		use gcj ; then
@@ -702,8 +689,6 @@ gcc_src_unpack() {
 	then
 		do_gcc_rename_java_bins
 	fi
-
-	unbreak_arm
 
 	# Fixup libtool to correctly generate .la files with portage
 	cd "${S}"
@@ -1050,8 +1035,7 @@ gcc_do_make() {
 	fi
 
 	pushd "${WORKDIR}"/build
-	einfo "Running make LDFLAGS=\"${LDFLAGS}\" STAGE1_CFLAGS=\"${STAGE1_CFLAGS}\" LIBPATH=\"${LIBPATH}\" BOOT_CFLAGS=\"${BOOT_CFLAGS}\" ${GCC_MAKE_TARGET}"
-
+	
 	emake \
 		LDFLAGS="${LDFLAGS}" \
 		STAGE1_CFLAGS="${STAGE1_CFLAGS}" \
@@ -1204,15 +1188,15 @@ gcc_src_compile() {
 
 gcc_src_test() {
 	cd "${WORKDIR}"/build
-	make -k check || ewarn "check failed and that sucks :("
+	emake -j1 -k check || ewarn "check failed and that sucks :("
 }
 
 gcc-library_src_install() {
-	einfo "Installing ${PN} ..."
 	# Do the 'make install' from the build directory
 	cd "${WORKDIR}"/build
 	S=${WORKDIR}/build \
-	make DESTDIR="${D}" \
+	emake -j1 \
+		DESTDIR="${D}" \
 		prefix=${PREFIX} \
 		bindir=${BINPATH} \
 		includedir=${LIBPATH}/include \
@@ -1248,25 +1232,22 @@ gcc-library_src_install() {
 
 gcc-compiler_src_install() {
 	local x=
+	cd "${WORKDIR}"/build
 
-	# Do allow symlinks in ${PREFIX}/lib/gcc-lib/${CHOST}/${GCC_CONFIG_VER}/include as
-	# this can break the build.
-	for x in "${WORKDIR}"/build/gcc/include*/* ; do
-		[[ -L ${x} ]] && rm -f "${x}"
-	done
+	# Do allow symlinks in private gcc include dir as this can break the build
+	find gcc/include*/ -type l -print0 | xargs rm -f
+
 	# Remove generated headers, as they can cause things to break
 	# (ncurses, openssl, etc).
-	for x in $(find "${WORKDIR}"/build/gcc/include*/ -name '*.h') ; do
+	for x in $(find gcc/include*/ -name '*.h') ; do
 		grep -q 'It has been auto-edited by fixincludes from' "${x}" \
 			&& rm -f "${x}"
 	done
-	einfo "Installing GCC..."
 	# Do the 'make install' from the build directory
-	cd "${WORKDIR}"/build
 	S=${WORKDIR}/build \
-	make DESTDIR="${D}" install || die
+	emake -j1 DESTDIR="${D}" install || die
 	# Punt some tools which are really only useful while building gcc
-	find "${D}" -name install-tools -type d -exec rm -rf "{}" \;
+	find "${D}" -name install-tools -prune -type d -exec rm -rf "{}" \;
 	# This one comes with binutils
 	find "${D}" -name libiberty.a -exec rm -f "{}" \;
 
@@ -1287,35 +1268,8 @@ gcc-compiler_src_install() {
 		
 	# Make sure we dont have stuff lying around that
 	# can nuke multiple versions of gcc
-	cd "${D}"${LIBPATH}
-
-	# Move Java headers to compiler-specific dir
-	for x in "${D}"${PREFIX}/include/gc*.h "${D}"${PREFIX}/include/j*.h ; do
-		[[ -f ${x} ]] && mv -f "${x}" "${D}"${LIBPATH}/include/
-	done
-	for x in gcj gnu java javax org ; do
-		if [[ -d ${D}${PREFIX}/include/${x} ]] ; then
-			dodir /${LIBPATH}/include/${x}
-			mv -f "${D}"${PREFIX}/include/${x}/* "${D}"${LIBPATH}/include/${x}/
-			rm -rf "${D}"${PREFIX}/include/${x}
-		fi
-	done
-
-	if [[ -d ${D}${PREFIX}/lib/security ]] ; then
-		dodir /${LIBPATH}/security
-		mv -f "${D}"${PREFIX}/lib/security/* "${D}"${LIBPATH}/security
-		rm -rf "${D}"${PREFIX}/lib/security
-	fi
-
-	# Move libgcj.spec to compiler-specific directories
-	[[ -f ${D}${PREFIX}/lib/libgcj.spec ]] && \
-		mv -f "${D}"${PREFIX}/lib/libgcj.spec "${D}"${LIBPATH}/libgcj.spec
-
-	# Rename jar because it could clash with Kaffe's jar if this gcc is
-	# primary compiler (aka don't have the -<version> extension)
-	cd "${D}"${BINPATH}
-	[[ -f jar ]] && mv -f jar gcj-jar
-
+	gcc_slot_java
+	
 	# Move <cxxabi.h> to compiler-specific directories
 	[[ -f ${D}${STDCXX_INCDIR}/cxxabi.h ]] && \
 		mv -f "${D}"${STDCXX_INCDIR}/cxxabi.h "${D}"${LIBPATH}/include/
@@ -1381,7 +1335,9 @@ gcc-compiler_src_install() {
 			|| prepman "${DATAPATH}"
 	fi
 	# prune empty dirs left behind
-	find "${D}" -type d | xargs rmdir >& /dev/null
+	for x in 1 2 3 4 ; do
+		find "${D}" -type d -exec rmdir "{}" \; >& /dev/null
+	done
 
 	# install testsuite results
 	if use test; then
@@ -1415,7 +1371,42 @@ gcc-compiler_src_install() {
 	# and copy the minispecs
 	copy_minispecs_gcc_specs
 }
+gcc_slot_java() {
+	local x
+	
+	# Move Java headers to compiler-specific dir
+		for x in "${D}"${PREFIX}/include/gc*.h "${D}"${PREFIX}/include/j*.h ; do
+			[[ -f ${x} ]] && mv -f "${x}" "${D}"${LIBPATH}/include/
+		done
+		for x in gcj gnu java javax org ; do
+			if [[ -d ${D}${PREFIX}/include/${x} ]] ; then
+				dodir /${LIBPATH}/include/${x}
+				mv -f "${D}"${PREFIX}/include/${x}/* "${D}"${LIBPATH}/include/${x}/
+				rm -rf "${D}"${PREFIX}/include/${x}
+			fi
+		done
+		if [[ -d ${D}${PREFIX}/lib/security ]] || [[ -d ${D}${PREFIX}/$(get_libdir)/security ]] ; then
+			dodir /${LIBPATH}/security
+			mv -f "${D}"${PREFIX}/lib*/security/* "${D}"${LIBPATH}/security
+			rm -rf "${D}"${PREFIX}/lib*/security
+		fi
 
+		# Move libgcj.spec to compiler-specific directories
+		[[ -f ${D}${PREFIX}/lib/libgcj.spec ]] && \
+		mv -f "${D}"${PREFIX}/lib/libgcj.spec "${D}"${LIBPATH}/libgcj.spec
+
+		# SLOT up libgcj.pc (and let gcc-config worry about links)
+		local libgcj=$(find "${D}"${PREFIX}/lib/pkgconfig/ -name 'libgcj*.pc')
+		if [[ -n ${libgcj} ]] ; then
+			sed -i "/^libdir=/s:=.*:=${LIBPATH}:" "${libgcj}"
+			mv "${libgcj}" "${D}"/usr/lib/pkgconfig/libgcj-${GCC_PV}.pc || die
+		fi
+
+		# Rename jar because it could clash with Kaffe's jar if this gcc is
+		# primary compiler (aka don't have the -<version> extension)
+		cd "${D}"${BINPATH}
+		[[ -f jar ]] && mv -f jar gcj-jar
+}
 # Move around the libs to the right location.  For some reason,
 # when installing gcc, it dumps internal libraries into /usr/lib
 # instead of the private gcc lib path
@@ -1462,8 +1453,6 @@ gcc_movelibs() {
 	done
 	find "${D}" -type d | xargs rmdir >& /dev/null
 
-	# make sure the libtool archives have libdir set to where they actually
-	# -are-, and not where they -used- to be.
 	fix_libtool_libdir_paths $(find "${D}"${LIBPATH} -name *.la)
 }
 
@@ -1558,7 +1547,21 @@ do_gcc_HTB_patches() {
 	epatch "${WORKDIR}/bounds-checking-gcc-${HTB_GCC_VER}-${HTB_VER}.patch"
 	BRANDING_GCC_PKGVERSION="${BRANDING_GCC_PKGVERSION}, HTB-${HTB_GCC_VER}-${HTB_VER}"
 }
-
+do_gcc_USER_patches() {
+	local check base=${PORTAGE_CONFIGROOT}/etc/portage/patches
+	for check in {${CATEGORY}/${PF},${CATEGORY}/${P},${CATEGORY}/${PN}}; do
+		EPATCH_SOURCE=${base}/${CTARGET}/${check}
+		[[ -r ${EPATCH_SOURCE} ]] || EPATCH_SOURCE=${base}/${CHOST}/${check}
+		[[ -r ${EPATCH_SOURCE} ]] || EPATCH_SOURCE=${base}/${check}
+		if [[ -d ${EPATCH_SOURCE} ]] ; then
+			EPATCH_SUFFIX="patch"
+			EPATCH_FORCE="yes" \
+			EPATCH_MULTI_MSG="Applying user patches from ${EPATCH_SOURCE} ..." \
+			epatch
+			break
+		fi
+	done
+}
 should_we_gcc_config() {
 	# we always want to run gcc-config if we're bootstrapping, otherwise
 	# we might get stuck with the c-only stage1 compiler
@@ -1701,12 +1704,22 @@ disable_multilib_libjava() {
 	fi
 }
 
+# make sure the libtool archives have libdir set to where they actually
+# -are-, and not where they -used- to be.  also, any dependencies we have
+# on our own .la files need to be updated.
 fix_libtool_libdir_paths() {
-	local dirpath
-	for archive in $* ; do
-		dirpath=$(dirname ${archive} | sed -e "s:^${D}::")
-		sed -i ${archive} -e "s:^libdir.*:libdir=\'${dirpath}\':"
-	done
+	pushd "${D}" >/dev/null
+	local dir=${LIBPATH}
+	local allarchives=$(cd ./${dir}; echo *.la)
+	allarchives="\(${allarchives// /\\|}\)"
+	sed -i \
+		-e "/^libdir=/s:=.*:='${dir}':" \
+		./${dir}/*.la
+ 	sed -i \
+ 		-e "/^dependency_libs=/s:/[^ ]*/${allarchives}:${LIBPATH}/\1:g" \
+		$(find ./${PREFIX}/lib* -maxdepth 3 -name '*.la') \
+		./${dir}/*.la
+	popd >/dev/null
 }
 
 is_multilib() {

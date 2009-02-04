@@ -125,6 +125,16 @@ append-fflags() {
 	return 0
 }
 
+# @FUNCTION: append-cxxflags
+# @USAGE: <flags>
+# @DESCRIPTION:
+# Add extra <flags> to the current CXXFLAGS.
+append-cxxflags() {
+	[[ -z $* ]] && return 0
+	export CXXFLAGS="${CXXFLAGS} $*"
+	return 0
+}
+
 # @FUNCTION: append-lfs-flags
 # @DESCRIPTION:
 # Add flags that enable Large File Support.
@@ -501,66 +511,6 @@ get-flag() {
 	return 1
 }
 
-# @FUNCTION: has_hardened
-# @DESCRIPTION:
-# DEPRECATED - use gcc-specs-relro or gcc-specs-now from toolchain-funcs
-has_hardened() {
-	ewarn "has_hardened: deprecated, please use gcc-specs-{relro,now}()!" >&2
-
-	test_version_info Hardened && return 0
-	# The specs file wont exist unless gcc has GCC_SPECS support
-	[[ -f ${GCC_SPECS} && ${GCC_SPECS} != ${GCC_SPECS/hardened/} ]]
-}
-
-# @FUNCTION: has_pic
-# @DESCRIPTION:
-# DEPRECATED - use gcc-specs-pie from toolchain-funcs
-# indicate whether PIC is set
-has_pic() {
-	ewarn "has_pic: deprecated, please use gcc-specs-pie()!" >&2
-
-	[[ ${CFLAGS/-fPIC} != ${CFLAGS} || \
-	   ${CFLAGS/-fpic} != ${CFLAGS} ]] || \
-	gcc-specs-pie
-}
-
-# @FUNCTION: has_pie
-# @DESCRIPTION:
-# DEPRECATED - use gcc-specs-pie from toolchain-funcs
-# indicate whether PIE is set
-has_pie() {
-	ewarn "has_pie: deprecated, please use gcc-specs-pie()!" >&2
-
-	[[ ${CFLAGS/-fPIE} != ${CFLAGS} || \
-	   ${CFLAGS/-fpie} != ${CFLAGS} ]] || \
-	gcc-specs-pie
-}
-
-# @FUNCTION: has_ssp_all
-# @DESCRIPTION:
-# DEPRECATED - use gcc-specs-ssp from toolchain-funcs
-# indicate whether code for SSP is being generated for all functions
-has_ssp_all() {
-	ewarn "has_ssp_all: deprecated, please use gcc-specs-ssp()!" >&2
-
-	# note; this matches only -fstack-protector-all
-	[[ ${CFLAGS/-fstack-protector-all} != ${CFLAGS} || \
-	   -n $(echo | $(tc-getCC) ${CFLAGS} -E -dM - | grep __SSP_ALL__) ]] || \
-	gcc-specs-ssp-all
-}
-
-# @FUNCTION: has_ssp
-# @DESCRIPTION:
-# DEPRECATED - use gcc-specs-ssp from toolchain-funcs
-# indicate whether code for SSP is being generated
-has_ssp() {
-	ewarn "has_ssp: deprecated, please use gcc-specs-ssp()!" >&2
-
-	# note; this matches both -fstack-protector and -fstack-protector-all
-	[[ ${CFLAGS/-fstack-protector} != ${CFLAGS} || \
-	   -n $(echo | $(tc-getCC) ${CFLAGS} -E -dM - | grep __SSP__) ]] || \
-	gcc-specs-ssp
-}
 
 # @FUNCTION: has_m64
 # @DESCRIPTION:
@@ -683,20 +633,6 @@ raw-ldflags() {
 # DEPRECATED - Gets the flags needed for "NOW" binding
 bindnow-flags() {
 	ewarn "QA: stop using the bindnow-flags function ... simply drop it from your ebuild" >&2
-
-	case $($(tc-getLD) -v 2>&1 </dev/null) in
-	*GNU* | *'with BFD'*) # GNU ld
-		echo "-Wl,-z,now" ;;
-	*Apple*) # Darwin ld
-		echo "-bind_at_load" ;;
-	*)
-		# Some linkers just recognize -V instead of -v
-		case $($(tc-getLD) -V 2>&1 </dev/null) in
-			*Solaris*) # Solaris accept almost the same GNU options
-				echo "-Wl,-z,now" ;;
-		esac
-		;;
-	esac
 }
 
 

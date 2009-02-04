@@ -350,47 +350,47 @@ gcc-specs-directive() {
 gcc-specs-relro() {
 	local directive
 	directive=$(gcc-specs-directive link_command)
-	return $([[ ${directive/\{!norelro:} != ${directive} ]])
+	return $([[ "${directive/\{!norelro:}" != "${directive}" ]])
 }
 # Returns true if gcc sets now
 gcc-specs-now() {
 	local directive
 	directive=$(gcc-specs-directive link_command)
-	return $([[ ${directive/\{!nonow:} != ${directive} ]])
+	return $([[ "${directive/\{!nonow:}" != "${directive}" ]])
 }
 # Returns true if gcc builds PIEs
 gcc-specs-pie() {
 	local directive
 	directive=$(gcc-specs-directive cc1)
-	return $([[ ${directive/\{!nopie:} != ${directive} ]])
+	return $([[ "${directive/\{!nopie:}" != "${directive}" ]])
 }
 # Returns true if gcc builds with the stack protector
 gcc-specs-ssp() {
 	local directive
 	directive=$(gcc-specs-directive cc1)
-	return $([[ ${directive/\{!fno-stack-protector:} != ${directive} ]])
+	return $([[ "${directive/\{!fno-stack-protector:}" != "${directive}" ]])
 }
 # Returns true if gcc upgrades fstack-protector to fstack-protector-all
 gcc-specs-ssp-to-all() {
 	local directive
 	directive=$(gcc-specs-directive cc1)
-	return $([[ ${directive/\{!fno-stack-protector-all:} != ${directive} ]])
+	return $([[ "${directive/\{!fno-stack-protector-all:}" != "${directive}" ]])
 }
 # Returns true if gcc builds with the FORTIFY_SOURCE's
 gcc-specs-fortify() {
 	local directive
 	directive=$(gcc-specs-directive cpp_unique_options)
-	return $([[ ${directive/\{!U_FORTIFY_SOURCE:} != ${directive} ]])
+	return $([[ "${directive/\{!U_FORTIFY_SOURCE:}" != "${directive}" ]])
 }
 # Returns true if gcc builds with the fno-strict-overflow
 gcc-specs-strict() {
 	local directive
 	directive=$(gcc-specs-directive cc1)
-	return $([[ ${directive/\{!fstrict-overflow:} != ${directive} ]])
+	 return $([[ "${directive/\{!fstrict-overflow:}" != "${directive}" ]])
 }
 
 # @FUNCTION: gen_usr_ldscript
-# @USAGE: <list of libs to create linker scripts for>
+# @USAGE: [-a] <list of libs to create linker scripts for>
 # @DESCRIPTION:
 # This function generate linker scripts in /usr/lib for dynamic
 # libs in /lib.  This is to fix linking problems when you have
@@ -404,11 +404,16 @@ gcc-specs-strict() {
 # the library (libfoo.so), as ldconfig should usually update it
 # correctly to point to the latest version of the library present.
 gen_usr_ldscript() {
-	local lib libdir=$(get_libdir) output_format=""
+	local lib libdir=$(get_libdir) output_format="" auto=false suffix=$(get_libname)
 	# Just make sure it exists
 	dodir /usr/${libdir}
-
-	# OUTPUT_FORMAT gives hints to the linker as to what binary format
+	if [[ $1 == "-a" ]] ; then
+		auto=true
+		shift
+		dodir /${libdir}
+	fi
+	
+# OUTPUT_FORMAT gives hints to the linker as to what binary format
 	# is referenced ... makes multilib saner
 	output_format=$($(tc-getCC) ${CFLAGS} ${LDFLAGS} -Wl,--verbose 2>&1 | sed -n 's/^OUTPUT_FORMAT("\([^"]*\)",.*/\1/p')
 	[[ -n ${output_format} ]] && output_format="OUTPUT_FORMAT ( ${output_format} )"
@@ -419,6 +424,16 @@ gen_usr_ldscript() {
 			ewarn "making a symlink instead."
 			dosym "/${libdir}/${lib}" "/usr/${libdir}/${lib}"
 		else
+			local tlib
+			if ${auto} ; then
+				lib="lib${lib}${suffix}"
+				mv "${D}"/usr/${libdir}/${lib}* "${D}"/${libdir}/ || die
+				tlib=$(scanelf -qF'%S#F' "${D}"/${libdir}/${lib})
+				[[ -z ${tlib} ]] && die "unable to read SONAME from ${lib}"
+				rm -f "${D}"/${libdir}/${lib}
+			else
+				tlib=${lib}
+			fi
 			cat > "${D}/usr/${libdir}/${lib}" <<-END_LDSCRIPT
 			/* GNU ld script
 			   Since Gentoo has critical dynamic libraries
@@ -429,9 +444,9 @@ gen_usr_ldscript() {
 			   See bug http://bugs.gentoo.org/4411 for more info.
 			 */
 			${output_format}
-			GROUP ( /${libdir}/${lib} )
+			GROUP ( /${libdir}/${tlib} )
 			END_LDSCRIPT
+			fperms a+x "/usr/${libdir}/${lib}" || die "could not change perms on ${lib}"
 		fi
-		fperms a+x "/usr/${libdir}/${lib}" || die "could not change perms on ${lib}"
 	done
 }
