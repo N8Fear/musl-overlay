@@ -28,20 +28,20 @@ _manage-hardened() {
 _filter-hardened() {
 	local f
 	for f in "$@" ; do
-		case "${f}" in
+		case "$f" in
 			# Ideally we should only concern ourselves with PIE flags,
 			# not -fPIC or -fpic, but too many places filter -fPIC without
 			# thinking about -fPIE.
 			-fPIC|-fpic|-fPIE|-fpie|-Wl,pie|-pie)
-				gcc-specs-pie && _manage-hardened ${f} -nopie ;;
+				gcc-specs-pie && _manage-hardened "$f" -nopie ;;
 			-fstack-protector)
-				gcc-specs-ssp && _manage-hardened ${f} -fno-stack-protector ;;
+				gcc-specs-ssp && _manage-hardened "$f" -fno-stack-protector ;;
 			-fstack-protector-all)
-				gcc-specs-ssp-to-all && _manage-hardened ${f} -fno-stack-protector-all ;;
+				gcc-specs-ssp-to-all && _manage-hardened "$f" -fno-stack-protector-all ;;
 			-D_FORTIFY_SOURCE=2|-D_FORTIFY_SOURCE=1|-D_FORTIFY_SOURCE=0)
-				gcc-specs-fortify && _manage-hardened ${f} -U_FORTIFY_SOURCE ;;
+				gcc-specs-fortify && _manage-hardened "$f" -U_FORTIFY_SOURCE ;;
 			-fno-strict-overflow)
-				gcc-specs-strict && _manage-hardened ${f} -fstrict-overflow ;;
+				gcc-specs-strict && _manage-hardened "$f" -fstrict-overflow ;;
 		esac
 	done
 }
