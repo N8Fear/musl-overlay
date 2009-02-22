@@ -19,7 +19,7 @@ _manage-hardened() {
 		elog "Hardened compiler will filter some flags"
 		_raw_append_flag $2
 	else
-		ewarn "Compiler do not support $2" && return 0
+		die "Compiler do not support $2"
 	fi
 }
 
