@@ -1,6 +1,6 @@
-# Copyright 1999-2008 Gentoo Foundation
+# Copyright 1999-2009 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/sys-libs/glibc/glibc-2.9_p20081201-r1.ebuild,v 1.1 2008/12/27 04:20:52 vapier Exp $
+# $Header: /var/cvsroot/gentoo-x86/sys-libs/glibc/glibc-2.8_p20080602-r2.ebuild,v 1.7 2009/02/19 01:02:47 vapier Exp $
 
 inherit eutils versionator libtool toolchain-funcs flag-o-matic gnuconfig multilib
 
@@ -8,7 +8,7 @@ DESCRIPTION="GNU libc6 (also called glibc2) C library"
 HOMEPAGE="http://www.gnu.org/software/libc/libc.html"
 
 LICENSE="LGPL-2"
-KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86"
+KEYWORDS="alpha amd64 ~arm ~ia64 ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86"
 RESTRICT="strip" # strip ourself #46186
 EMULTILIB_PKG="true"
 
@@ -24,7 +24,7 @@ SNAP_VER=""
 fi
 MANPAGE_VER=""                                 # pregenerated manpages
 INFOPAGE_VER=""                                # pregenerated infopages
-PATCH_VER="2"                                  # Gentoo patchset
+PATCH_VER="5"                                  # Gentoo patchset
 PORTS_VER=${RELEASE_VER}                       # version of glibc ports addon
 LIBIDN_VER=""                                  # version of libidn addon
 LT_VER=""                                      # version of linuxthreads addon
@@ -178,12 +178,12 @@ eblit-src_unpack-post() {
 		epatch "${FILESDIR}"/2.5/glibc-2.5-hardened-configure-picdefault.patch
 		epatch "${FILESDIR}"/2.7/glibc-2.7-hardened-inittls-nosysenter.patch
 
-		einfo "Installing Hardened Gentoo SSP handler"
+		einfo "Installing Hardened Gentoo SSP and FORTIFY_SOURCE handler"
 		cp -f "${FILESDIR}"/2.6/glibc-2.6-gentoo-stack_chk_fail.c \
 			debug/stack_chk_fail.c || die
-		einfo "Installing Hardened Gentoo FORTIFY handler"
 		cp -f "${FILESDIR}"/2.6/glibc-2.6-gentoo-chk_fail.c \
 			debug/chk_fail.c || die
+		
 		if use debug ; then
 			# When using Hardened Gentoo stack handler, have smashes dump core for
 			# analysis - debug only, as core could be an information leak
@@ -195,7 +195,7 @@ eblit-src_unpack-post() {
 			sed -i \
 				-e '/^CFLAGS-backtrace.c/ iCFLAGS-chk_fail.c = -DSSP_SMASH_DUMPS_CORE' \
 				debug/Makefile \
-				|| die "Failed to modify debug/Makefile for debug fortify handler"
+				|| die "Failed to modify debug/Makefile for debug fortify handler"	
 		fi
 
 		# Build nscd with ssp-all
