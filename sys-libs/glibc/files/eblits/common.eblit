@@ -1,6 +1,6 @@
 # Copyright 1999-2007 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/sys-libs/glibc/files/eblits/common.eblit,v 1.7 2008/12/23 11:59:43 bluebird Exp $
+# $Header: /var/cvsroot/gentoo-x86/sys-libs/glibc/files/eblits/common.eblit,v 1.9 2009/01/28 18:11:41 vapier Exp $
 
 # We need to be able to set alternative headers for
 # compiling for non-native platform
@@ -164,12 +164,14 @@ setup_flags() {
 	filter-flags -O?
 	append-flags -O2 -fno-strict-aliasing
 
+	# Cant build glibc itself with fortify code
+	filter-flags -D_FORTIFY_SOURCE=2
+
 	# building glibc with SSP is fraught with difficulty, especially
 	# due to __stack_chk_fail_local which would mean significant changes
 	# to the glibc build process. See bug #94325
 	filter-flags -fstack-protector
-	filter-flags -D_FORTIFY_SOURCE=2
-	
+
 	if use hardened && gcc-specs-pie ; then
 		# Force PIC macro definition for all compilations since they're all
 		# either -fPIC or -fPIE with the default-PIE compiler.
@@ -252,8 +254,6 @@ use_multilib() {
 
 # Setup toolchain variables that would be defined in the profiles for these archs.
 setup_env() {
-	# These should not be set, else the zoneinfo do not always get installed ...
-	unset LANGUAGE LANG LC_ALL
 	# silly users
 	unset LD_RUN_PATH
 
