@@ -9,7 +9,7 @@
 
 inherit mount-boot eutils flag-o-matic toolchain-funcs autotools
 
-PATCHVER="1.8" # Should match the revision ideally
+PATCHVER="1.9" # Should match the revision ideally
 DESCRIPTION="GNU GRUB Legacy boot loader"
 HOMEPAGE="http://www.gnu.org/software/grub/"
 SRC_URI="mirror://gentoo/${P}.tar.gz
@@ -56,7 +56,7 @@ src_unpack() {
 		"${S}"/grub/asmstub.c \
 		|| die "Failed to hack memory size"
 
-	# Ticket 20 https://hardened.gentooexperimental.org/secure/report/1
+	# Ticket 20 http://hardened.gentooexperimental.org/secure/report/1
 	epatch "${FILESDIR}"/grub-0.97-gcc4-hardened.patch
 	
 	if [[ -n ${PATCHVER} ]] ; then
