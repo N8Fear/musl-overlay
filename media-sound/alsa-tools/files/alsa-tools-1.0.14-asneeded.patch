@@ -1,8 +1,0 @@
---- alsa-tools-1.0.14/hdspmixer/src/Makefile.am	2007-09-26 19:26:45.000000000 +0200
-+++ alsa-tools-1.0.14/hdspmixer/src/Makefile.am	2007-09-26 19:28:56.000000000 +0200
-@@ -56,3 +56,5 @@
- 	pixmaps.cxx \
- 	pixmaps.h \
- 	defines.h
-+
-+hdspmixer_LDADD = -lfltk
