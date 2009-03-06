@@ -7,10 +7,10 @@ We have disable -fstrict-overflow flag.
 -Wformat-security is on as default.
 uClibc is not supported yet. you will need 0.9.0.30 when we support it.
 If you want GCC 4.4 then use the testing branch.
-For /etc/portages/packages.* files read packages.README
+You need a least glibc 2.8 and grub from the overlay to make it work.
 Notice: pieworld.README is not up-to-date, it is mostly here for reference since it is the work we based this overlay on.
 The working gcc 4.3.2-r2 in portage only have PIE/PIC support yet.
-/zorry 2009-01-14
+/zorry 2009-03-06
 
 
 
