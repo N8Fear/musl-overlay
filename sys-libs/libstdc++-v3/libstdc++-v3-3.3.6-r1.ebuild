@@ -85,10 +85,12 @@ do_filter_flags() {
 	filter-flags -mno-tls-direct-seg-refs
 
 	# xgcc isnt patched with propolice
-	filter-flags -fstack-protector-all
-#	filter-flags -fno-stack-protector-all is not supported on gcc-4.*
-	filter-flags -fstack-protector
-	filter-flags -fno-stack-protector
+	if [[ get-version < 4.0 ]] ; then
+	    filter-flags -fstack-protector-all
+	    filter-flags -fno-stack-protector-all
+	    filter-flags -fno-stack-protector
+	fi
+	    filter-flags -fstack-protector
 	
 	# xgcc isnt patched with the gcc symbol visibility patch
 	filter-flags -fvisibility-inlines-hidden
