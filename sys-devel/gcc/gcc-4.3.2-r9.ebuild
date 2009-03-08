@@ -76,7 +76,7 @@ src_unpack() {
 	if use hardened ; then
 	
 	    einfo "Hardened toolchain for GCC 4 is made by zorry, psm and xake"
-	    einfo "http://forum.gentoo.org/viewtopic-t-668885.html"
+	    einfo "http://forums.gentoo.org/viewtopic-t-668885.html"
 	    einfo "https://hardened.gentooexperimental.org/trac/secure"
 	    einfo "Thanks KernelOfTruth, dw and everyone else helping testing, suggesting fixes and other things we have missed."
 	    einfo "/zorry"
