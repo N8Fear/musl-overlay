@@ -85,12 +85,12 @@ do_filter_flags() {
 	filter-flags -mno-tls-direct-seg-refs
 
 	# xgcc isnt patched with propolice
-	if [[ get-version < 4.0 ]] ; then
-	    filter-flags -fstack-protector-all
-	    filter-flags -fno-stack-protector-all
-	    filter-flags -fno-stack-protector
+	if [[ get-version < 4.1 ]] ; then
+		filter-flags -fno-stack-protector-all
+		filter-flags -fstack-protector-all
+		filter-flags -fno-stack-protector
+		filter-flags -fstack-protector
 	fi
-	    filter-flags -fstack-protector
 	
 	# xgcc isnt patched with the gcc symbol visibility patch
 	filter-flags -fvisibility-inlines-hidden
@@ -120,10 +120,16 @@ src_unpack() {
 	unpack ${A}
 	cd "${S}"
 	EPATCH_SUFFIX="patch" epatch "${WORKDIR}"/patch
+
+	# gcc isnt patched with SSP support and we can't use filter-flags on > GCC 4.1
+	if [[ get-version > 4.1 ]] ; then
+		epatch "$FILESDIR"/compile_with_no-SSP.patch
+	fi
+
 	elibtoolize --portage --shallow
 	./contrib/gcc_update --touch
 	mkdir -p "${WORKDIR}"/build
-
+	
 	if use multilib ; then
 		# ugh, this shit has to match the way we've hacked gcc else
 		# the build falls apart #259215
