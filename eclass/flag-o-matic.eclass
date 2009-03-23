@@ -1,6 +1,6 @@
 # Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/eclass/flag-o-matic.eclass,v 1.127 2008/12/21 21:40:49 solar Exp $
+# $Header: /var/cvsroot/gentoo-x86/eclass/flag-o-matic.eclass,v 1.132 2009/01/21 00:42:20 gengor Exp $
 
 # @ECLASS: flag-o-matic.eclass
 # @MAINTAINER:
@@ -15,9 +15,8 @@ ___ECLASS_RECUR_FLAG_O_MATIC="yes"
 [[ -z ${___ECLASS_RECUR_HARDENED_FUNCS} ]] && inherit hardened-funcs
 
 ################ DEPRECATED functions ################
-# The following are still present to avoid breaking existing
-# code more than necessary; however they are deprecated. Please
-# use gcc-specs-* from toolchain-funcs.eclass instead, if you
+# The following are removed and use gcc-specs-* 
+# from toolchain-funcs.eclass instead, if you
 # need to know which hardened techs are active in the compiler.
 # See bug #100974
 #
@@ -156,7 +155,7 @@ _raw_append_flag() {
 # Add extra <flags> to your current {C,CXX,F,FC}FLAGS.
 # Call _append_flag in hardened-funcs. Check flag for
 # -fno-stack-protector-all and if not call _raw_append_flag.
-# GCC >4.1 don't support -fno-stack-protector
+# GCC >4.1 don't support -fno-stack-protector-all
 append-flags() {
 	local f
 	[[ -z "$@" ]] && return 0

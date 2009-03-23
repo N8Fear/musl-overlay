@@ -1,6 +1,6 @@
 # Copyright 1999-2007 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/eclass/toolchain-funcs.eclass,v 1.79 2008/09/16 06:40:21 vapier Exp $
+# $Header: /var/cvsroot/gentoo-x86/eclass/toolchain-funcs.eclass,v 1.87 2009/03/01 08:09:44 vapier Exp $
 
 # @ECLASS: toolchain-funcs.eclass
 # @MAINTAINER:
@@ -72,6 +72,10 @@ tc-getNM() { tc-getPROG NM nm "$@"; }
 # @USAGE: [toolchain prefix]
 # @RETURN: name of the archiver indexer
 tc-getRANLIB() { tc-getPROG RANLIB ranlib "$@"; }
+# @FUNCTION: tc-getOBJCOPY
+# @USAGE: [toolchain prefix]
+# @RETURN: name of the object copier
+tc-getOBJCOPY() { tc-getPROG OBJCOPY objcopy "$@"; }
 # @FUNCTION: tc-getF77
 # @USAGE: [toolchain prefix]
 # @RETURN: name of the Fortran 77 compiler
@@ -436,10 +440,11 @@ gen_usr_ldscript() {
 			fi
 			cat > "${D}/usr/${libdir}/${lib}" <<-END_LDSCRIPT
 			/* GNU ld script
-			   Since Gentoo has critical dynamic libraries
-			   in /lib, and the static versions in /usr/lib,
-			   we need to have a "fake" dynamic lib in /usr/lib,
-			   otherwise we run into linking problems.
+			   Since Gentoo has critical dynamic libraries in /lib, and the static versions
+                           in /usr/lib, we need to have a "fake" dynamic lib in /usr/lib, otherwise we
+                           run into linking problems.  This "fake" dynamic lib is a linker script that
+                           redirects the linker to the real lib.  And yes, this works in the cross-
+  	                   compiling scenario as the sysroot-ed linker will prepend the real path.
 
 			   See bug http://bugs.gentoo.org/4411 for more info.
 			 */

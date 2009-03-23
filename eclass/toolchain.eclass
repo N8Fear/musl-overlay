@@ -1,6 +1,6 @@
 # Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/eclass/toolchain.eclass,v 1.368 2008/12/22 18:53:47 solar Exp $
+# $Header: /var/cvsroot/gentoo-x86/eclass/toolchain.eclass,v 1.395 2009/03/15 07:13:25 vapier Exp $
 #
 # Maintainer: Toolchain Ninjas <toolchain@gentoo.org>
 
@@ -583,26 +583,26 @@ do_gcc_rename_java_bins() {
 	# 1) Move the man files if present (missing prior to gcc-3.4)
 	for manfile in rmic rmiregistry; do
 		[[ -f ${S}/gcc/doc/${manfile}.1 ]] || continue
-		mv ${S}/gcc/doc/${manfile}.1 ${S}/gcc/doc/g${manfile}.1
+		 mv "${S}"/gcc/doc/${manfile}.1 "${S}"/gcc/doc/g${manfile}.1
 	done
 	# 2) Fixup references in the docs if present (mission prior to gcc-3.4)
 	for jfile in gcc/doc/gcj.info gcc/doc/grmic.1 gcc/doc/grmiregistry.1 gcc/java/gcj.texi; do
 		[[ -f ${S}/${jfile} ]] || continue
-		sed -i -e 's:rmiregistry:grmiregistry:g' ${S}/${jfile} ||
+		sed -i -e 's:rmiregistry:grmiregistry:g' "${S}"/${jfile} ||
 			die "Failed to fixup file ${jfile} for rename to grmiregistry"
-		sed -i -e 's:rmic:grmic:g' ${S}/${jfile} ||
+		sed -i -e 's:rmic:grmic:g' "${S}"/${jfile} ||
 			die "Failed to fixup file ${jfile} for rename to grmic"
 	done
 	# 3) Fixup Makefiles to build the changed executable names
 	#	 These are present in all 3.x versions, and are the important bit
 	#	 to get gcc to build with the new names.
 	for jfile in libjava/Makefile.am libjava/Makefile.in gcc/java/Make-lang.in; do
-		sed -i -e 's:rmiregistry:grmiregistry:g' ${S}/${jfile} ||
+		sed -i -e 's:rmiregistry:grmiregistry:g' "${S}"/${jfile} ||
 			die "Failed to fixup file ${jfile} for rename to grmiregistry"
 		# Careful with rmic on these files; it's also the name of a directory
 		# which should be left unchanged.  Replace occurrences of 'rmic$',
 		# 'rmic_' and 'rmic '.
-		sed -i -e 's:rmic\([$_ ]\):grmic\1:g' ${S}/${jfile} ||
+		sed -i -e 's:rmic\([$_ ]\):grmic\1:g' "${S}"/${jfile} ||
 			die "Failed to fixup file ${jfile} for rename to grmic"
 	done
 }
@@ -675,10 +675,7 @@ gcc_src_unpack() {
 	# disable --as-needed from being compiled into gcc specs
 	# natively when using a gcc version < 3.4.4
 	# http://gcc.gnu.org/bugzilla/show_bug.cgi?id=14992
-	if [[ ${GCCMAJOR} < 3 ]] || \
-	   [[ ${GCCMAJOR}.${GCCMINOR} < 3.4 ]] || \
-	   [[ ${GCCMAJOR}.${GCCMINOR}.${GCCMICRO} < 3.4.4 ]]
-	then
+	if ! tc_version_is_at_least 3.4.4 ; then
 		sed -i -e s/HAVE_LD_AS_NEEDED/USE_LD_AS_NEEDED/g "${S}"/gcc/config.in
 	fi
 
@@ -699,7 +696,7 @@ gcc_src_unpack() {
 	# update configure files
 	local f
 	einfo "Fixing misc issues in configure files"
-	[[ ${GCCMAJOR} -ge 4 ]] && epatch "${GCC_FILESDIR}"/gcc-configure-texinfo.patch
+	tc_version_is_at_least 4.1 && epatch "${GCC_FILESDIR}"/gcc-configure-texinfo.patch
 	for f in $(grep -l 'autoconf version 2.13' $(find "${S}" -name configure)) ; do
 		ebegin "  Updating ${f/${S}\/} [LANG]"
 		patch "${f}" "${GCC_FILESDIR}"/gcc-configure-LANG.patch >& "${T}"/configure-patch.log \
@@ -924,7 +921,9 @@ gcc_do_configure() {
 	if [[ ${CTARGET} == *-uclibc* ]] ; then
 		confgcc="${confgcc} --disable-__cxa_atexit --enable-target-optspace"
 		[[ ${GCCMAJOR}.${GCCMINOR} == 3.3 ]] && confgcc="${confgcc} --enable-sjlj-exceptions"
-		[[ ${GCCMAJOR}.${GCCMINOR} > 3.3 ]] && confgcc="${confgcc} --enable-clocale=uclibc"
+		if tc_version_is_at_least 3.4 && [[ ${GCCMAJOR}.${GCCMINOR} < 4.3 ]] ; then
+			confgcc="${confgcc} --enable-clocale=uclibc"
+		fi
 	elif [[ ${CTARGET} == *-gnu* ]] ; then
 		confgcc="${confgcc} --enable-__cxa_atexit"
 		confgcc="${confgcc} --enable-clocale=gnu"
@@ -1105,12 +1104,30 @@ gcc_do_filter_flags() {
 
 	case ${GCC_BRANCH_VER} in
 	3.2|3.3)
+		replace-cpu-flags k8 athlon64 opteron i686 x86-64
+		replace-cpu-flags pentium-m pentium3m pentium3
 		case $(tc-arch) in
-			x86)   filter-flags '-mtune=*';;
-			amd64) filter-flags '-mtune=*'
-				replace-cpu-flags k8 athlon64 opteron i686;;
+			amd64|x86) filter-flags '-mtune=*' ;;
+			# in gcc 3.3 there is a bug on ppc64 where if -mcpu is used,
+			# the compiler wrongly assumes a 32bit target
+			ppc64) filter-flags "-mcpu=*";;
 		esac
+		case $(tc-arch) in
+			amd64) replace-cpu-flags core2 nocona;;
+			x86)   replace-cpu-flags core2 prescott;;
+		esac
+
+		replace-cpu-flags G3 750
+		replace-cpu-flags G4 7400
+		replace-cpu-flags G5 7400
+
+		# XXX: should add a sed or something to query all supported flags
+		#      from the gcc source and trim everything else ...
+		filter-flags -f{no-,}unit-at-a-time -f{no-,}web -mno-tls-direct-seg-refs
+		filter-flags -f{no-,}stack-protector{,-all}
+		filter-flags -fvisibility-inlines-hidden -fvisibility=hidden
 		;;
+
 	3.4|4.*)
 		case $(tc-arch) in
 			x86|amd64) filter-flags '-mcpu=*';;
@@ -1483,7 +1500,7 @@ gcc_quick_unpack() {
 		# We want branch updates to be against a release tarball
 		if [[ -n ${BRANCH_UPDATE} ]] ; then
 			pushd "${S}" > /dev/null
-			epatch ${DISTDIR}/gcc-${GCC_RELEASE_VER}-branch-update-${BRANCH_UPDATE}.patch.bz2
+			epatch "${DISTDIR}"/gcc-${GCC_RELEASE_VER}-branch-update-${BRANCH_UPDATE}.patch.bz2
 			popd > /dev/null
 		fi
 	fi
@@ -1782,6 +1799,7 @@ is_ada() {
 }
 
 is_treelang() {
+	has boundschecking ${IUSE} && use boundschecking && return 1 #260532
 	is_crosscompile && return 1 #199924
 	gcc-lang-supported treelang || return 1
 	#use treelang

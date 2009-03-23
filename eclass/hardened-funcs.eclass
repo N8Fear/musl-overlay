@@ -2,7 +2,7 @@
 
 # Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/eclass/hardened-funcs.eclass,v 1.0 2008/12/22 09:20:34 zorry Exp $
+# $Header: /var/cvsroot/gentoo-x86/eclass/hardened-funcs.eclass,v 1.001 2009/03/23 21:38:00 zorry Exp $
 #
 # Maintainer: Hardened Ninjas <hardened@gentoo.org>
 
@@ -14,12 +14,12 @@ ___ECLASS_RECUR_HARDENED_FUNCS="yes"
 # Internal function for _filter-hardened
 # _manage_hardened <flag being filtered> <cflag to use>
 _manage-hardened() {
-	[[ -z $2 ]] && die "Internal hardened-funcs error - please report"
-	if test-flags "$2" > /dev/null ; then
+	[[ -z $1 ]] && die "Internal hardened-funcs error - please report"
+	if test-flags "$1" > /dev/null ; then
 		elog "Hardened compiler will filter some flags"
-		_raw_append_flag $2
+		_raw_append_flag $1
 	else
-		die "Compiler do not support $2"
+		die "Compiler do not support $1"
 	fi
 }
 
@@ -33,15 +33,15 @@ _filter-hardened() {
 			# not -fPIC or -fpic, but too many places filter -fPIC without
 			# thinking about -fPIE.
 			-fPIC|-fpic|-fPIE|-fpie|-Wl,pie|-pie)
-				gcc-specs-pie && _manage-hardened "$f" -nopie ;;
+				gcc-specs-pie && _manage-hardened -nopie ;;
 			-fstack-protector)
-				gcc-specs-ssp && _manage-hardened "$f" -fno-stack-protector ;;
+				gcc-specs-ssp && _manage-hardened -fno-stack-protector ;;
 			-fstack-protector-all)
-				gcc-specs-ssp-to-all && _manage-hardened "$f" -fno-stack-protector-all ;;
+				gcc-specs-ssp-to-all && _manage-hardened -fno-stack-protector-all ;;
 			-D_FORTIFY_SOURCE=2|-D_FORTIFY_SOURCE=1|-D_FORTIFY_SOURCE=0)
-				gcc-specs-fortify && _manage-hardened "$f" -U_FORTIFY_SOURCE ;;
+				gcc-specs-fortify && _manage-hardened -U_FORTIFY_SOURCE ;;
 			-fno-strict-overflow)
-				gcc-specs-strict && _manage-hardened "$f" -fstrict-overflow ;;
+				gcc-specs-strict && _manage-hardened -fstrict-overflow ;;
 		esac
 	done
 }
@@ -52,7 +52,7 @@ _append-flag() {
 	case "$1" in
 	-fno-stack-protector-all)
 	    gcc-specs-ssp-to-all || continue
-		_manage-hardened -fstack-protector-all "$1" ;;
+		_manage-hardened -fno-stack-protector-all ;;
 	*)
 	_raw_append_flag "$1"
 	esac
