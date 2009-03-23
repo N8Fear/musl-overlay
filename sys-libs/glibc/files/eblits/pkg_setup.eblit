@@ -1,0 +1,44 @@
+# Copyright 1999-2009 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+# $Header: /var/cvsroot/gentoo-x86/sys-libs/glibc/files/eblits/pkg_setup.eblit,v 1.1 2009/03/01 21:06:22 vapier Exp $
+
+eblit-glibc-pkg_setup() {
+	# prevent native builds from downgrading ... maybe update to allow people
+	# to change between diff -r versions ? (2.3.6-r4 -> 2.3.6-r2)
+	if [[ ${ROOT} == "/" ]] && [[ ${CBUILD} == ${CHOST} ]] && [[ ${CHOST} == ${CTARGET} ]] ; then
+		if has_version '>'${CATEGORY}/${PF} ; then
+			eerror "Sanity check to keep you from breaking your system:"
+			eerror " Downgrading glibc is not supported and a sure way to destruction"
+			die "aborting to save your system"
+		fi
+	fi
+
+	# users have had a chance to phase themselves, time to give em the boot
+	if [[ -e ${ROOT}/etc/locale.gen ]] && [[ -e ${ROOT}/etc/locales.build ]] ; then
+		eerror "You still haven't deleted ${ROOT}/etc/locales.build."
+		eerror "Do so now after making sure ${ROOT}/etc/locale.gen is kosher."
+		die "lazy upgrader detected"
+	fi
+
+	if [[ ${CTARGET} == i386-* ]] ; then
+		eerror "i386 CHOSTs are no longer supported."
+		eerror "Chances are you don't actually want/need i386."
+		eerror "Please read http://www.gentoo.org/doc/en/change-chost.xml"
+		die "please fix your CHOST"
+	fi
+
+	if [[ -n ${LT_VER} ]] ; then
+		if use nptlonly && ! use nptl ; then
+			eerror "If you want nptlonly, add nptl to your USE too ;p"
+			die "nptlonly without nptl"
+		fi
+	fi
+
+	if [[ -e /proc/xen ]] && [[ $(tc-arch) == "x86" ]] && ! is-flag -mno-tls-direct-seg-refs ; then
+		ewarn "You are using Xen but don't have -mno-tls-direct-seg-refs in your CFLAGS."
+		ewarn "This will result in a 50% performance penalty, which is probably not what you want."
+	fi
+
+	use hardened && ! gcc-specs-pie && \
+		ewarn "PIE hardening not applied, as your compiler doesn't default to PIE"
+}

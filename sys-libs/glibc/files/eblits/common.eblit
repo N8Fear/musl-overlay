@@ -164,8 +164,8 @@ setup_flags() {
 	filter-flags -O?
 	append-flags -O2 -fno-strict-aliasing
 
-	# Cant build glibc itself with fortify code
-	filter-flags -D_FORTIFY_SOURCE=2
+	# Can't build glibc itself with fortify code. See bug #256660
+	append-cppflags -U_FORTIFY_SOURCE
 
 	# building glibc with SSP is fraught with difficulty, especially
 	# due to __stack_chk_fail_local which would mean significant changes
