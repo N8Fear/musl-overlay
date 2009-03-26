@@ -1,6 +1,6 @@
 # Copyright 1999-2009 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/sys-libs/glibc/files/eblits/pkg_setup.eblit,v 1.1 2009/03/01 21:06:22 vapier Exp $
+# $Header: /var/cvsroot/gentoo-x86/sys-libs/glibc/files/eblits/pkg_setup.eblit,v 1.3 2009/03/23 18:48:48 vapier Exp $
 
 eblit-glibc-pkg_setup() {
 	# prevent native builds from downgrading ... maybe update to allow people
@@ -10,6 +10,17 @@ eblit-glibc-pkg_setup() {
 			eerror "Sanity check to keep you from breaking your system:"
 			eerror " Downgrading glibc is not supported and a sure way to destruction"
 			die "aborting to save your system"
+		fi
+
+		# Check for broken kernels #262698
+		cd "${T}"
+		printf '#include <pwd.h>\nint main(){return getpwuid(0)==0;}\n' > kern-clo-test.c
+		emake kern-clo-test || die
+		if ! ./kern-clo-test ; then
+			eerror "Your patched vendor kernel is broken.  You need to get an"
+			eerror "update from whoever is providing the kernel to you."
+			eerror "http://sourceware.org/bugzilla/show_bug.cgi?id=5227"
+			die "keeping your system alive, say thank you"
 		fi
 	fi
 
@@ -36,7 +47,8 @@ eblit-glibc-pkg_setup() {
 
 	if [[ -e /proc/xen ]] && [[ $(tc-arch) == "x86" ]] && ! is-flag -mno-tls-direct-seg-refs ; then
 		ewarn "You are using Xen but don't have -mno-tls-direct-seg-refs in your CFLAGS."
-		ewarn "This will result in a 50% performance penalty, which is probably not what you want."
+		ewarn "This will result in a 50% performance penalty when running with a 32bit"
+		ewarn "hypervisor, which is probably not what you want."
 	fi
 
 	use hardened && ! gcc-specs-pie && \
