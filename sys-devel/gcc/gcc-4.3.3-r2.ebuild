@@ -2,8 +2,6 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: /var/cvsroot/gentoo-x86/sys-devel/gcc/gcc-4.3.3-r1.ebuild,v 1.1 2009/03/15 07:16:10 vapier Exp $
 
-GENTOO_PATCH_EXCLUDE="69_all_gcc43-pr39013.patch" #262567
-
 PATCH_VER="1.1"
 UCLIBC_VER="1.1"
 
@@ -78,13 +76,11 @@ src_unpack() {
 	[[ ${CTARGET} == *-softfloat-* ]] && epatch "${FILESDIR}"/4.3.2/gcc-4.3.2-softfloat.patch
 
 	if use hardened ; then
-		einfo "You are using the Hardened toolchain overlay for GCC 4."
-		einfo "This toolchain is created and maintained by zorry, psm and xake."
-		einfo "If you have questions visit these places:"
+		einfo "Hardened toolchain for GCC 4 is made by zorry, psm and xake"
 		einfo "http://forums.gentoo.org/viewtopic-t-668885.html"
 		einfo "http://hardened.gentooexperimental.org/trac/secure"
-		einfo "Thanks KernelOfTruth, dw and everyone else helping with testing," 
-		einfo "suggesting fixes and pointing out other things we have missed."
+		einfo "Thanks KernelOfTruth, dw and everyone else helping testing," 
+		einfo "suggesting fixes and other things we have missed."
 		einfo "/zorry"
 	fi
 }
