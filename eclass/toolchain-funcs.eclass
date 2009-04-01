@@ -1,6 +1,6 @@
 # Copyright 1999-2007 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/eclass/toolchain-funcs.eclass,v 1.87 2009/03/01 08:09:44 vapier Exp $
+# $Header: /var/cvsroot/gentoo-x86/eclass/toolchain-funcs.eclass,v 1.88 2009/03/28 11:09:27 vapier Exp $
 
 # @ECLASS: toolchain-funcs.eclass
 # @MAINTAINER:
@@ -390,8 +390,9 @@ gcc-specs-fortify() {
 gcc-specs-strict() {
 	local directive
 	directive=$(gcc-specs-directive cc1)
-	 return $([[ "${directive/\{!fstrict-overflow:}" != "${directive}" ]])
+	return $([[ "${directive/\{!fstrict-overflow:}" != "${directive}" ]])
 }
+
 
 # @FUNCTION: gen_usr_ldscript
 # @USAGE: [-a] <list of libs to create linker scripts for>
@@ -411,13 +412,14 @@ gen_usr_ldscript() {
 	local lib libdir=$(get_libdir) output_format="" auto=false suffix=$(get_libname)
 	# Just make sure it exists
 	dodir /usr/${libdir}
+
 	if [[ $1 == "-a" ]] ; then
 		auto=true
 		shift
 		dodir /${libdir}
 	fi
-	
-# OUTPUT_FORMAT gives hints to the linker as to what binary format
+
+	# OUTPUT_FORMAT gives hints to the linker as to what binary format
 	# is referenced ... makes multilib saner
 	output_format=$($(tc-getCC) ${CFLAGS} ${LDFLAGS} -Wl,--verbose 2>&1 | sed -n 's/^OUTPUT_FORMAT("\([^"]*\)",.*/\1/p')
 	[[ -n ${output_format} ]] && output_format="OUTPUT_FORMAT ( ${output_format} )"
@@ -431,8 +433,12 @@ gen_usr_ldscript() {
 			local tlib
 			if ${auto} ; then
 				lib="lib${lib}${suffix}"
+				tlib=$(scanelf -qF'%S#F' "${D}"/usr/${libdir}/${lib})
 				mv "${D}"/usr/${libdir}/${lib}* "${D}"/${libdir}/ || die
-				tlib=$(scanelf -qF'%S#F' "${D}"/${libdir}/${lib})
+				# some SONAMEs are funky: they encode a version before the .so
+				if [[ ${tlib} != ${lib}* ]] ; then
+					mv "${D}"/usr/${libdir}/${tlib}* "${D}"/${libdir}/ || die
+				fi
 				[[ -z ${tlib} ]] && die "unable to read SONAME from ${lib}"
 				rm -f "${D}"/${libdir}/${lib}
 			else
@@ -441,10 +447,10 @@ gen_usr_ldscript() {
 			cat > "${D}/usr/${libdir}/${lib}" <<-END_LDSCRIPT
 			/* GNU ld script
 			   Since Gentoo has critical dynamic libraries in /lib, and the static versions
-                           in /usr/lib, we need to have a "fake" dynamic lib in /usr/lib, otherwise we
-                           run into linking problems.  This "fake" dynamic lib is a linker script that
-                           redirects the linker to the real lib.  And yes, this works in the cross-
-  	                   compiling scenario as the sysroot-ed linker will prepend the real path.
+			   in /usr/lib, we need to have a "fake" dynamic lib in /usr/lib, otherwise we
+			   run into linking problems.  This "fake" dynamic lib is a linker script that
+			   redirects the linker to the real lib.  And yes, this works in the cross-
+			   compiling scenario as the sysroot-ed linker will prepend the real path.
 
 			   See bug http://bugs.gentoo.org/4411 for more info.
 			 */
