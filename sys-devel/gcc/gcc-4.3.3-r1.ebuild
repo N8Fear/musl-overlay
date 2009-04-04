@@ -6,6 +6,7 @@ PATCH_VER="1.0"
 UCLIBC_VER="1.0"
 
 ETYPE="gcc-compiler"
+GCC_FILESDIR="${PORTDIR}/sys-devel/gcc/files"
 
 # Hardened gcc 4 stuff
 PIE_VER="10.2.0"
@@ -69,9 +70,9 @@ src_unpack() {
 
 	use vanilla && return 0
 
-	[[ ${CHOST} == ${CTARGET} ]] && epatch "${FILESDIR}"/gcc-spec-env.patch
+	[[ ${CHOST} == ${CTARGET} ]] && epatch "${GCC_FILESDIR}"/gcc-spec-env.patch
 
-	[[ ${CTARGET} == *-softfloat-* ]] && epatch "${FILESDIR}"/4.3.2/gcc-4.3.2-softfloat.patch
+	[[ ${CTARGET} == *-softfloat-* ]] && epatch "${GCC_FILESDIR}"/4.3.2/gcc-4.3.2-softfloat.patch
 
 	if use hardened ; then
 	
