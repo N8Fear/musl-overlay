@@ -1,6 +1,6 @@
-# Copyright 1999-2008 Gentoo Foundation
+# Copyright 1999-2009 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/eclass/flag-o-matic.eclass,v 1.132 2009/01/21 00:42:20 gengor Exp $
+# $Header: /var/cvsroot/gentoo-x86/eclass/flag-o-matic.eclass,v 1.134 2009/04/05 08:22:29 grobian Exp $
 
 # @ECLASS: flag-o-matic.eclass
 # @MAINTAINER:
@@ -113,6 +113,16 @@ append-cppflags() {
 	return 0
 }
 
+# @FUNCTION: append-cxxflags
+# @USAGE: <flags>
+# @DESCRIPTION:
+# Add extra <flags> to the current CXXFLAGS.
+append-cxxflags() {
+	[[ -z $* ]] && return 0
+	export CXXFLAGS="${CXXFLAGS} $*"
+	return 0
+}
+
 # @FUNCTION: append-fflags
 # @USAGE: <flags>
 # @DESCRIPTION:
@@ -121,16 +131,6 @@ append-fflags() {
 	[[ -z $* ]] && return 0
 	export FFLAGS="${FFLAGS} $*"
 	export FCFLAGS="${FCFLAGS} $*"
-	return 0
-}
-
-# @FUNCTION: append-cxxflags
-# @USAGE: <flags>
-# @DESCRIPTION:
-# Add extra <flags> to the current CXXFLAGS.
-append-cxxflags() {
-	[[ -z $* ]] && return 0
-	export CXXFLAGS="${CXXFLAGS} $*"
 	return 0
 }
 
@@ -631,7 +631,7 @@ raw-ldflags() {
 # @DESCRIPTION:
 # DEPRECATED - Gets the flags needed for "NOW" binding
 bindnow-flags() {
-	ewarn "QA: stop using the bindnow-flags function ... simply drop it from your ebuild" >&2
+	ewarn "QA: stop using the bindnow-flags function ... simply drop it from your ebuild"
 }
 
 

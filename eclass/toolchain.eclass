@@ -1,6 +1,6 @@
 # Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/eclass/toolchain.eclass,v 1.395 2009/03/15 07:13:25 vapier Exp $
+# $Header: /var/cvsroot/gentoo-x86/eclass/toolchain.eclass,v 1.396 2009/04/04 16:52:40 grobian Exp $
 #
 # Maintainer: Toolchain Ninjas <toolchain@gentoo.org>
 
@@ -247,7 +247,7 @@ get_gcc_src_uri() {
 	export PATCH_GCC_VER=${PATCH_GCC_VER:-${GCC_RELEASE_VER}}
 	export UCLIBC_GCC_VER=${UCLIBC_GCC_VER:-${PATCH_GCC_VER}}
 	export HTB_GCC_VER=${HTB_GCC_VER:-${GCC_RELEASE_VER}}
-	
+
 	# Set where to download gcc itself depending on whether we're using a
 	# prerelease, snapshot, or release tarball.
 	if [[ -n ${PRERELEASE} ]] ; then
@@ -835,6 +835,12 @@ gcc_do_configure() {
 		--mandir=${DATAPATH}/man \
 		--infodir=${DATAPATH}/info \
 		--with-gxx-include-dir=${STDCXX_INCDIR}"
+	# On Darwin we need libdir to be set in order to get correct install names
+	# for things like libobjc-gnu, libgcj and libfortran.  If we enable it on
+	# non-Darwin we screw up the behaviour this eclass relies on.  We in
+	# particular need this over --libdir for bug #255315.
+	[[ ${CHOST} == *-darwin* ]] && \
+		confgcc="${confgcc} --enable-version-specific-runtime-libs"
 
 	# All our cross-compile logic goes here !  woo !
 	confgcc="${confgcc} --host=${CHOST}"
@@ -928,6 +934,8 @@ gcc_do_configure() {
 		confgcc="${confgcc} --enable-__cxa_atexit"
 		confgcc="${confgcc} --enable-clocale=gnu"
 	elif [[ ${CTARGET} == *-freebsd* ]]; then
+		confgcc="${confgcc} --enable-__cxa_atexit"
+	elif [[ ${CTARGET} == *-solaris* ]]; then
 		confgcc="${confgcc} --enable-__cxa_atexit"
 	fi
 	[[ ${GCCMAJOR}.${GCCMINOR} < 3.4 ]] && confgcc="${confgcc} --disable-libunwind-exceptions"
@@ -1034,7 +1042,7 @@ gcc_do_make() {
 	fi
 
 	pushd "${WORKDIR}"/build
-	
+
 	emake \
 		LDFLAGS="${LDFLAGS}" \
 		STAGE1_CFLAGS="${STAGE1_CFLAGS}" \
@@ -1127,10 +1135,14 @@ gcc_do_filter_flags() {
 		filter-flags -f{no-,}stack-protector{,-all}
 		filter-flags -fvisibility-inlines-hidden -fvisibility=hidden
 		;;
-
 	3.4|4.*)
 		case $(tc-arch) in
 			x86|amd64) filter-flags '-mcpu=*';;
+			*-macos)
+				# http://gcc.gnu.org/bugzilla/show_bug.cgi?id=25127
+				[[ ${GCC_BRANCH_VER} == 4.0 || ${GCC_BRANCH_VER}  == 4.1 ]] && \
+					filter-flags '-mcpu=*' '-march=*' '-mtune=*'
+			;;
 		esac
 		;;
 	esac
@@ -1171,7 +1183,7 @@ gcc_src_compile() {
 	gcc_do_filter_flags
 	einfo "CFLAGS=\"${CFLAGS}\""
 	einfo "CXXFLAGS=\"${CXXFLAGS}\""
-	
+
 	# Call setup_minispecs_gcc_build_specs in hardened-funcs
 	# For hardened gcc 4 for build the hardened specs file to use when building gcc
 	setup_minispecs_gcc_build_specs
@@ -1195,7 +1207,7 @@ gcc_src_compile() {
 
 	einfo "Compiling ${PN} ..."
 	gcc_do_make ${GCC_MAKE_TARGET}
-	
+
 	# Call setup_split_specs in hardened-funcs
 	# Setup Hardened Split specs for gcc 3.4
 	setup_split_specs
@@ -1249,11 +1261,10 @@ gcc-library_src_install() {
 
 gcc-compiler_src_install() {
 	local x=
-	cd "${WORKDIR}"/build
 
+	cd "${WORKDIR}"/build
 	# Do allow symlinks in private gcc include dir as this can break the build
 	find gcc/include*/ -type l -print0 | xargs rm -f
-
 	# Remove generated headers, as they can cause things to break
 	# (ncurses, openssl, etc).
 	for x in $(find gcc/include*/ -name '*.h') ; do
@@ -1282,11 +1293,11 @@ gcc-compiler_src_install() {
 	create_gcc_env_entry
 	# Call create_hardened_gcc_env_entry in hardened-funcs
 	create_hardened_gcc_env_entry
-		
+
 	# Make sure we dont have stuff lying around that
 	# can nuke multiple versions of gcc
 	gcc_slot_java
-	
+
 	# Move <cxxabi.h> to compiler-specific directories
 	[[ -f ${D}${STDCXX_INCDIR}/cxxabi.h ]] && \
 		mv -f "${D}"${STDCXX_INCDIR}/cxxabi.h "${D}"${LIBPATH}/include/
@@ -1382,15 +1393,16 @@ gcc-compiler_src_install() {
 	# use gid of 0 because some stupid ports don't have
 	# the group 'root' set to gid 0
 	chown -R root:0 "${D}"${LIBPATH}
-	
+
 	# Call copy_minispecs_gcc_specs in hardened-funcs
 	# Make the "specs" file for hardened gcc 4
 	# and copy the minispecs
 	copy_minispecs_gcc_specs
 }
+
 gcc_slot_java() {
 	local x
-	
+
 	# Move Java headers to compiler-specific dir
 		for x in "${D}"${PREFIX}/include/gc*.h "${D}"${PREFIX}/include/j*.h ; do
 			[[ -f ${x} ]] && mv -f "${x}" "${D}"${LIBPATH}/include/
@@ -1488,7 +1500,7 @@ gcc_quick_unpack() {
 	export PATCH_GCC_VER=${PATCH_GCC_VER:-${GCC_RELEASE_VER}}
 	export UCLIBC_GCC_VER=${UCLIBC_GCC_VER:-${PATCH_GCC_VER}}
 	export HTB_GCC_VER=${HTB_GCC_VER:-${GCC_RELEASE_VER}}
-	
+
 	if [[ -n ${GCC_A_FAKEIT} ]] ; then
 		unpack ${GCC_A_FAKEIT}
 	elif [[ -n ${PRERELEASE} ]] ; then
@@ -1659,7 +1671,7 @@ do_gcc_config() {
 gcc_version_patch() {
 	# gcc-4.3+ has configure flags (whoo!)
 	tc_version_is_at_least 4.3 && einfo "Building ${version_string} (${BRANDING_GCC_PKGVERSION})" && return 0
-	
+
 	local version_string=${GCC_CONFIG_VER}
 	[[ -n ${BRANCH_UPDATE} ]] && version_string="${version_string} ${BRANCH_UPDATE}"
 
@@ -1675,7 +1687,7 @@ gcc_version_patch() {
 	fi
 	sed -i -e 's~gcc\.gnu\.org\/bugs\.html~bugs\.gentoo\.org\/~' \
 		"${S}"/gcc/version.c || die "Failed to change the bug URL"
-}	
+}
 
 # The purpose of this DISGUSTING gcc multilib hack is to allow 64bit libs
 # to live in lib instead of lib64 where they belong, with 32bit libraries
@@ -1726,16 +1738,19 @@ disable_multilib_libjava() {
 # on our own .la files need to be updated.
 fix_libtool_libdir_paths() {
 	pushd "${D}" >/dev/null
+
 	local dir=${LIBPATH}
 	local allarchives=$(cd ./${dir}; echo *.la)
 	allarchives="\(${allarchives// /\\|}\)"
+
 	sed -i \
 		-e "/^libdir=/s:=.*:='${dir}':" \
 		./${dir}/*.la
- 	sed -i \
- 		-e "/^dependency_libs=/s:/[^ ]*/${allarchives}:${LIBPATH}/\1:g" \
+	sed -i \
+		-e "/^dependency_libs=/s:/[^ ]*/${allarchives}:${LIBPATH}/\1:g" \
 		$(find ./${PREFIX}/lib* -maxdepth 3 -name '*.la') \
 		./${dir}/*.la
+
 	popd >/dev/null
 }
 
@@ -1744,6 +1759,8 @@ is_multilib() {
 	case ${CTARGET} in
 		mips64*|powerpc64*|s390x*|sparc*|x86_64*)
 			has_multilib_profile || use multilib ;;
+		*-*-solaris*) use multilib ;;
+		*-apple-darwin*) use multilib ;;
 		*)	false ;;
 	esac
 }
