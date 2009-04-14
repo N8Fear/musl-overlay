@@ -583,7 +583,7 @@ do_gcc_rename_java_bins() {
 	# 1) Move the man files if present (missing prior to gcc-3.4)
 	for manfile in rmic rmiregistry; do
 		[[ -f ${S}/gcc/doc/${manfile}.1 ]] || continue
-		 mv "${S}"/gcc/doc/${manfile}.1 "${S}"/gcc/doc/g${manfile}.1
+		mv "${S}"/gcc/doc/${manfile}.1 "${S}"/gcc/doc/g${manfile}.1
 	done
 	# 2) Fixup references in the docs if present (mission prior to gcc-3.4)
 	for jfile in gcc/doc/gcj.info gcc/doc/grmic.1 gcc/doc/grmiregistry.1 gcc/java/gcj.texi; do
@@ -1291,11 +1291,13 @@ gcc-compiler_src_install() {
 
 	dodir /etc/env.d/gcc
 	create_gcc_env_entry
+
 	# Call create_hardened_gcc_env_entry in hardened-funcs
 	create_hardened_gcc_env_entry
 
 	# Make sure we dont have stuff lying around that
 	# can nuke multiple versions of gcc
+
 	gcc_slot_java
 
 	# Move <cxxabi.h> to compiler-specific directories
@@ -1404,38 +1406,40 @@ gcc_slot_java() {
 	local x
 
 	# Move Java headers to compiler-specific dir
-		for x in "${D}"${PREFIX}/include/gc*.h "${D}"${PREFIX}/include/j*.h ; do
-			[[ -f ${x} ]] && mv -f "${x}" "${D}"${LIBPATH}/include/
-		done
-		for x in gcj gnu java javax org ; do
-			if [[ -d ${D}${PREFIX}/include/${x} ]] ; then
-				dodir /${LIBPATH}/include/${x}
-				mv -f "${D}"${PREFIX}/include/${x}/* "${D}"${LIBPATH}/include/${x}/
-				rm -rf "${D}"${PREFIX}/include/${x}
-			fi
-		done
-		if [[ -d ${D}${PREFIX}/lib/security ]] || [[ -d ${D}${PREFIX}/$(get_libdir)/security ]] ; then
-			dodir /${LIBPATH}/security
-			mv -f "${D}"${PREFIX}/lib*/security/* "${D}"${LIBPATH}/security
-			rm -rf "${D}"${PREFIX}/lib*/security
+	for x in "${D}"${PREFIX}/include/gc*.h "${D}"${PREFIX}/include/j*.h ; do
+		[[ -f ${x} ]] && mv -f "${x}" "${D}"${LIBPATH}/include/
+	done
+	for x in gcj gnu java javax org ; do
+		if [[ -d ${D}${PREFIX}/include/${x} ]] ; then
+			dodir /${LIBPATH}/include/${x}
+			mv -f "${D}"${PREFIX}/include/${x}/* "${D}"${LIBPATH}/include/${x}/
+			rm -rf "${D}"${PREFIX}/include/${x}
 		fi
+	done
 
-		# Move libgcj.spec to compiler-specific directories
-		[[ -f ${D}${PREFIX}/lib/libgcj.spec ]] && \
+	if [[ -d ${D}${PREFIX}/lib/security ]] || [[ -d ${D}${PREFIX}/$(get_libdir)/security ]] ; then
+		dodir /${LIBPATH}/security
+		mv -f "${D}"${PREFIX}/lib*/security/* "${D}"${LIBPATH}/security
+		rm -rf "${D}"${PREFIX}/lib*/security
+	fi
+
+	# Move libgcj.spec to compiler-specific directories
+	[[ -f ${D}${PREFIX}/lib/libgcj.spec ]] && \
 		mv -f "${D}"${PREFIX}/lib/libgcj.spec "${D}"${LIBPATH}/libgcj.spec
 
-		# SLOT up libgcj.pc (and let gcc-config worry about links)
-		local libgcj=$(find "${D}"${PREFIX}/lib/pkgconfig/ -name 'libgcj*.pc')
-		if [[ -n ${libgcj} ]] ; then
-			sed -i "/^libdir=/s:=.*:=${LIBPATH}:" "${libgcj}"
-			mv "${libgcj}" "${D}"/usr/lib/pkgconfig/libgcj-${GCC_PV}.pc || die
-		fi
+	# SLOT up libgcj.pc (and let gcc-config worry about links)
+	local libgcj=$(find "${D}"${PREFIX}/lib/pkgconfig/ -name 'libgcj*.pc')
+	if [[ -n ${libgcj} ]] ; then
+		sed -i "/^libdir=/s:=.*:=${LIBPATH}:" "${libgcj}"
+		mv "${libgcj}" "${D}"/usr/lib/pkgconfig/libgcj-${GCC_PV}.pc || die
+	fi
 
-		# Rename jar because it could clash with Kaffe's jar if this gcc is
-		# primary compiler (aka don't have the -<version> extension)
-		cd "${D}"${BINPATH}
-		[[ -f jar ]] && mv -f jar gcj-jar
+	# Rename jar because it could clash with Kaffe's jar if this gcc is
+	# primary compiler (aka don't have the -<version> extension)
+	cd "${D}"${BINPATH}
+	[[ -f jar ]] && mv -f jar gcj-jar
 }
+
 # Move around the libs to the right location.  For some reason,
 # when installing gcc, it dumps internal libraries into /usr/lib
 # instead of the private gcc lib path
@@ -1482,7 +1486,7 @@ gcc_movelibs() {
 	done
 	find "${D}" -type d | xargs rmdir >& /dev/null
 
-	fix_libtool_libdir_paths $(find "${D}"${LIBPATH} -name *.la)
+	fix_libtool_libdir_paths
 }
 
 #----<< src_* >>----
@@ -1564,18 +1568,7 @@ exclude_gcc_patches() {
 	done
 }
 
-do_gcc_HTB_patches() {
-	if ! want_boundschecking || \
-	   (want_ssp && [[ ${HTB_EXCLUSIVE} == "true" ]])
-	then
-		do_gcc_stub htb
-		return 0
-	fi
 
-	# modify the bounds checking patch with a regression patch
-	epatch "${WORKDIR}/bounds-checking-gcc-${HTB_GCC_VER}-${HTB_VER}.patch"
-	BRANDING_GCC_PKGVERSION="${BRANDING_GCC_PKGVERSION}, HTB-${HTB_GCC_VER}-${HTB_VER}"
-}
 do_gcc_USER_patches() {
 	local check base=${PORTAGE_CONFIGROOT}/etc/portage/patches
 	for check in {${CATEGORY}/${PF},${CATEGORY}/${P},${CATEGORY}/${PN}}; do
@@ -1591,6 +1584,20 @@ do_gcc_USER_patches() {
 		fi
 	done
 }
+
+do_gcc_HTB_patches() {
+	if ! want_boundschecking || \
+	   (want_ssp && [[ ${HTB_EXCLUSIVE} == "true" ]])
+	then
+		do_gcc_stub htb
+		return 0
+	fi
+
+	# modify the bounds checking patch with a regression patch
+	epatch "${WORKDIR}/bounds-checking-gcc-${HTB_GCC_VER}-${HTB_VER}.patch"
+	BRANDING_GCC_PKGVERSION="${BRANDING_GCC_PKGVERSION}, HTB-${HTB_GCC_VER}-${HTB_VER}"
+}
+
 should_we_gcc_config() {
 	# we always want to run gcc-config if we're bootstrapping, otherwise
 	# we might get stuck with the c-only stage1 compiler

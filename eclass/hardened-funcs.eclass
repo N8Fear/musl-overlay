@@ -41,7 +41,7 @@ _filter-hardened() {
 			-D_FORTIFY_SOURCE=2|-D_FORTIFY_SOURCE=1|-D_FORTIFY_SOURCE=0)
 				gcc-specs-fortify && _manage-hardened -U_FORTIFY_SOURCE ;;
 			-fno-strict-overflow)
-				gcc-specs-strict && _manage-hardened -fstrict-overflow ;;
+				gcc-specs-nostrict && _manage-hardened -fstrict-overflow ;;
 		esac
 	done
 }
