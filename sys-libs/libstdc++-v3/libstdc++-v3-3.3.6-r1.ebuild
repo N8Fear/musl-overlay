@@ -91,7 +91,7 @@ do_filter_flags() {
 		filter-flags -fno-stack-protector
 		filter-flags -fstack-protector
 	fi
-	
+
 	# xgcc isnt patched with the gcc symbol visibility patch
 	filter-flags -fvisibility-inlines-hidden
 	filter-flags -fvisibility=hidden
@@ -129,7 +129,7 @@ src_unpack() {
 	elibtoolize --portage --shallow
 	./contrib/gcc_update --touch
 	mkdir -p "${WORKDIR}"/build
-	
+
 	if use multilib ; then
 		# ugh, this shit has to match the way we've hacked gcc else
 		# the build falls apart #259215

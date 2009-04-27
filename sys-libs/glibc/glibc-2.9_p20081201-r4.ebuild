@@ -1,6 +1,6 @@
 # Copyright 1999-2009 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/sys-libs/glibc/glibc-2.9_p20081201-r2.ebuild,v 1.6 2009/03/08 20:32:10 vapier Exp $
+# $Header: /var/cvsroot/gentoo-x86/sys-libs/glibc/glibc-2.9_p20081201-r2.ebuild,v 1.7 2009/04/01 06:17:18 vapier Exp $
 
 inherit eutils versionator libtool toolchain-funcs flag-o-matic gnuconfig multilib
 
@@ -24,7 +24,7 @@ SNAP_VER=""
 fi
 MANPAGE_VER=""                                 # pregenerated manpages
 INFOPAGE_VER=""                                # pregenerated infopages
-PATCH_VER="4"                                  # Gentoo patchset
+PATCH_VER="5"                                  # Gentoo patchset
 PORTS_VER=${RELEASE_VER}                       # version of glibc ports addon
 LIBIDN_VER=""                                  # version of libidn addon
 LT_VER=""                                      # version of linuxthreads addon
@@ -193,7 +193,7 @@ eblit-src_unpack-post() {
 			debug/stack_chk_fail.c || die
 		cp -f "${FILESDIR}"/2.6/glibc-2.6-gentoo-chk_fail.c \
 			debug/chk_fail.c || die
-		
+
 		if use debug ; then
 			# When using Hardened Gentoo stack handler, have smashes dump core for
 			# analysis - debug only, as core could be an information leak
@@ -205,7 +205,7 @@ eblit-src_unpack-post() {
 			sed -i \
 				-e '/^CFLAGS-backtrace.c/ iCFLAGS-chk_fail.c = -DSSP_SMASH_DUMPS_CORE' \
 				debug/Makefile \
-				|| die "Failed to modify debug/Makefile for debug fortify handler"	
+				|| die "Failed to modify debug/Makefile for debug fortify handler"
 		fi
 
 		# Build nscd with ssp-all

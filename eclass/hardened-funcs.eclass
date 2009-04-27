@@ -1,5 +1,3 @@
-
-
 # Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: /var/cvsroot/gentoo-x86/eclass/hardened-funcs.eclass,v 1.001 2009/03/23 21:38:00 zorry Exp $
