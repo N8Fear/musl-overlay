@@ -291,8 +291,6 @@ src_configure() {
 	  filter-flags "-fstack-protector"
 	  filter-flags "-fstack-protector-all"
 	fi
-	filter-flags "-fstack-protector"
-	filter-flags "-fstack-protector-all"
 	filter-flags "-ftracer"
 	filter-flags "-fforce-addr"
 
