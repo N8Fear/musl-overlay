@@ -295,6 +295,7 @@ gcc-minor-version() {
 gcc-micro-version() {
 	gcc-fullversion "$@" | cut -f3 -d. | cut -f1 -d-
 }
+tc_version_is_at_least() { version_is_at_least "$1" "${2:-${GCC_PV}}" ; }
 
 # Returns the installation directory - internal toolchain
 # function for use by _gcc-specs-exists (for flag-o-matic).

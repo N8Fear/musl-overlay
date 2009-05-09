@@ -141,7 +141,7 @@ else
 	if [[ ${PN} != "kgcc64" && ${PN} != gcc-* ]] ; then
 		IUSE="${IUSE} altivec build fortran nls nocxx"
 		[[ -n ${PIE_VER} ]] && IUSE="${IUSE} nopie"
-		[[ -n ${PP_VER}	 ]] || [[ -n ${SPECS_VER} ]] && IUSE="${IUSE} nossp"
+		[[ -n ${PP_VER}	 ]] && IUSE="${IUSE} nossp"
 		[[ -n ${HTB_VER} ]] && IUSE="${IUSE} boundschecking"
 		[[ -n ${D_VER}	 ]] && IUSE="${IUSE} d"
 
@@ -633,11 +633,12 @@ gcc_src_unpack() {
 	fi
 	do_gcc_HTB_patches
 	# Hardened patches
-	# do_gcc_SSP_patches, do_gcc_FORTIFY_patches and do_gcc_PIE_patches is in hardened-funcs
+	# do_gcc_SSP_patches, do_gcc_FORTIFY_patches, do_gcc_PIE_patches and do_gcc_ESPF_patches is in hardened-funcs
 	do_gcc_SSP_patches
 	do_gcc_FORTIFY_patches
-	do_gcc_PIE_patches
+	[[ -z ${ESPF_VER} ]] && do_gcc_PIE_patches
 	do_gcc_USER_patches
+	do_gcc_ESPF_patches
 
 	${ETYPE}_src_unpack || die "failed to ${ETYPE}_src_unpack"
 
@@ -1216,8 +1217,12 @@ gcc_src_compile() {
 }
 
 gcc_src_test() {
-	cd "${WORKDIR}"/build
-	emake -j1 -k check || ewarn "check failed and that sucks :("
+	# GCC >= 4.4.* support -j*
+	if tc_version_is_at_least 4.4 ; then
+		emake -k check || ewarn "check failed and that sucks :("
+	else
+		emake -j1 -k check || ewarn "check failed and that sucks :("
+	fi
 }
 
 gcc-library_src_install() {
