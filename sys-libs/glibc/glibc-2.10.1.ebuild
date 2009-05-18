@@ -186,8 +186,8 @@ eblit-src_unpack-post() {
 		cd "${S}"
 		einfo "Patching to get working PIE binaries on PIE (hardened) platforms"
 		gcc-specs-pie && epatch "${FILESDIR}"/2.5/glibc-2.5-hardened-pie.patch
-		epatch "${FILESDIR}"/2.5/glibc-2.5-hardened-configure-picdefault.patch
-		epatch "${FILESDIR}"/2.7/glibc-2.7-hardened-inittls-nosysenter.patch
+		epatch "${FILESDIR}"/2.10/glibc-2.10-hardened-configure-picdefault.patch
+		epatch "${FILESDIR}"/2.10/glibc-2.10-hardened-inittls-nosysenter.patch
 
 		einfo "Installing Hardened Gentoo SSP and FORTIFY_SOURCE handler"
 		cp -f "${FILESDIR}"/2.6/glibc-2.6-gentoo-stack_chk_fail.c \
