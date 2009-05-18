@@ -1,21 +1,34 @@
-# Copyright 1999-2007 Gentoo Foundation
+# Copyright 1999-2009 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/sys-libs/glibc/files/eblits/src_unpack.eblit,v 1.7 2008/12/08 01:30:49 vapier Exp $
+# $Header: /var/cvsroot/gentoo-x86/sys-libs/glibc/files/eblits/src_unpack.eblit,v 1.8 2009/05/17 22:17:56 vapier Exp $
 
-check_kheader_version() {
-	local version=$(
-		printf '#include <linux/version.h>\nLINUX_VERSION_CODE\n' | \
-		$(tc-getCPP ${CTARGET}) -I "$(alt_build_headers)" | \
-		tail -n 1
-	)
-	[[ ${version} -ge "$1" ]]
+int_to_KV() {
+	local version=$1 major minor micro
+	major=$((version / 65536))
+	minor=$(((version % 65536) / 256))
+	micro=$((version % 256))
+	echo ${major}.${minor}.${micro}
+}
+
+eend_KV() {
+	[[ $(KV_to_int $1) -ge $(KV_to_int $2) ]]
+	eend $?
+}
+
+get_kheader_version() {
+	printf '#include <linux/version.h>\nLINUX_VERSION_CODE\n' | \
+	$(tc-getCPP ${CTARGET}) -I "$(alt_build_headers)" | \
+	tail -n 1
 }
 
 check_nptl_support() {
 	# don't care about the compiler here as we arent using it
 	just_headers && return
 
-	local min_kernel_version=$(KV_to_int "${NPTL_KERN_VER}")
+	local run_kv build_kv want_kv
+	run_kv=$(int_to_KV $(get_KV))
+	build_kv=$(int_to_KV $(get_kheader_version))
+	want_kv=${NPTL_KERN_VER}
 
 	ebegin "Checking gcc for __thread support"
 	if ! eend $(want__thread ; echo $?) ; then
@@ -27,20 +40,18 @@ check_nptl_support() {
 
 	if ! is_crosscompile && ! tc-is-cross-compiler ; then
 		# Building fails on an non-supporting kernel
-		ebegin "Checking kernel version (>=${NPTL_KERN_VER})"
-		if ! eend $([[ $(get_KV) -ge ${min_kernel_version} ]] ; echo $?) ; then
+		ebegin "Checking kernel version (${run_kv} >= ${want_kv})"
+		if ! eend_KV ${run_kv} ${want_kv} ; then
 			echo
-			eerror "You need a kernel of at least version ${NPTL_KERN_VER}"
-			eerror "for NPTL support!"
+			eerror "You need a kernel of at least ${want_kv} for NPTL support!"
 			die "Kernel version too low!"
 		fi
 	fi
 
-	ebegin "Checking linux-headers version (>=${NPTL_KERN_VER})"
-	if ! eend $(check_kheader_version "${min_kernel_version}" ; echo $?) ; then
+	ebegin "Checking linux-headers version (${build_kv} >= ${want_kv})"
+	if ! eend_KV ${build_kv} ${want_kv} ; then
 		echo
-		eerror "You need linux-headers of at least version ${NPTL_KERN_VER}"
-		eerror "for NPTL support!"
+		eerror "You need linux-headers of at least ${want_kv} for NPTL support!"
 		die "linux-headers version too low!"
 	fi
 }

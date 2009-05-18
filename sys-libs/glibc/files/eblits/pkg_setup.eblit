@@ -53,4 +53,5 @@ eblit-glibc-pkg_setup() {
 
 	use hardened && ! gcc-specs-pie && \
 		ewarn "PIE hardening not applied, as your compiler doesn't default to PIE"
+	die
 }

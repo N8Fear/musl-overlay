@@ -1,6 +1,6 @@
 # Copyright 1999-2007 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/sys-libs/glibc/files/eblits/src_compile.eblit,v 1.6 2008/11/29 21:05:49 vapier Exp $
+# $Header: /var/cvsroot/gentoo-x86/sys-libs/glibc/files/eblits/src_compile.eblit,v 1.7 2009/05/02 02:38:25 halcy0n Exp $
 
 glibc_do_configure() {
 	local myconf
@@ -55,7 +55,8 @@ glibc_do_configure() {
 	# Since SELinux support is only required for nscd, only enable it if:
 	# 1. USE selinux
 	# 2. only for the primary ABI on multilib systems
-	if use selinux ; then
+	# 3. Not a crosscompile
+	if ! is_crosscompile && use selinux ; then
 		if use multilib || has_multilib_profile ; then
 			if is_final_abi ; then
 				myconf="${myconf} --with-selinux"
