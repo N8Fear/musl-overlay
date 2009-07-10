@@ -1,6 +1,55 @@
 # ChangeLog for app-office/openoffice
-# Copyright 2002-2009 Gentoo Foundation; Distributed under the GPL v2
-# $Header: /var/cvsroot/gentoo-x86/app-office/openoffice/ChangeLog,v 1.458 2009/04/25 11:56:53 ranger Exp $
+# Copyright 1999-2009 Gentoo Foundation; Distributed under the GPL v2
+# $Header: /var/cvsroot/gentoo-x86/app-office/openoffice/ChangeLog,v 1.467 2009/05/31 15:35:26 suka Exp $
+
+  31 May 2009; Andreas Proschofsky <suka@gentoo.org>
+  openoffice-3.1.0.ebuild:
+  Update patchset to ooo-build 3.1.0.6, some smallish bug fixes
+
+  26 May 2009; Andreas Proschofsky <suka@gentoo.org>
+  openoffice-3.1.0.ebuild, -files/ooo_getline.diff:
+  Update to ooo-build-3.0.1.5 build set, some more build fixes
+
+  24 May 2009; Andreas Proschofsky <suka@gentoo.org>
+  openoffice-3.1.0.ebuild:
+  Trying to fix the KDE3 / KDE4 problem again, see bug #238539
+
+  24 May 2009; Andreas Proschofsky <suka@gentoo.org>
+  openoffice-3.1.0.ebuild:
+  Bump to ooo-build 3.0.1.4, bunch of smaller bugfixes
+
+  19 May 2009; Andreas Proschofsky <suka@gentoo.org>
+  +files/buildfix-gcc44.diff, openoffice-3.1.0.ebuild,
+  +files/ooo_getline.diff:
+  Fix build problems with gcc-4.4 (bug #269452) and glibc-2.10.1 (bug 
+  #270263) and correct post-install message for bash completion (bug
+  #270185)
+
+*openoffice-3.1.0 (17 May 2009)
+
+  17 May 2009; Andreas Proschofsky <suka@gentoo.org>
+  -openoffice-3.1.0_beta7.ebuild, +openoffice-3.1.0.ebuild,
+  -files/gentoo-3.1.0_beta7.diff, +files/gentoo-3.1.0.diff:
+  OpenOffice 3.1.0, in contrary to openoffice-bin this also adds OOXML 
+  export
+
+  12 May 2009; Peter Alfredsen <loki_val@gentoo.org>
+  openoffice-3.0.0.ebuild, openoffice-3.0.1.ebuild,
+  openoffice-3.1.0_beta7.ebuild:
+  Bug 257313 is fixed. Update mono deps to match.
+
+  03 May 2009; Peter Alfredsen <loki_val@gentoo.org>
+  openoffice-3.0.0.ebuild, openoffice-3.0.1.ebuild,
+  openoffice-3.1.0_beta7.ebuild:
+  Update deps w.r.t. bug 257313. Novell seems disinclined to fix this bug in
+  a timely manner, so we'll just have to work-around it.
+
+*openoffice-3.1.0_beta7 (01 May 2009)
+
+  01 May 2009; Andreas Proschofsky <suka@gentoo.org>
+  -openoffice-3.1.0_beta6.ebuild, +openoffice-3.1.0_beta7.ebuild,
+  -files/gentoo-3.1.0_beta6.diff, +files/gentoo-3.1.0_beta7.diff:
+  Newer beta-release for OOo 3.1
 
   25 Apr 2009; Brent Baude <ranger@gentoo.org> openoffice-3.0.1.ebuild:
   Marking openoffice-3.0.1 ~ppc64 for bug 244467
