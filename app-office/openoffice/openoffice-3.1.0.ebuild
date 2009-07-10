@@ -1,23 +1,23 @@
 # Copyright 1999-2009 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/app-office/openoffice/openoffice-3.0.0.ebuild,v 1.23 2009/04/25 11:52:29 suka Exp $
+# $Header: /var/cvsroot/gentoo-x86/app-office/openoffice/openoffice-3.1.0.ebuild,v 1.6 2009/05/31 15:35:26 suka Exp $
 
-WANT_AUTOCONF="2.5"
 WANT_AUTOMAKE="1.9"
-EAPI="1"
+EAPI="2"
 
-inherit autotools check-reqs db-use eutils fdo-mime flag-o-matic java-pkg-opt-2 kde-functions mono multilib toolchain-funcs
+inherit bash-completion check-reqs db-use eutils fdo-mime flag-o-matic java-pkg-opt-2 kde-functions mono multilib toolchain-funcs
 
 IUSE="binfilter cups dbus debug eds gnome gstreamer gtk kde ldap mono nsplugin odk opengl pam templates"
 
-MY_PV="3.0.0.3.6"
-PATCHLEVEL="OOO300"
-SRC="OOo_${PV}_src"
-MST="ooo300-m9"
-DEVPATH="http://download.go-oo.org/${PATCHLEVEL}/${MST}"
-S="${WORKDIR}/ooo"
-S_OLD="${WORKDIR}/ooo-build-${MY_PV}"
-CONFFILE="${S}/distro-configs/Gentoo.conf.in"
+MY_PV=3.1.0.6
+PATCHLEVEL=OOO310
+SRC=OOo_${PV}_src
+MST=ooo310-m11
+DEVPATH=http://download.go-oo.org/${PATCHLEVEL}/${MST}
+S=${WORKDIR}/ooo
+S_OLD=${WORKDIR}/ooo-build-${MY_PV}
+CONFFILE=${S}/distro-configs/Gentoo.conf.in
+BASIS=basis3.1
 DESCRIPTION="OpenOffice.org, a full office productivity suite."
 
 SRC_URI="${DEVPATH}-artwork.tar.bz2
@@ -26,13 +26,14 @@ SRC_URI="${DEVPATH}-artwork.tar.bz2
 	${DEVPATH}-calc.tar.bz2
 	${DEVPATH}-components.tar.bz2
 	${DEVPATH}-extensions.tar.bz2
+	${DEVPATH}-extras.tar.bz2
 	${DEVPATH}-filters.tar.bz2
+	${DEVPATH}-help.tar.bz2
 	${DEVPATH}-impress.tar.bz2
-	${DEVPATH}-l10n.tar.bz2
-	${DEVPATH}-libs_core.tar.bz2
-	${DEVPATH}-libs_extern.tar.bz2
-	${DEVPATH}-libs_extern_sys.tar.bz2
-	${DEVPATH}-libs_gui.tar.bz2
+	${DEVPATH}-libs-core.tar.bz2
+	${DEVPATH}-libs-extern.tar.bz2
+	${DEVPATH}-libs-extern-sys.tar.bz2
+	${DEVPATH}-libs-gui.tar.bz2
 	${DEVPATH}-postprocess.tar.bz2
 	${DEVPATH}-sdk.tar.bz2
 	${DEVPATH}-testing.tar.bz2
@@ -52,7 +53,7 @@ SRC_URI="${DEVPATH}-artwork.tar.bz2
 	http://download.go-oo.org/SRC680/libwps-0.1.2.tar.gz
 	http://download.go-oo.org/SRC680/libwpg-0.1.3.tar.gz"
 
-LANGS1="af ar as_IN be_BY bg bn br bs ca cs cy da de dz el en_GB en_ZA eo es et fa fi fr ga gl gu_IN he hi_IN hr hu it ja km ko ku lt lv mk ml_IN mr_IN nb ne nl nn nr ns or_IN pa_IN pl pt pt_BR ru rw sh sk sl sr ss st sv sw_TZ ta_IN te_IN tg th ti_ER tn tr ts uk ur_IN ve vi xh zh_CN zh_TW zu"
+LANGS1="af ar as_IN be_BY bg bn br brx bs ca cs cy da de dgo dz el en en_GB en_ZA eo es et eu fa fi fr ga gl gu he hi_IN hr hu id it ja ka kk km kn_IN ko kok ks ku lt mai mk ml_IN mn mni mr_IN nb ne nl nn nr ns oc or_IN pa_IN pl pt pt_BR ru rw sa_IN sat sd sh sk sl sr ss st sv sw_TZ ta ta_IN te_IN tg th ti_ER tn tr ts uk ur_IN uz ve vi xh zh_CN zh_TW zu"
 LANGS="${LANGS1} en en_US"
 
 for X in ${LANGS} ; do
@@ -63,7 +64,7 @@ HOMEPAGE="http://go-oo.org"
 
 LICENSE="LGPL-2"
 SLOT="0"
-KEYWORDS="amd64 ppc ~sparc x86"
+KEYWORDS="~amd64 ~ppc ~sparc ~x86"
 
 COMMON_DEPEND="!app-office/openoffice-bin
 	x11-libs/libXaw
@@ -83,7 +84,7 @@ COMMON_DEPEND="!app-office/openoffice-bin
 	kde? ( kde-base/kdelibs:3.5 )
 	java? ( >=dev-java/bsh-2.0_beta4
 		>=dev-db/hsqldb-1.8.0.9 )
-	mono? ( >=dev-lang/mono-1.2.3.1 )
+	mono? ( || ( >dev-lang/mono-2.4-r1 <dev-lang/mono-2.4 ) )
 	nsplugin? ( || ( net-libs/xulrunner:1.8 net-libs/xulrunner:1.9 =www-client/seamonkey-1* )
 		>=dev-libs/nspr-4.6.6
 		>=dev-libs/nss-3.11-r1 )
@@ -100,7 +101,7 @@ COMMON_DEPEND="!app-office/openoffice-bin
 	app-arch/unzip
 	>=app-text/hunspell-1.1.4-r1
 	dev-libs/expat
-	>=dev-libs/icu-3.8
+	>=dev-libs/icu-4.0
 	>=sys-libs/db-4.3
 	>=app-text/libwpd-0.8.8
 	>=media-libs/vigra-1.4
@@ -132,8 +133,9 @@ DEPEND="${COMMON_DEPEND}
 	>=net-misc/curl-7.12
 	sys-libs/zlib
 	sys-apps/coreutils
-	pam? ( sys-libs/pam )
-	>=dev-lang/python-2.3.4
+	pam? ( sys-libs/pam
+		sys-apps/shadow[pam] )
+	>=dev-lang/python-2.3.4[threads]
 	java? ( || ( =virtual/jdk-1.6* =virtual/jdk-1.5* )
 		>=dev-java/ant-core-1.7 )
 	ldap? ( net-nds/openldap )"
@@ -158,7 +160,7 @@ pkg_setup() {
 
 	# Check if we have enough RAM and free diskspace to build this beast
 	CHECKREQS_MEMORY="512"
-	use debug && CHECKREQS_DISK_BUILD="8192" || CHECKREQS_DISK_BUILD="5120"
+	use debug && CHECKREQS_DISK_BUILD="8192" || CHECKREQS_DISK_BUILD="6144"
 	check_reqs
 
 	strip-linguas ${LANGS}
@@ -169,8 +171,7 @@ pkg_setup() {
 		ewarn " To get a localized build, set the according LINGUAS variable(s). "
 		ewarn
 	else
-		export LINGUAS_OOO=`echo ${LINGUAS} | \
-			sed -e 's/\ben\b/en_US/g' -e 's/_/-/g'`
+		export LINGUAS_OOO=$(echo ${LINGUAS} | sed -e 's/\ben\b/en_US/g;s/_/-/g')
 	fi
 
 	if use !java; then
@@ -196,14 +197,6 @@ pkg_setup() {
 		die
 	fi
 
-	if use pam; then
-		if ! built_with_use sys-apps/shadow pam; then
-			eerror " shadow needs to be built with pam-support. "
-			eerror " rebuild it accordingly or remove the pam use-flag "
-			die
-		fi
-	fi
-
 	if use nsplugin; then
 		if pkg-config --exists libxul; then
 			BRWS="libxul"
@@ -216,23 +209,20 @@ pkg_setup() {
 		fi
 	fi
 
-	# Check python
-	if ! built_with_use dev-lang/python threads
-	then
-	    eerror "Python needs to be built with threads."
-	    die
-	fi
-
 	java-pkg-opt-2_pkg_setup
 
 	# sys-libs/db version used
-	local db_ver="$(db_findver '>=sys-libs/db-4.3')"
+	local db_ver=$(db_findver '>=sys-libs/db-4.3')
 
 }
 
 src_unpack() {
 
 	unpack ooo-build-${MY_PV}.tar.gz
+
+}
+
+src_prepare() {
 
 	# Hackish workaround for overlong path problem, see bug #130837
 	mv "${S_OLD}" "${S}" || die
@@ -241,16 +231,16 @@ src_unpack() {
 	cd "${S}"
 	epatch "${FILESDIR}/gentoo-${PV}.diff"
 	epatch "${FILESDIR}/ooo-env_log.diff"
-	cp -f "${FILESDIR}/nojavanostax.diff" "${S}/patches/dev300" || die
-	cp -f "${FILESDIR}/hunspell-one-dir-nocrash.diff" "${S}/patches/dev300" || die
-	cp -f "${FILESDIR}/fixsandbox.diff" "${S}/patches/dev300" || die
-	cp -f "${FILESDIR}/solenv.workaround-for-the-kde-mess.diff" "${S}/patches/dev300" || die
+	cp -f "${FILESDIR}/base64.diff" "${S}/patches/hotfixes" || die
+	cp -f "${FILESDIR}/buildfix-gcc44.diff" "${S}/patches/hotfixes" || die
+	cp -f "${FILESDIR}/solenv.workaround-for-the-kde-mess.diff" "${S}/patches/hotfixes" || die
 
 	#Use flag checks
 	if use java ; then
 		echo "--with-ant-home=${ANT_HOME}" >> ${CONFFILE}
 		echo "--with-jdk-home=$(java-config --jdk-home 2>/dev/null)" >> ${CONFFILE}
 		echo "--with-java-target-version=$(java-pkg_get-target)" >> ${CONFFILE}
+		echo "--with-jvm-path=/usr/$(get_libdir)/" >> ${CONFFILE}
 		echo "--with-system-beanshell" >> ${CONFFILE}
 		echo "--with-system-hsqldb" >> ${CONFFILE}
 		echo "--with-beanshell-jar=$(java-pkg_getjar bsh bsh.jar)" >> ${CONFFILE}
@@ -265,19 +255,20 @@ src_unpack() {
 		echo "--without-system-mozilla" >> ${CONFFILE}
 	fi
 
-	echo "`use_enable binfilter`" >> ${CONFFILE}
-	echo "`use_enable cups`" >> ${CONFFILE}
-	echo "`use_enable dbus`" >> ${CONFFILE}
-	echo "`use_enable eds evolution2`" >> ${CONFFILE}
-	echo "`use_enable gnome gnome-vfs`" >> ${CONFFILE}
-	echo "`use_enable gnome lockdown`" >> ${CONFFILE}
-	echo "`use_enable gstreamer`" >> ${CONFFILE}
-	echo "`use_enable gtk systray`" >> ${CONFFILE}
-	echo "`use_enable ldap`" >> ${CONFFILE}
-	echo "`use_enable opengl`" >> ${CONFFILE}
-	echo "`use_with ldap openldap`" >> ${CONFFILE}
-	echo "`use_enable debug crashdump`" >> ${CONFFILE}
-	echo "`use_enable debug strip-solver`" >> ${CONFFILE}
+	echo $(use_enable binfilter) >> ${CONFFILE}
+	echo $(use_enable cups) >> ${CONFFILE}
+	echo $(use_enable dbus) >> ${CONFFILE}
+	echo $(use_enable eds evolution2) >> ${CONFFILE}
+	echo $(use_enable gnome gconf) >> ${CONFFILE}
+	echo $(use_enable gnome gnome-vfs) >> ${CONFFILE}
+	echo $(use_enable gnome lockdown) >> ${CONFFILE}
+	echo $(use_enable gstreamer) >> ${CONFFILE}
+	echo $(use_enable gtk systray) >> ${CONFFILE}
+	echo $(use_enable ldap) >> ${CONFFILE}
+	echo $(use_enable opengl) >> ${CONFFILE}
+	echo $(use_with ldap openldap) >> ${CONFFILE}
+	echo $(use_enable debug crashdump) >> ${CONFFILE}
+	echo $(use_enable debug strip-solver) >> ${CONFFILE}
 
 	# Extension stuff
 	echo "--with-extension-integration" >> ${CONFFILE}
@@ -285,26 +276,22 @@ src_unpack() {
 	echo "--enable-pdfimport" >> ${CONFFILE}
 	echo "--enable-presenter-console" >> ${CONFFILE}
 
+	echo "--without-writer2latex" >> ${CONFFILE}
+
 	# Use splash screen without Sun logo
 	echo "--with-intro-bitmaps=\\\"${S}/build/${MST}/ooo_custom_images/nologo/introabout/intro.bmp\\\"" >> ${CONFFILE}
 
-	eautoreconf
-
 }
 
-src_compile() {
+src_configure() {
 
 	# Use multiprocessing by default now, it gets tested by upstream
-	export JOBS=`echo "${MAKEOPTS}" | sed -e "s/.*-j\([0-9]\+\).*/\1/"`
+	export JOBS=$(echo "${MAKEOPTS}" | sed -e "s/.*-j\([0-9]\+\).*/\1/")
 
 	# Compile problems with these ...
 	filter-flags "-funroll-loops"
 	filter-flags "-fprefetch-loop-arrays"
 	filter-flags "-fno-default-inline"
-	if [[ $(gcc-major-version) -lt 4 ]] ; then
-	  filter-flags "-fstack-protector"
-	  filter-flags "-fstack-protector-all"
-	fi
 	filter-flags "-ftracer"
 	filter-flags "-fforce-addr"
 
@@ -312,6 +299,8 @@ src_compile() {
 
 	if [[ $(gcc-major-version) -lt 4 ]]; then
 		replace-flags "-fomit-frame-pointer" "-momit-leaf-frame-pointer"
+		filter-flags "-fstack-protector"
+		filter-flags "-fstack-protector-all"
 	fi
 
 	# Build with NVidia cards breaks otherwise
@@ -323,11 +312,10 @@ src_compile() {
 
 	# Make sure gnome-users get gtk-support
 	local GTKFLAG="--disable-gtk --disable-cairo --without-system-cairo"
-	( use gtk || use gnome ) && GTKFLAG="--enable-gtk --enable-cairo --with-system-cairo"
+	{ use gtk || use gnome; } && GTKFLAG="--enable-gtk --enable-cairo --with-system-cairo"
 
 	cd "${S}"
-	./configure \
-		--with-distro="Gentoo" \
+	./configure --with-distro="Gentoo" \
 		--with-arch="${ARCH}" \
 		--with-srcdir="${DISTDIR}" \
 		--with-lang="${LINGUAS_OOO}" \
@@ -336,13 +324,13 @@ src_compile() {
 		--with-installed-ooo-dirname="openoffice" \
 		--with-tag="${MST}" \
 		${GTKFLAG} \
-		`use_enable mono` \
-		`use_enable kde` \
-		`use_enable !debug strip` \
-		`use_enable odk` \
-		`use_enable pam` \
-		`use_with java` \
-		`use_with templates sun-templates` \
+		$(use_enable mono) \
+		$(use_enable kde) \
+		$(use_enable !debug strip) \
+		$(use_enable odk) \
+		$(use_enable pam) \
+		$(use_with java) \
+		$(use_with templates sun-templates) \
 		--disable-access \
 		--disable-post-install-scripts \
 		--enable-extensions \
@@ -351,7 +339,10 @@ src_compile() {
 		--libdir=/usr/$(get_libdir) \
 		|| die "Configuration failed!"
 
-	einfo "Building OpenOffice.org..."
+}
+
+src_compile() {
+
 	use kde && set-kdedir 3
 	make || die "Build failed"
 
@@ -368,7 +359,15 @@ src_install() {
 #	chown -RP root:0 "${D}"
 
 	# record java libraries
-	use java && java-pkg_regjar "${D}"/usr/$(get_libdir)/openoffice/basis3.0/program/classes/*.jar
+	if use java; then
+			java-pkg_regjar "${D}"/usr/$(get_libdir)/openoffice/${BASIS}/program/classes/*.jar
+			java-pkg_regjar "${D}"/usr/$(get_libdir)/openoffice/ure/share/java/*.jar
+	fi
+
+	# Upstream places the bash-completion module in /etc. Gentoo places them in
+	# /usr/share/bash-completion. bug 226061
+	dobashcompletion "${D}"/etc/bash_completion.d/ooffice.sh ooffice
+	rm -rf "${D}"/etc/bash_completion.d/ || die "rm failed"
 
 }
 
@@ -376,11 +375,12 @@ pkg_postinst() {
 
 	fdo-mime_desktop_database_update
 	fdo-mime_mime_database_update
+	BASH_COMPLETION_NAME=ooffice && bash-completion_pkg_postinst
 
 	[[ -x /sbin/chpax ]] && [[ -e /usr/$(get_libdir)/openoffice/program/soffice.bin ]] && chpax -zm /usr/$(get_libdir)/openoffice/program/soffice.bin
 
 	# Add available & useful jars to openoffice classpath
-	use java && /usr/$(get_libdir)/openoffice/basis3.0/program/java-set-classpath $(java-config --classpath=jdbc-mysql 2>/dev/null) >/dev/null
+	use java && /usr/$(get_libdir)/openoffice/${BASIS}/program/java-set-classpath $(java-config --classpath=jdbc-mysql 2>/dev/null) >/dev/null
 
 	elog
 	elog " Spell checking is provided through our own myspell-ebuilds, "
