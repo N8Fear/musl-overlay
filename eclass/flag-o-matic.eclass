@@ -1,6 +1,6 @@
 # Copyright 1999-2009 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/eclass/flag-o-matic.eclass,v 1.134 2009/04/05 08:22:29 grobian Exp $
+# $Header: /var/cvsroot/gentoo-x86/eclass/flag-o-matic.eclass,v 1.142 2009/07/29 08:32:43 ssuominen Exp $
 
 # @ECLASS: flag-o-matic.eclass
 # @MAINTAINER:
@@ -11,12 +11,11 @@
 # and safely manage toolchain flags in their builds.
 
 inherit eutils toolchain-funcs multilib
-___ECLASS_RECUR_FLAG_O_MATIC="yes"
-[[ -z ${___ECLASS_RECUR_HARDENED_FUNCS} ]] && inherit hardened-funcs
 
 ################ DEPRECATED functions ################
-# The following are removed and use gcc-specs-* 
-# from toolchain-funcs.eclass instead, if you
+# The following are still present to avoid breaking existing
+# code more than necessary; however they are deprecated. Please
+# use gcc-specs-* from toolchain-funcs.eclass instead, if you
 # need to know which hardened techs are active in the compiler.
 # See bug #100974
 #
@@ -26,7 +25,6 @@ ___ECLASS_RECUR_FLAG_O_MATIC="yes"
 # has_ssp_all
 # has_ssp
 
-# _filter_hardened is moved to hardened-funcs
 
 # {C,CXX,F,FC}FLAGS that we allow in strip-flags
 # Note: shell globs and character lists are allowed
@@ -43,10 +41,12 @@ setup-allowed-flags() {
 	fi
 	# allow a bunch of flags that negate features / control ABI
 	ALLOWED_FLAGS="${ALLOWED_FLAGS} -fno-stack-protector -fno-stack-protector-all \
-		-fno-strict-aliasing -fno-bounds-checking -fstrict-overflow"
+		-fno-strict-aliasing -fno-bounds-checking -fstrict-overflow -fno-omit-frame-pointer"
 	ALLOWED_FLAGS="${ALLOWED_FLAGS} -mregparm -mno-app-regs -mapp-regs \
-		-mno-mmx -mno-sse -mno-sse2 -mno-sse3 -mno-3dnow \
-		-mips1 -mips2 -mips3 -mips4 -mips32 -mips64 -mips16 \
+		-mno-mmx -mno-sse -mno-sse2 -mno-sse3 -mno-ssse3 -mno-sse4 -mno-sse4.1 \
+		-mno-sse4.2 -mno-avx -mno-aes -mno-pclmul -mno-sse4a -mno-3dnow \
+		-mno-popcnt -mno-abm \
+		-mips1 -mips2 -mips3 -mips4 -mips32 -mips64 -mips16 -mplt \
 		-msoft-float -mno-soft-float -mhard-float -mno-hard-float -mfpu \
 		-mieee -mieee-with-inexact -mschedule \
 		-mtls-direct-seg-refs -mno-tls-direct-seg-refs \
@@ -59,6 +59,33 @@ setup-allowed-flags() {
 	# NOTE:  currently -Os have issues with gcc3 and K6* arch's
 	export UNSTABLE_FLAGS="-Os -O3 -freorder-blocks"
 	return 0
+}
+
+# inverted filters for hardened compiler.  This is trying to unpick
+# the hardened compiler defaults.
+_filter-hardened() {
+	local f
+	for f in "$@" ; do
+		case "${f}" in
+			# Ideally we should only concern ourselves with PIE flags,
+			# not -fPIC or -fpic, but too many places filter -fPIC without
+			# thinking about -fPIE.
+			-fPIC|-fpic|-fPIE|-fpie|-Wl,pie|-pie)
+				gcc-specs-pie || continue
+				is-flagq -nopie || append-flags -nopie;;
+			-fstack-protector)
+				gcc-specs-ssp || continue
+				is-flagq -fno-stack-protector || append-flags $(test-flags -fno-stack-protector) 
+ 				_is_flagq CFLAGS -fno-stack-protector || append-cflags $(test-flags-CC -fno-stack-protector) 
+ 				_is_flagq CXXFLAGS -fno-stack-protector || append-cxxflags $(test-flags-CXX -fno-stack-protector);; 
+			-fstack-protector-all)
+				gcc-specs-ssp-to-all || continue
+				is-flagq -fno-stack-protector-all || append-flags $(test-flags -fno-stack-protector-all);;
+			-fno-strict-overflow)
+				gcc-specs-nostrict || continue
+				is-flagq -fstrict-overflow || append-flags $(test-flags -fstrict-overflow);;
+		esac
+	done
 }
 
 # Remove occurrences of strings from variable given in $1
@@ -113,6 +140,16 @@ append-cppflags() {
 	return 0
 }
 
+# @FUNCTION: append-cflags
+# @USAGE: <flags>
+# @DESCRIPTION:
+# Add extra <flags> to the current CFLAGS.
+append-cflags() {
+	[[ -z $* ]] && return 0
+	export CFLAGS="${CFLAGS} $*"
+	return 0
+}
+
 # @FUNCTION: append-cxxflags
 # @USAGE: <flags>
 # @DESCRIPTION:
@@ -142,26 +179,15 @@ append-lfs-flags() {
 	append-cppflags -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE
 }
 
-# Append flag if the compiler doesn't barf it
-_raw_append_flag() {
-	export CFLAGS="${CFLAGS} $1"
-	export CXXFLAGS="${CXXFLAGS} $1"
-	export FFLAGS="${FFLAGS} $1"
-	export FCFLAGS="${FCFLAGS} $1" 
-}
 # @FUNCTION: append-flags
 # @USAGE: <flags>
 # @DESCRIPTION:
 # Add extra <flags> to your current {C,CXX,F,FC}FLAGS.
-# Call _append_flag in hardened-funcs. Check flag for
-# -fno-stack-protector-all and if not call _raw_append_flag.
-# GCC >4.1 don't support -fno-stack-protector-all
 append-flags() {
-	local f
-	[[ -z "$@" ]] && return 0
-	for f in "$@"; do
-		_append-flag "${f}"
-	done
+	[[ -z $* ]] && return 0
+	append-cflags "$@"
+	append-cxxflags "$@"
+	append-fflags "$@"
 	return 0
 }
 
@@ -510,6 +536,66 @@ get-flag() {
 	return 1
 }
 
+# @FUNCTION: has_hardened
+# @DESCRIPTION:
+# DEPRECATED - use gcc-specs-relro or gcc-specs-now from toolchain-funcs
+has_hardened() {
+	ewarn "has_hardened: deprecated, please use gcc-specs-{relro,now}()!" >&2
+
+	test_version_info Hardened && return 0
+	# The specs file wont exist unless gcc has GCC_SPECS support
+	[[ -f ${GCC_SPECS} && ${GCC_SPECS} != ${GCC_SPECS/hardened/} ]]
+}
+
+# @FUNCTION: has_pic
+# @DESCRIPTION:
+# DEPRECATED - use gcc-specs-pie from toolchain-funcs
+# indicate whether PIC is set
+has_pic() {
+	ewarn "has_pic: deprecated, please use gcc-specs-pie()!" >&2
+
+	[[ ${CFLAGS/-fPIC} != ${CFLAGS} || \
+	   ${CFLAGS/-fpic} != ${CFLAGS} ]] || \
+	gcc-specs-pie
+}
+
+# @FUNCTION: has_pie
+# @DESCRIPTION:
+# DEPRECATED - use gcc-specs-pie from toolchain-funcs
+# indicate whether PIE is set
+has_pie() {
+	ewarn "has_pie: deprecated, please use gcc-specs-pie()!" >&2
+
+	[[ ${CFLAGS/-fPIE} != ${CFLAGS} || \
+	   ${CFLAGS/-fpie} != ${CFLAGS} ]] || \
+	gcc-specs-pie
+}
+
+# @FUNCTION: has_ssp_all
+# @DESCRIPTION:
+# DEPRECATED - use gcc-specs-ssp from toolchain-funcs
+# indicate whether code for SSP is being generated for all functions
+has_ssp_all() {
+	ewarn "has_ssp_all: deprecated, please use gcc-specs-ssp()!" >&2
+
+	# note; this matches only -fstack-protector-all
+	[[ ${CFLAGS/-fstack-protector-all} != ${CFLAGS} || \
+	   -n $(echo | $(tc-getCC) ${CFLAGS} -E -dM - | grep __SSP_ALL__) ]] || \
+	gcc-specs-ssp-to-all
+}
+
+# @FUNCTION: has_ssp
+# @DESCRIPTION:
+# DEPRECATED - use gcc-specs-ssp from toolchain-funcs
+# indicate whether code for SSP is being generated
+has_ssp() {
+	ewarn "has_ssp: deprecated, please use gcc-specs-ssp()!" >&2
+
+	# note; this matches both -fstack-protector and -fstack-protector-all
+	[[ ${CFLAGS/-fstack-protector} != ${CFLAGS} || \
+	   -n $(echo | $(tc-getCC) ${CFLAGS} -E -dM - | grep __SSP__) ]] || \
+	gcc-specs-ssp
+}
 
 # @FUNCTION: has_m64
 # @DESCRIPTION:
@@ -631,7 +717,8 @@ raw-ldflags() {
 # @DESCRIPTION:
 # DEPRECATED - Gets the flags needed for "NOW" binding
 bindnow-flags() {
-	ewarn "QA: stop using the bindnow-flags function ... simply drop it from your ebuild"
+	eerror "QA: stop using the bindnow-flags function ... simply drop it from your ebuild"
+	die "Stop using bindnow-flags."
 }
 
 

@@ -1,6 +1,6 @@
 # Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/eclass/toolchain.eclass,v 1.396 2009/04/04 16:52:40 grobian Exp $
+# $Header: /var/cvsroot/gentoo-x86/eclass/toolchain.eclass,v 1.403 2009/07/26 20:09:59 halcy0n Exp $
 #
 # Maintainer: Toolchain Ninjas <toolchain@gentoo.org>
 
@@ -9,8 +9,7 @@ LICENSE="GPL-2 LGPL-2.1"
 RESTRICT="strip" # cross-compilers need controlled stripping
 
 #---->> eclass stuff <<----
-inherit eutils versionator libtool toolchain-funcs flag-o-matic gnuconfig multilib fixheadtails hardened-funcs
-___ECLASS_RECUR_TOOLCHAIN="yes"
+inherit eutils versionator libtool toolchain-funcs flag-o-matic gnuconfig multilib fixheadtails
 
 EXPORT_FUNCTIONS pkg_setup src_unpack src_compile src_test pkg_preinst src_install pkg_postinst pkg_prerm pkg_postrm
 DESCRIPTION="Based on the ${ECLASS} eclass"
@@ -136,7 +135,7 @@ if [[ ${ETYPE} == "gcc-library" ]] ; then
 	IUSE="nls build test"
 	SLOT="${CTARGET}-${SO_VERSION_SLOT:-5}"
 else
-	IUSE="multislot test"
+	IUSE="multislot nptl test"
 
 	if [[ ${PN} != "kgcc64" && ${PN} != gcc-* ]] ; then
 		IUSE="${IUSE} altivec build fortran nls nocxx"
@@ -157,6 +156,7 @@ else
 			tc_version_is_at_least "4.1" && IUSE="${IUSE} objc++"
 			tc_version_is_at_least "4.2" && IUSE="${IUSE} openmp"
 			tc_version_is_at_least "4.3" && IUSE="${IUSE} fixed-point"
+			tc_version_is_at_least "4.4" && IUSE="${IUSE} graphite"
 		fi
 	fi
 
@@ -222,6 +222,42 @@ gcc_get_s_dir() {
 #			The resulting filename of this tarball will be:
 #			gcc-${PATCH_GCC_VER:-${GCC_RELEASE_VER}}-patches-${PATCH_VER}.tar.bz2
 #
+#	PIE_VER
+#	PIE_GCC_VER
+#	obsoleted: PIE_CORE
+#			These variables control patching in various updates for the logic
+#			controlling Position Independant Executables. PIE_VER is expected
+#			to be the version of this patch, PIE_GCC_VER the gcc version of
+#			the patch, and PIE_CORE (obsoleted) the actual filename of the patch.
+#			An example:
+#					PIE_VER="8.7.6.5"
+#					PIE_GCC_VER="3.4.0"
+#			The resulting filename of this tarball will be:
+#			gcc-${PIE_GCC_VER:-${GCC_RELEASE_VER}}-piepatches-v${PIE_VER}.tar.bz2
+#				old syntax (do not define PIE_CORE anymore):
+#					PIE_CORE="gcc-3.4.0-piepatches-v${PIE_VER}.tar.bz2"
+#
+#	SPECS_VER
+#	SPECS_GCC_VER
+#			This is for the minispecs files included in the hardened gcc-4.x
+#
+#	PP_VER
+#	PP_GCC_VER
+#	obsoleted: PP_FVER
+#			These variables control patching in stack smashing protection
+#			support. They both control the version of ProPolice to download.
+#
+#		PP_VER / PP_GCC_VER
+#			Used to roll our own custom tarballs of ssp.
+#		PP_FVER / PP_VER
+#			Used for mirroring ssp straight from IBM.
+#			PP_VER sets the version of the directory in which to find the
+#			patch, and PP_FVER sets the version of the patch itself. For
+#			example:
+#					PP_VER="3_4"
+#					PP_FVER="${PP_VER//_/.}-2"
+#			would download gcc3_4/protector-3.4-2.tar.gz
+#
 #	HTB_VER
 #	HTB_GCC_VER
 #			These variables control whether or not an ebuild supports Herman
@@ -246,7 +282,13 @@ gentoo_urls() {
 get_gcc_src_uri() {
 	export PATCH_GCC_VER=${PATCH_GCC_VER:-${GCC_RELEASE_VER}}
 	export UCLIBC_GCC_VER=${UCLIBC_GCC_VER:-${PATCH_GCC_VER}}
+	export PIE_GCC_VER=${PIE_GCC_VER:-${GCC_RELEASE_VER}}
+	export PP_GCC_VER=${PP_GCC_VER:-${GCC_RELEASE_VER}}
 	export HTB_GCC_VER=${HTB_GCC_VER:-${GCC_RELEASE_VER}}
+	export SPECS_GCC_VER=${SPECS_GCC_VER:-${GCC_RELEASE_VER}}
+
+	[[ -n ${PIE_VER} ]] && \
+		PIE_CORE=${PIE_CORE:-gcc-${PIE_GCC_VER}-piepatches-v${PIE_VER}.tar.bz2}
 
 	# Set where to download gcc itself depending on whether we're using a
 	# prerelease, snapshot, or release tarball.
@@ -261,6 +303,19 @@ get_gcc_src_uri() {
 			GCC_SRC_URI="${GCC_SRC_URI} $(gentoo_urls gcc-${GCC_RELEASE_VER}-branch-update-${BRANCH_UPDATE}.patch.bz2)"
 	fi
 
+	# propolice aka stack smashing protection
+	if [[ -n ${PP_VER} ]] ; then
+		if [[ -n ${PP_FVER} ]] ; then
+			GCC_SRC_URI="${GCC_SRC_URI}
+				!nossp? (
+					http://www.research.ibm.com/trl/projects/security/ssp/gcc${PP_VER}/protector-${PP_FVER}.tar.gz
+					$(gentoo_urls protector-${PP_FVER}.tar.gz)
+				)"
+		else
+			GCC_SRC_URI="${GCC_SRC_URI} $(gentoo_urls gcc-${PP_GCC_VER}-ssp-${PP_VER}.tar.bz2)"
+		fi
+	fi
+
 	# uclibc lovin
 	[[ -n ${UCLIBC_VER} ]] && \
 		GCC_SRC_URI="${GCC_SRC_URI} $(gentoo_urls gcc-${UCLIBC_GCC_VER}-uclibc-patches-${UCLIBC_VER}.tar.bz2)"
@@ -273,6 +328,22 @@ get_gcc_src_uri() {
 	# various gentoo patches
 	[[ -n ${PATCH_VER} ]] && \
 		GCC_SRC_URI="${GCC_SRC_URI} $(gentoo_urls gcc-${PATCH_GCC_VER}-patches-${PATCH_VER}.tar.bz2)"
+
+	# strawberry pie, Cappuccino and a Gauloises (it's a good thing)
+	[[ -n ${PIE_VER} ]] && \
+		GCC_SRC_URI="${GCC_SRC_URI} !nopie? ( $(gentoo_urls ${PIE_CORE}) )"
+
+	# espf patch for gcc >4.4.1 compiler. New hardened patchset
+        [[ -n ${ESPF_VER} ]] && \
+                GCC_SRC_URI="${GCC_SRC_URI} ( $(gentoo_urls gcc-${GCC_RELEASE_VER}-espf-${ESPF_VER}.tar.bz2)
+			http://weaver.gentooenterprise.com/hardened/patches/gcc-${GCC_RELEASE_VER}-espf-${ESPF_VER}.tar.bz2
+		)"
+
+	# gcc minispec for the hardened gcc 4 compiler
+	[[ -n ${SPECS_VER} ]] && \
+		GCC_SRC_URI="${GCC_SRC_URI} ( $(gentoo_urls gcc-${SPECS_GCC_VER}-specs-${SPECS_VER}.tar.bz2)
+		http://weaver.gentooenterprise.com/hardened/patches/gcc-${SPECS_GCC_VER}-specs-${SPECS_VER}.tar.bz2
+		)"
 
 	# gcc bounds checking patch
 	if [[ -n ${HTB_VER} ]] ; then
@@ -293,12 +364,8 @@ get_gcc_src_uri() {
 	if [[ ${PN} != "kgcc64" && ${PN} != gcc-* ]] ; then
 		tc_version_is_at_least "4.3" && \
 			GCC_SRC_URI="${GCC_SRC_URI}
-			gcj? ( ftp://sourceware.org/pub/java/ecj-${GCC_BRANCH_VER}.jar )"
+			gcj? ( ftp://sourceware.org/pub/java/ecj-4.3.jar )"
 	fi
-	
-	# Call get_gcc_src_uri_hardened in hardened-funcs to get
-	# Hardened sourcs uri
-	get_gcc_src_uri_hardened
 
 	echo "${GCC_SRC_URI}"
 }
@@ -317,6 +384,191 @@ get_make_var() {
 }
 XGCC() { get_make_var GCC_FOR_TARGET ; }
 
+# The gentoo piessp patches allow for 3 configurations:
+# 1) PIE+SSP by default
+# 2) PIE by default
+# 3) SSP by default
+hardened_gcc_works() {
+	if [[ $1 == "pie" ]] ; then
+		# $gcc_cv_ld_pie is unreliable as it simply take the output of
+		# `ld --help | grep -- -pie`, that reports the option in all cases, also if
+		# the loader doesn't actually load the resulting executables.
+		# To avoid breakage, blacklist FreeBSD here at least
+		[[ ${CTARGET} == *-freebsd* ]] && return 1
+
+		want_pie || return 1
+		hardened_gcc_is_stable pie && return 0
+		if has ~$(tc-arch) ${ACCEPT_KEYWORDS} ; then
+			hardened_gcc_check_unsupported pie && return 1
+			ewarn "Allowing pie-by-default for an unstable arch ($(tc-arch))"
+			return 0
+		fi
+		return 1
+	elif [[ $1 == "ssp" ]] ; then
+		[[ -z ${PP_VER} ]] && return 1
+		hardened_gcc_is_stable ssp && return 0
+		if has ~$(tc-arch) ${ACCEPT_KEYWORDS} ; then
+			hardened_gcc_check_unsupported ssp && return 1
+			ewarn "Allowing ssp-by-default for an unstable arch ($(tc-arch))"
+			return 0
+		fi
+		return 1
+	else
+		# laziness ;)
+		hardened_gcc_works pie || return 1
+		hardened_gcc_works ssp || return 1
+		return 0
+	fi
+}
+
+hardened_gcc_is_stable() {
+	if [[ $1 == "pie" ]] ; then
+		# HARDENED_* variables are deprecated and here for compatibility
+		local tocheck="${HARDENED_PIE_WORKS} ${HARDENED_GCC_WORKS}"
+		if [[ ${CTARGET} == *-uclibc* ]] ; then
+			tocheck="${tocheck} ${PIE_UCLIBC_STABLE}"
+		else
+			tocheck="${tocheck} ${PIE_GLIBC_STABLE}"
+		fi
+	elif [[ $1 == "ssp" ]] ; then
+		# ditto
+		local tocheck="${HARDENED_SSP_WORKS} ${HARDENED_GCC_WORKS}"
+		if [[ ${CTARGET} == *-uclibc* ]] ; then
+			tocheck="${tocheck} ${SSP_UCLIBC_STABLE}"
+		else
+			tocheck="${tocheck} ${SSP_STABLE}"
+		fi
+	else
+		die "hardened_gcc_stable needs to be called with pie or ssp"
+	fi
+
+	hasq $(tc-arch) ${tocheck} && return 0
+	return 1
+}
+
+hardened_gcc_check_unsupported() {
+	local tocheck=""
+	# if a variable is unset, we assume that all archs are unsupported. since
+	# this function is never called if hardened_gcc_is_stable returns true,
+	# this shouldn't cause problems... however, allowing this logic to work
+	# even with the variables unset will break older ebuilds that dont use them.
+	if [[ $1 == "pie" ]] ; then
+		if [[ ${CTARGET} == *-uclibc* ]] ; then
+			[[ -z ${PIE_UCLIBC_UNSUPPORTED} ]] && return 0
+			tocheck="${tocheck} ${PIE_UCLIBC_UNSUPPORTED}"
+		else
+			[[ -z ${PIE_GLIBC_UNSUPPORTED} ]] && return 0
+			tocheck="${tocheck} ${PIE_GLIBC_UNSUPPORTED}"
+		fi
+	elif [[ $1 == "ssp" ]] ; then
+		if [[ ${CTARGET} == *-uclibc* ]] ; then
+			[[ -z ${SSP_UCLIBC_UNSUPPORTED} ]] && return 0
+			tocheck="${tocheck} ${SSP_UCLIBC_UNSUPPORTED}"
+		else
+			[[ -z ${SSP_UNSUPPORTED} ]] && return 0
+			tocheck="${tocheck} ${SSP_UNSUPPORTED}"
+		fi
+	else
+		die "hardened_gcc_check_unsupported needs to be called with pie or ssp"
+	fi
+
+	hasq $(tc-arch) ${tocheck} && return 0
+	return 1
+}
+
+espf_arch_support() {
+	if [[ ${CTARGET} == *-uclibc* ]] && has $(tc-arch) ${ESPF_UCLIBC_SUPPORT} || has $(tc-arch) ${ESPF_GLIBC_SUPPORT} ; then
+			return 0
+	else
+			return 1
+	fi
+}
+
+has_libssp() {
+	[[ -e /$(get_libdir)/libssp.so ]] && return 0
+	return 1
+}
+
+want_libssp() {
+	[[ ${GCC_LIBSSP_SUPPORT} == "true" ]] || return 1
+	has_libssp || return 1
+	[[ -n ${PP_VER} ]] || return 1
+	return 0
+}
+
+_want_stuff() {
+	local var=$1 flag=$2
+	[[ -z ${!var} ]] && return 1
+	use ${flag} && return 0
+	return 1
+}
+want_boundschecking() { _want_stuff HTB_VER boundschecking ; }
+want_pie() { _want_stuff PIE_VER !nopie ; }
+want_ssp() { _want_stuff PP_VER !nossp ; }
+
+want_split_specs() {
+	[[ ${SPLIT_SPECS} == "true" ]] && want_pie
+}
+want_minispecs() {
+	if tc_version_is_at_least 4.3.2 && use hardened ; then
+		[[ -n ${SPECS_VER} ]] && want_pie && return 0
+		[[ -n ${ESPF_VER} ]] && [[ -n ${SPECS_VER} ]] && return 1
+		die "For Hardened to work you need the minispecs files and have the PIE patch"
+	fi
+	return 1	
+}
+want_espf() {
+	if tc_version_is_at_least 4.3.4 && use hardened ; then
+		[[ -n ${ESPF_VER} ]] && [[ -n ${SPECS_VER} ]] && return 0 
+		die "For Hardened to work you need the minispecs files and have the espf patch"
+	fi
+	return 1
+}
+# This function checks whether or not glibc has the support required to build
+# Position Independant Executables with gcc.
+glibc_have_pie() {
+	if [[ ! -f ${ROOT}/usr/$(get_libdir)/Scrt1.o ]] ; then
+		echo
+		ewarn "Your glibc does not have support for pie, the file Scrt1.o is missing"
+		ewarn "Please update your glibc to a proper version or disable hardened"
+		echo
+		return 1
+	fi
+}
+
+# This function determines whether or not libc has been patched with stack
+# smashing protection support.
+libc_has_ssp() {
+	[[ ${ROOT} != "/" ]] && return 0
+
+	# lib hacks taken from sandbox configure
+	echo 'int main(){}' > "${T}"/libctest.c
+	LC_ALL=C gcc "${T}"/libctest.c -lc -o libctest -Wl,-verbose &> "${T}"/libctest.log || return 1
+	local libc_file=$(awk '/attempt to open/ { if (($4 ~ /\/libc\.so/) && ($5 == "succeeded")) LIBC = $4; }; END {print LIBC}' "${T}"/libctest.log)
+
+	[[ -z ${libc_file} ]] && die "Unable to find a libc !?"
+
+	# Check for gcc-4.x style ssp support
+	if	[[ -n $(readelf -s "${libc_file}" 2>/dev/null | \
+				grep 'FUNC.*GLOBAL.*__stack_chk_fail') ]]
+	then
+		return 0
+	else
+		# Check for gcc-3.x style ssp support
+		if	[[ -n $(readelf -s "${libc_file}" 2>/dev/null | \
+					grep 'OBJECT.*GLOBAL.*__guard') ]] && \
+			[[ -n $(readelf -s "${libc_file}" 2>/dev/null | \
+					grep 'FUNC.*GLOBAL.*__stack_smash_handler') ]]
+		then
+			return 0
+		elif is_crosscompile ; then
+			die "'${libc_file}' was detected w/out ssp, that sucks (a lot)"
+		else
+			return 1
+		fi
+	fi
+}
+
 # This is to make sure we don't accidentally try to enable support for a
 # language that doesnt exist. GCC 3.4 supports f77, while 4.0 supports f95, etc.
 #
@@ -330,7 +582,83 @@ gcc-lang-supported() {
 
 #----<< support checks >>----
 
-#---->>env.d logic <<----
+#---->> specs + env.d logic <<----
+
+# defaults to enable for all hardened toolchains
+gcc_common_hard="-DEFAULT_RELRO -DEFAULT_BIND_NOW"
+
+# configure to build with the hardened GCC specs as the default
+make_gcc_hard() {
+	if hardened_gcc_works ; then
+		einfo "Updating gcc to use automatic PIE + SSP building ..."
+		sed -e "s|^HARD_CFLAGS = |HARD_CFLAGS = -DEFAULT_PIE_SSP ${gcc_common_hard} |" \
+			-i "${S}"/gcc/Makefile.in || die "Failed to update gcc!"
+	elif hardened_gcc_works pie ; then
+		einfo "Updating gcc to use automatic PIE building ..."
+		ewarn "SSP has not been enabled by default"
+		sed -e "s|^HARD_CFLAGS = |HARD_CFLAGS = -DEFAULT_PIE ${gcc_common_hard} |" \
+			-i "${S}"/gcc/Makefile.in || die "Failed to update gcc!"
+	elif hardened_gcc_works ssp ; then
+		einfo "Updating gcc to use automatic SSP building ..."
+		ewarn "PIE has not been enabled by default"
+		sed -e "s|^HARD_CFLAGS = |HARD_CFLAGS = -DEFAULT_SSP ${gcc_common_hard} |" \
+			-i "${S}"/gcc/Makefile.in || die "Failed to update gcc!"
+	else
+		# do nothing if hardened isnt supported, but dont die either
+		ewarn "hardened is not supported for this arch in this gcc version"
+		ebeep
+		return 0
+	fi
+
+	# rebrand to make bug reports easier
+	BRANDING_GCC_PKGVERSION=${BRANDING_GCC_PKGVERSION/Gentoo/Gentoo Hardened}
+}
+
+# now we generate different spec files so that the user can select a compiler
+# that enforces certain features in gcc itself and so we don't have to worry
+# about a certain package ignoring CFLAGS/LDFLAGS
+_create_specs_file() {
+	# Usage: _create_specs_file <USE flag> <specs name> <CFLAGS>
+	local uflag=$1 name=$2 flags=${*:3}
+	ebegin "Creating a ${name} gcc specs file"
+	pushd "${WORKDIR}"/build/gcc > /dev/null
+	if [[ -z ${uflag} ]] || use ${uflag} ; then
+		# backup the compiler first
+		cp Makefile Makefile.orig
+		sed -i -e '/^HARD_CFLAGS/s:=.*:='"${flags}"':' Makefile
+		mv xgcc xgcc.foo
+		mv gcc.o gcc.o.foo
+		emake -s xgcc
+		$(XGCC) -dumpspecs > "${WORKDIR}"/build/${name}.specs
+		# restore everything to normal
+		mv gcc.o.foo gcc.o
+		mv xgcc.foo xgcc
+		mv Makefile.orig Makefile
+	else
+		$(XGCC) -dumpspecs > "${WORKDIR}"/build/${name}.specs
+	fi
+	popd > /dev/null
+	eend $([[ -s ${WORKDIR}/build/${name}.specs ]] ; echo $?)
+}
+create_vanilla_specs_file()			 { _create_specs_file hardened vanilla ; }
+create_hardened_specs_file()		 { _create_specs_file !hardened hardened  ${gcc_common_hard} -DEFAULT_PIE_SSP ; }
+create_hardenednossp_specs_file()	 { _create_specs_file "" hardenednossp	  ${gcc_common_hard} -DEFAULT_PIE ; }
+create_hardenednopie_specs_file()	 { _create_specs_file "" hardenednopie	  ${gcc_common_hard} -DEFAULT_SSP ; }
+create_hardenednopiessp_specs_file() { _create_specs_file "" hardenednopiessp ${gcc_common_hard} ; }
+
+split_out_specs_files() {
+	local s spec_list="hardenednopiessp vanilla"
+	if hardened_gcc_works ; then
+		spec_list="${spec_list} hardened hardenednossp hardenednopie"
+	elif hardened_gcc_works pie ; then
+		spec_list="${spec_list} hardenednossp"
+	elif hardened_gcc_works ssp ; then
+		spec_list="${spec_list} hardenednopie"
+	fi
+	for s in ${spec_list} ; do
+		create_${s}_specs_file || return 1
+	done
+}
 
 create_gcc_env_entry() {
 	dodir /etc/env.d/gcc
@@ -397,16 +725,144 @@ create_gcc_env_entry() {
 	# Set which specs file to use
 	[[ -n ${gcc_specs_file} ]] && echo "GCC_SPECS=\"${gcc_specs_file}\"" >> ${gcc_envd_file}
 }
+setup_minispecs_gcc_build_specs() {
+	# Setup the "build.specs" file for gcc to use when building.
+	if want_minispecs ; then
+		if hardened_gcc_works pie ; then
+			cat "${WORKDIR}"/specs/pie.specs >> "${WORKDIR}"/build.specs
+		fi
+		for s in nostrict znow; do
+			cat "${WORKDIR}"/specs/${s}.specs >> "${WORKDIR}"/build.specs
+		done
+		export GCC_SPECS="${WORKDIR}"/build.specs
+	fi
+}
+copy_minispecs_gcc_specs() {
+	# Build system specs file which, if it exists, must be a complete set of
+	# specs as it completely and unconditionally overrides the builtin specs.
+	# For gcc 4
+	if want_minispecs ; then
+		$(XGCC) -dumpspecs > "${WORKDIR}"/specs/specs
+		cat "${WORKDIR}"/build.specs >> "${WORKDIR}"/specs/specs
+		insinto ${LIBPATH}
+		doins "${WORKDIR}"/specs/* || die "failed to install specs"
+	fi
+	if want_espf ; then
+		insinto ${LIBPATH}
+		doins "${WORKDIR}"/specs/* || die "failed to install specs"
+	fi
+}
+add_profile_eselect_conf() {
+	local compiler_config_file=$1
+	local abi=$2
+	local specs=$3
+	local gcc_specs_file
+	local var
 
-#----<<env.d logic >>----
+	if [[ -z ${specs} ]] ; then
+		# I'm leaving the following commented out to remind me that it
+		# was an insanely -bad- idea. Stuff broke. GCC_SPECS isnt unset
+		# on chroot or in non-toolchain.eclass gcc ebuilds!
+		#gcc_specs_file="${LIBPATH}/specs"
+		gcc_specs_file=""
 
+		if use hardened ; then
+			specs="hardened"
+		else
+			specs="vanilla"
+		fi
+	else
+		gcc_specs_file="${LIBPATH}/${specs}.specs"
+	fi
+
+	echo >> ${compiler_config_file}
+	if ! is_multilib ; then
+		echo "[${specs}]" >> ${compiler_config_file}
+		echo "	ctarget=${CTARGET}" >> ${compiler_config_file}
+	else
+		echo "[${abi}-${specs}]" >> ${compiler_config_file}
+		var="CTARGET_${abi}"
+		if [[ -n ${!var} ]] ; then
+			echo "	ctarget=${!var}" >> ${compiler_config_file}
+		else
+			var="CHOST_${abi}"
+			if [[ -n ${!var} ]] ; then
+				echo "	ctarget=${!var}" >> ${compiler_config_file}
+			else
+				echo "	ctarget=${CTARGET}" >> ${compiler_config_file}
+			fi
+		fi
+	fi
+
+	local MULTIDIR=$($(XGCC) $(get_abi_CFLAGS ${abi}) --print-multi-directory)
+	local LDPATH=${LIBPATH}
+	if [[ ${MULTIDIR} != "." ]] ; then
+		LDPATH="${LIBPATH}/${MULTIDIR}"
+	fi
+
+	echo "	ldpath=${LDPATH}" >> ${compiler_config_file}
+
+	if [[ -n ${gcc_specs_file} ]] ; then
+		echo "	specs=${gcc_specs_file}" >> ${compiler_config_file}
+	fi
+
+	var="CFLAGS_${abi}"
+	if [[ -n ${!var} ]] ; then
+		echo "	cflags=${!var}" >> ${compiler_config_file}
+	fi
+}
+
+create_eselect_conf() {
+	local config_dir="/etc/eselect/compiler"
+	local compiler_config_file="${D}/${config_dir}/${CTARGET}-${GCC_CONFIG_VER}.conf"
+	local abi
+
+	dodir ${config_dir}
+
+	echo "[global]" > ${compiler_config_file}
+	echo "	version=${CTARGET}-${GCC_CONFIG_VER}" >> ${compiler_config_file}
+	echo "	binpath=${BINPATH}" >> ${compiler_config_file}
+	echo "	manpath=${DATAPATH}/man" >> ${compiler_config_file}
+	echo "	infopath=${DATAPATH}/info" >> ${compiler_config_file}
+	echo "	alias_cc=gcc" >> ${compiler_config_file}
+	echo "	stdcxx_incdir=${STDCXX_INCDIR##*/}" >> ${compiler_config_file}
+	echo "	bin_prefix=${CTARGET}" >> ${compiler_config_file}
+
+	# Per spyderous, it is best not to alias the fortran compilers
+	#if [[ -x "${D}/${BINPATH}/${CTARGET}-g77" ]] ; then
+	#	echo "	alias_gfortran=g77" >> ${compiler_config_file}
+	#elif [[ -x "${D}/${BINPATH}/${CTARGET}-gfortran" ]] ; then
+	#	echo "	alias_g77=gfortran" >> ${compiler_config_file}
+	#fi
+
+	for abi in $(get_all_abis) ; do
+		add_profile_eselect_conf "${compiler_config_file}" "${abi}"
+
+		if want_split_specs ; then
+			if use hardened ; then
+				add_profile_eselect_conf "${compiler_config_file}" "${abi}" vanilla
+			elif hardened_gcc_works ; then
+				add_profile_eselect_conf "${compiler_config_file}" "${abi}" hardened
+			fi
+
+			if hardened_gcc_works || hardened_gcc_works pie ; then
+				add_profile_eselect_conf "${compiler_config_file}" "${abi}" hardenednossp
+			fi
+
+			if hardened_gcc_works || hardened_gcc_works ssp ; then
+				add_profile_eselect_conf "${compiler_config_file}" "${abi}" hardenednopie
+			fi
+
+			add_profile_eselect_conf "${compiler_config_file}" "${abi}" hardenednopiessp
+		fi
+	done
+}
+
+#----<< specs + env.d logic >>----
 
 #---->> pkg_* <<----
 gcc_pkg_setup() {
 	[[ -z ${ETYPE} ]] && die "Your ebuild needs to set the ETYPE variable"
-
-	#You must build non-hardened compiler with vanilla-spec compiler.
-	check_hardened_compiler_vanilla
 
 	if [[ ( $(tc-arch) == "amd64" || $(tc-arch) == "ppc64" ) && ( ${LD_PRELOAD} == "/lib/libsandbox.so" || ${LD_PRELOAD} == "/usr/lib/libsandbox.so" ) ]] && is_multilib ; then
 		eerror "Sandbox in your installed portage does not support compilation."
@@ -448,9 +904,11 @@ gcc_pkg_setup() {
 		# we dont want to use the installed compiler's specs to build gcc!
 		unset GCC_SPECS
 	fi
-	# Call want_libssp and libc_has_ssp in hardened-funcs
+
 	want_libssp && libc_has_ssp && \
 		die "libssp cannot be used with a glibc that has been patched to provide ssp symbols"
+
+	unset LANGUAGES #265283
 }
 
 gcc-compiler_pkg_preinst() {
@@ -458,8 +916,11 @@ gcc-compiler_pkg_preinst() {
 }
 
 gcc-compiler_pkg_postinst() {
-
-	do_gcc_config
+	if has_version 'app-admin/eselect-compiler' ; then
+		do_eselect_compiler
+	else
+		do_gcc_config
+	fi
 
 	if ! is_crosscompile ; then
 		echo
@@ -552,9 +1013,37 @@ gcc-compiler_pkg_postrm() {
 #---->> src_* <<----
 
 # generic GCC src_unpack, to be called from the ebuild's src_unpack.
+# BIG NOTE regarding hardened support: ebuilds with support for hardened are
+# expected to export the following variable:
+#
+#	HARDENED_GCC_WORKS
+#			This variable should be set to the archs on which hardened should
+#			be allowed. For example: HARDENED_GCC_WORKS="x86 sparc amd64"
+#			This allows for additional archs to be supported by hardened when
+#			ready.
+#
+# Travis Tilley <lv@gentoo.org> (03 Sep 2004)
+#
 gcc-compiler_src_unpack() {
-	# Call hardened_compiler_src_unpack_setup in hardened-funcs
-	hardened_compiler_src_unpack_setup
+	# For the old gcc < 3.4
+	if ! tc_version_is_at_least 4.3 ; then
+	# Fail if using pie patches, building hardened, and glibc doesn't have
+	# the necessary support
+		want_pie && use hardened && glibc_have_pie
+		einfo "updating configuration to build GCC gcc-3 style"
+		make_gcc_hard || die "failed to make gcc hard"
+	fi
+	# For the newer gcc > 3.4
+	if tc_version_is_at_least 4.3.2 && use hardened ; then
+		if [[ ${PIE_VER} ]] ; then
+		  glibc_have_pie || die "failed to make gcc hardened"
+		fi
+		if [[ ${ESPF_VER} ]] ; then
+		  espf_arch_support || die "ESPF is not supported on this $(tc-arch) arch."
+		fi
+		# Rebrand to make bug reports easier
+		use hardened && BRANDING_GCC_PKGVERSION=${BRANDING_GCC_PKGVERSION/Gentoo/Gentoo Hardened}
+	fi
 
 	if is_libffi ; then
 		# move the libffi target out of gcj and into all
@@ -613,8 +1102,6 @@ gcc_src_unpack() {
 
 	gcc_quick_unpack
 	exclude_gcc_patches
-	# Call exclude_hardened_gcc_patches in hardened-funcs
-	exclude_hardened_gcc_patches
 
 	cd "${S}"
 
@@ -632,20 +1119,20 @@ gcc_src_unpack() {
 		fi
 	fi
 	do_gcc_HTB_patches
-	# Hardened patches
-	# do_gcc_SSP_patches, do_gcc_FORTIFY_patches, do_gcc_PIE_patches and do_gcc_ESPF_patches is in hardened-funcs
 	do_gcc_SSP_patches
-	do_gcc_FORTIFY_patches
-	[[ -z ${ESPF_VER} ]] && do_gcc_PIE_patches
+	do_gcc_PIE_patches
 	do_gcc_USER_patches
 	do_gcc_ESPF_patches
 
 	${ETYPE}_src_unpack || die "failed to ${ETYPE}_src_unpack"
 
 	# protoize don't build on FreeBSD, skip it
-	if ! is_crosscompile && ! use elibc_FreeBSD ; then
-		# enable protoize / unprotoize
-		sed -i -e '/^LANGUAGES =/s:$: proto:' "${S}"/gcc/Makefile.in
+	## removed in 4.5, bug #270558 --de.
+	if [[ ${GCCMAJOR}.${GCCMINOR} < 4.5 ]]; then
+		if ! is_crosscompile && ! use elibc_FreeBSD ; then
+			# enable protoize / unprotoize
+			sed -i -e '/^LANGUAGES =/s:$: proto:' "${S}"/gcc/Makefile.in
+		fi
 	fi
 
 	fix_files=""
@@ -670,7 +1157,7 @@ gcc_src_unpack() {
 	# >= gcc-4.3 doesn't bundle ecj.jar, so copy it
 	if [[ ${GCCMAJOR}.${GCCMINOR} > 4.2 ]] &&
 		use gcj ; then
-		cp -pPR "${DISTDIR}/ecj-${GCC_BRANCH_VER}.jar" "${S}/ecj.jar" || die
+		cp -pPR "${DISTDIR}/ecj-4.3.jar" "${S}/ecj.jar" || die
 	fi
 
 	# disable --as-needed from being compiled into gcc specs
@@ -738,9 +1225,21 @@ gcc-compiler-configure() {
 		else
 			confgcc="${confgcc} --disable-libmudflap"
 		fi
-		# Call hardened_configure in hardened-funcs
-		hardened_configure
-		
+
+		if want_libssp ; then
+			confgcc="${confgcc} --enable-libssp"
+		else
+			export gcc_cv_libc_provides_ssp=yes
+			confgcc="${confgcc} --disable-libssp"
+		fi
+
+		# If we want hardened support on newer espf-patchset
+		if want_espf ; then
+			confgcc="${confgcc} --enable-espf"
+		else
+			[[ ${ESPF_VER} ]] && confgcc="${confgcc} --disable-espf"
+		fi
+
 		if tc_version_is_at_least "4.2" ; then
 			confgcc="${confgcc} $(use_enable openmp libgomp)"
 		fi
@@ -862,6 +1361,12 @@ gcc_do_configure() {
 	# users to control this feature in the event they need the support.
 	tc_version_is_at_least "4.3" && confgcc="${confgcc} $(use_enable fixed-point)"
 
+	# graphite support was added in 4.4, which depends upon external libraries
+	# for optimizations.  This option allows users to determine if they want
+	# these optimizations and libraries pulled in
+	tc_version_is_at_least "4.4" && \
+		confgcc="${confgcc} $(use_with graphite ppl) $(use_with graphite cloog)"
+
 
 	[[ $(tc-is-softfloat) == "yes" ]] && confgcc="${confgcc} --with-float=soft"
 
@@ -926,7 +1431,7 @@ gcc_do_configure() {
 	# __cxa_atexit is "essential for fully standards-compliant handling of
 	# destructors", but apparently requires glibc.
 	if [[ ${CTARGET} == *-uclibc* ]] ; then
-		confgcc="${confgcc} --disable-__cxa_atexit --enable-target-optspace"
+		confgcc="${confgcc} --disable-__cxa_atexit --enable-target-optspace $(use_enable nptl tls)"
 		[[ ${GCCMAJOR}.${GCCMINOR} == 3.3 ]] && confgcc="${confgcc} --enable-sjlj-exceptions"
 		if tc_version_is_at_least 3.4 && [[ ${GCCMAJOR}.${GCCMINOR} < 4.3 ]] ; then
 			confgcc="${confgcc} --enable-clocale=uclibc"
@@ -944,6 +1449,7 @@ gcc_do_configure() {
 	# create a sparc*linux*-{gcc,g++} that can handle -m32 and -m64 (biarch)
 	if [[ ${CTARGET} == sparc*linux* ]] \
 		&& is_multilib \
+		&& ! is_crosscompile \
 		&& [[ ${GCCMAJOR}.${GCCMINOR} > 4.2 ]]
 	then
 		confgcc="${confgcc} --enable-targets=all"
@@ -1185,7 +1691,6 @@ gcc_src_compile() {
 	einfo "CFLAGS=\"${CFLAGS}\""
 	einfo "CXXFLAGS=\"${CXXFLAGS}\""
 
-	# Call setup_minispecs_gcc_build_specs in hardened-funcs
 	# For hardened gcc 4 for build the hardened specs file to use when building gcc
 	setup_minispecs_gcc_build_specs
 
@@ -1209,20 +1714,19 @@ gcc_src_compile() {
 	einfo "Compiling ${PN} ..."
 	gcc_do_make ${GCC_MAKE_TARGET}
 
-	# Call setup_split_specs in hardened-funcs
-	# Setup Hardened Split specs for gcc 3.4
-	setup_split_specs
+	# Do not create multiple specs files for PIE+SSP if boundschecking is in
+	# USE, as we disable PIE+SSP when it is.
+	# minispecs and espf will not need to split out specs.
+	if [[ ${ETYPE} == "gcc-compiler" ]] && want_split_specs && ! want_minispecs && ! want_espf ; then
+		split_out_specs_files || die "failed to split out specs"
+	fi
 
 	popd > /dev/null
 }
 
 gcc_src_test() {
-	# GCC >= 4.4.* support -j*
-	if tc_version_is_at_least 4.4 ; then
-		emake -k check || ewarn "check failed and that sucks :("
-	else
-		emake -j1 -k check || ewarn "check failed and that sucks :("
-	fi
+	cd "${WORKDIR}"/build
+	emake -j1 -k check || ewarn "check failed and that sucks :("
 }
 
 gcc-library_src_install() {
@@ -1297,9 +1801,35 @@ gcc-compiler_src_install() {
 	dodir /etc/env.d/gcc
 	create_gcc_env_entry
 
-	# Call create_hardened_gcc_env_entry in hardened-funcs
-	create_hardened_gcc_env_entry
+	if want_split_specs ; then
+		if use hardened ; then
+			create_gcc_env_entry vanilla
+		fi
+		! use hardened && hardened_gcc_works && create_gcc_env_entry hardened
+		if hardened_gcc_works || hardened_gcc_works pie ; then
+			create_gcc_env_entry hardenednossp
+		fi
+		if hardened_gcc_works || hardened_gcc_works ssp ; then
+			create_gcc_env_entry hardenednopie
+		fi
+		create_gcc_env_entry hardenednopiessp
 
+		insinto ${LIBPATH}
+		doins "${WORKDIR}"/build/*.specs || die "failed to install specs"
+	fi
+	# Setup the gcc_env_entry for hardened gcc 4 with minispecs or espf
+	if want_minispecs ; then
+		if hardened_gcc_works pie ; then
+		    create_gcc_env_entry hardenednopie
+		fi
+		create_gcc_env_entry vanilla
+	fi
+	if  want_espf ; then
+		create_gcc_env_entry hardenednopie
+		create_gcc_env_entry hardenednossp
+		create_gcc_env_entry vanilla
+	fi
+	
 	# Make sure we dont have stuff lying around that
 	# can nuke multiple versions of gcc
 
@@ -1401,9 +1931,10 @@ gcc-compiler_src_install() {
 	# the group 'root' set to gid 0
 	chown -R root:0 "${D}"${LIBPATH}
 
-	# Call copy_minispecs_gcc_specs in hardened-funcs
-	# Make the "specs" file for hardened gcc 4
-	# and copy the minispecs
+	# Create config files for eselect-compiler
+	create_eselect_conf
+
+	# Copy the needed minispec for hardened gcc 4
 	copy_minispecs_gcc_specs
 }
 
@@ -1508,7 +2039,10 @@ gcc_quick_unpack() {
 	pushd "${WORKDIR}" > /dev/null
 	export PATCH_GCC_VER=${PATCH_GCC_VER:-${GCC_RELEASE_VER}}
 	export UCLIBC_GCC_VER=${UCLIBC_GCC_VER:-${PATCH_GCC_VER}}
+	export PIE_GCC_VER=${PIE_GCC_VER:-${GCC_RELEASE_VER}}
+	export PP_GCC_VER=${PP_GCC_VER:-${GCC_RELEASE_VER}}
 	export HTB_GCC_VER=${HTB_GCC_VER:-${GCC_RELEASE_VER}}
+	export SPECS_GCC_VER=${SPECS_GCC_VER:-${GCC_RELEASE_VER}}
 
 	if [[ -n ${GCC_A_FAKEIT} ]] ; then
 		unpack ${GCC_A_FAKEIT}
@@ -1547,11 +2081,33 @@ gcc_quick_unpack() {
 	[[ -n ${UCLIBC_VER} ]] && \
 		unpack gcc-${UCLIBC_GCC_VER}-uclibc-patches-${UCLIBC_VER}.tar.bz2
 
+	if want_ssp ; then
+		if [[ -n ${PP_FVER} ]] ; then
+			# The gcc 3.4 propolice versions are meant to be unpacked to ${S}
+			pushd "${S}" > /dev/null
+			unpack protector-${PP_FVER}.tar.gz
+			popd > /dev/null
+		else
+			unpack gcc-${PP_GCC_VER}-ssp-${PP_VER}.tar.bz2
+		fi
+	fi
+
+	if want_pie ; then
+		if [[ -n ${PIE_CORE} ]] ; then
+			unpack ${PIE_CORE}
+		else
+			unpack gcc-${PIE_GCC_VER}-piepatches-v${PIE_VER}.tar.bz2
+		fi
+		[[ -n ${SPECS_VER} ]] && \
+			unpack gcc-${SPECS_GCC_VER}-specs-${SPECS_VER}.tar.bz2
+	fi
+	if [[ -n ${ESPF_VER} ]] ; then
+		unpack gcc-${GCC_RELEASE_VER}-espf-${ESPF_VER}.tar.bz2
+		unpack gcc-${GCC_RELEASE_VER}-specs-${SPECS_VER}.tar.bz2
+	fi
+
 	want_boundschecking && \
 		unpack "bounds-checking-gcc-${HTB_GCC_VER}-${HTB_VER}.patch.bz2"
-	
-	# Call hardened_gcc_quick_unpack in hardened-funcs
-	hardened_gcc_quick_unpack
 
 	popd > /dev/null
 }
@@ -1560,6 +2116,9 @@ gcc_quick_unpack() {
 #
 #	GENTOO_PATCH_EXCLUDE
 #			List of filenames, relative to ${WORKDIR}/patch/
+#
+#	PIEPATCH_EXCLUDE
+#			List of filenames, relative to ${WORKDIR}/piepatch/
 #
 # Travis Tilley <lv@gentoo.org> (03 Sep 2004)
 #
@@ -1571,8 +2130,27 @@ exclude_gcc_patches() {
 			rm -f "${WORKDIR}"/patch/${i} || die "failed to delete ${i}"
 		fi
 	done
+	for i in ${PIEPATCH_EXCLUDE} ; do
+		if [[ -f ${WORKDIR}/piepatch/${i} ]] ; then
+			einfo "Excluding piepatch ${i}"
+			rm -f "${WORKDIR}"/piepatch/${i} || die "failed to delete ${i}"
+		fi
+	done
 }
 
+# Try to apply some stub patches so that gcc won't error out when
+# passed parameters like -fstack-protector but no ssp is found
+do_gcc_stub() {
+	local v stub_patch=""
+	for v in ${GCC_RELEASE_VER} ${GCC_BRANCH_VER} ; do
+		stub_patch=${GCC_FILESDIR}/stubs/gcc-${v}-$1-stub.patch
+		if [[ -e ${stub_patch} ]] && ! use vanilla ; then
+			EPATCH_SINGLE_MSG="Applying stub patch for $1 ..." \
+			epatch "${stub_patch}"
+			return 0
+		fi
+	done
+}
 
 do_gcc_USER_patches() {
 	local check base=${PORTAGE_CONFIGROOT}/etc/portage/patches
@@ -1601,6 +2179,145 @@ do_gcc_HTB_patches() {
 	# modify the bounds checking patch with a regression patch
 	epatch "${WORKDIR}/bounds-checking-gcc-${HTB_GCC_VER}-${HTB_VER}.patch"
 	BRANDING_GCC_PKGVERSION="${BRANDING_GCC_PKGVERSION}, HTB-${HTB_GCC_VER}-${HTB_VER}"
+}
+
+# patch in ProPolice Stack Smashing protection
+do_gcc_SSP_patches() {
+	# PARISC has no love ... it's our stack :(
+	if [[ $(tc-arch) == "hppa" ]] || \
+	   ! want_ssp || \
+	   (want_boundschecking && [[ ${HTB_EXCLUSIVE} == "true" ]])
+	then
+		do_gcc_stub ssp
+		return 0
+	fi
+
+	local ssppatch
+	local sspdocs
+
+	if [[ -n ${PP_FVER} ]] ; then
+		# Etoh keeps changing where files are and what the patch is named
+		if tc_version_is_at_least 3.4.1 ; then
+			# >3.4.1 uses version in patch name, and also includes docs
+			ssppatch="${S}/gcc_${PP_VER}.dif"
+			sspdocs="yes"
+		elif tc_version_is_at_least 3.4.0 ; then
+			# >3.4 put files where they belong and 3_4 uses old patch name
+			ssppatch="${S}/protector.dif"
+			sspdocs="no"
+		elif tc_version_is_at_least 3.2.3 ; then
+			# earlier versions have no directory structure or docs
+			mv "${S}"/protector.{c,h} "${S}"/gcc
+			ssppatch="${S}/protector.dif"
+			sspdocs="no"
+		fi
+	else
+		# Just start packaging the damn thing ourselves
+		mv "${WORKDIR}"/ssp/protector.{c,h} "${S}"/gcc/
+		ssppatch=${WORKDIR}/ssp/gcc-${PP_GCC_VER}-ssp.patch
+		# allow boundschecking and ssp to get along
+		(want_boundschecking && [[ -e ${WORKDIR}/ssp/htb-ssp.patch ]]) \
+			&& patch -s "${ssppatch}" "${WORKDIR}"/ssp/htb-ssp.patch
+	fi
+
+	[[ -z ${ssppatch} ]] && die "Sorry, SSP is not supported in this version"
+	epatch ${ssppatch}
+
+	if [[ ${PN} == "gcc" && ${sspdocs} == "no" ]] ; then
+		epatch "${GCC_FILESDIR}"/pro-police-docs.patch
+	fi
+
+	# Don't build crtbegin/end with ssp
+	sed -e 's|^CRTSTUFF_CFLAGS = |CRTSTUFF_CFLAGS = -fno-stack-protector |'\
+		-i gcc/Makefile.in || die "Failed to update crtstuff!"
+
+	# if gcc in a stage3 defaults to ssp, is version 3.4.0 and a stage1 is built
+	# the build fails building timevar.o w/:
+	# cc1: stack smashing attack in function ix86_split_to_parts()
+	if use build && tc_version_is_at_least 3.4.0 ; then
+		if gcc -dumpspecs | grep -q "fno-stack-protector:" ; then
+			epatch "${GCC_FILESDIR}"/3.4.0/gcc-3.4.0-cc1-no-stack-protector.patch
+		fi
+	fi
+
+	BRANDING_GCC_PKGVERSION="${BRANDING_GCC_PKGVERSION}, ssp-${PP_FVER:-${PP_GCC_VER}-${PP_VER}}"
+	if want_libssp ; then
+		update_gcc_for_libssp
+	else
+		update_gcc_for_libc_ssp
+	fi
+
+	# Don't build libgcc with ssp
+	sed -e 's|^\(LIBGCC2_CFLAGS.*\)$|\1 -fno-stack-protector|' \
+		-i gcc/Makefile.in || die "Failed to update gcc!"
+}
+
+# If glibc or uclibc has been patched to provide the necessary symbols itself,
+# then lets use those for SSP instead of libgcc.
+update_gcc_for_libc_ssp() {
+	if libc_has_ssp ; then
+		einfo "Updating gcc to use SSP from libc ..."
+		sed -e 's|^\(LIBGCC2_CFLAGS.*\)$|\1 -D_LIBC_PROVIDES_SSP_|' \
+			-i "${S}"/gcc/Makefile.in || die "Failed to update gcc!"
+	fi
+}
+
+# a split out non-libc non-libgcc ssp requires additional spec logic changes
+update_gcc_for_libssp() {
+	einfo "Updating gcc to use SSP from libssp..."
+	sed -e 's|^\(INTERNAL_CFLAGS.*\)$|\1 -D_LIBSSP_PROVIDES_SSP_|' \
+		-i "${S}"/gcc/Makefile.in || die "Failed to update gcc!"
+}
+
+# do various updates to PIE logic
+do_gcc_PIE_patches() {
+	if ! want_pie || \
+	   (want_boundschecking && [[ ${HTB_EXCLUSIVE} == "true" ]])
+	then
+		return 0
+	fi
+
+	want_boundschecking \
+		&& rm -f "${WORKDIR}"/piepatch/*/*-boundschecking-no.patch* \
+		|| rm -f "${WORKDIR}"/piepatch/*/*-boundschecking-yes.patch*
+
+	use vanilla && return 0
+
+	if tc_version_is_at_least 4.3.2; then
+		guess_patch_type_in_dir "${WORKDIR}"/piepatch/
+		EPATCH_MULTI_MSG="Applying pie patches ..." \
+		epatch "${WORKDIR}"/piepatch/
+	else
+		guess_patch_type_in_dir "${WORKDIR}"/piepatch/upstream
+
+		# corrects startfile/endfile selection and shared/static/pie flag usage
+		EPATCH_MULTI_MSG="Applying upstream pie patches ..." \
+		epatch "${WORKDIR}"/piepatch/upstream
+		# adds non-default pie support (rs6000)
+		EPATCH_MULTI_MSG="Applying non-default pie patches ..." \
+		epatch "${WORKDIR}"/piepatch/nondef
+		# adds default pie support (rs6000 too) if DEFAULT_PIE[_SSP] is defined
+		EPATCH_MULTI_MSG="Applying default pie patches ..." \
+		epatch "${WORKDIR}"/piepatch/def
+
+		# we want to be able to control the pie patch logic via something other
+		# than ALL_CFLAGS...
+		sed -e '/^ALL_CFLAGS/iHARD_CFLAGS = ' \
+			-e 's|^ALL_CFLAGS = |ALL_CFLAGS = $(HARD_CFLAGS) |' \
+			-i "${S}"/gcc/Makefile.in
+	fi
+
+	BRANDING_GCC_PKGVERSION="${BRANDING_GCC_PKGVERSION}, pie-${PIE_VER}"
+}
+
+# do various updates to ESPF
+do_gcc_ESPF_patches() {
+	if [[ -n ${ESPF_VER} ]] || ! use vanilla; then
+		guess_patch_type_in_dir "${WORKDIR}"/espf-gcc-"${GCC_RELEASE_VER}"
+		  EPATCH_MULTI_MSG="Applying espf patches ..." \
+		  epatch "${WORKDIR}"/espf-gcc-"${GCC_RELEASE_VER}"
+		BRANDING_GCC_PKGVERSION="${BRANDING_GCC_PKGVERSION}, espf-${ESPF_VER}"
+	fi
 }
 
 should_we_gcc_config() {
@@ -1678,11 +2395,101 @@ do_gcc_config() {
 	gcc-config ${CTARGET}-${GCC_CONFIG_VER}${use_specs}
 }
 
+should_we_eselect_compiler() {
+	# we always want to run gcc-config if we're bootstrapping, otherwise
+	# we might get stuck with the c-only stage1 compiler
+	use bootstrap && return 0
+	use build && return 0
+
+	# if the current config is invalid, we definitely want a new one
+	# Note: due to bash quirkiness, the following must not be 1 line
+	local curr_config
+	curr_config=$(env -i eselect compiler show ${CTARGET} 2>&1) || return 0
+	[[ -z ${curr_config} || ${curr_config} == "(none)" ]] && return 0
+
+	# if the previously selected config has the same major.minor (branch) as
+	# the version we are installing, then it will probably be uninstalled
+	# for being in the same SLOT, make sure we run gcc-config.
+	local curr_config_ver=$(echo ${curr_config} | cut -f1 -d/ | awk -F - '{ print $5 }')
+	local curr_branch_ver=$(get_version_component_range 1-2 ${curr_config_ver})
+
+	# If we're using multislot, just run gcc-config if we're installing
+	# to the same profile as the current one.
+	use multislot && return $([[ ${curr_config_ver} == ${GCC_CONFIG_VER} ]])
+
+	if [[ ${curr_branch_ver} == ${GCC_BRANCH_VER} ]] ; then
+		return 0
+	else
+		# if we're installing a genuinely different compiler version,
+		# we should probably tell the user -how- to switch to the new
+		# gcc version, since we're not going to do it for him/her.
+		# We don't want to switch from say gcc-3.3 to gcc-3.4 right in
+		# the middle of an emerge operation (like an 'emerge -e world'
+		# which could install multiple gcc versions).
+		einfo "The current gcc config appears valid, so it will not be"
+		einfo "automatically switched for you.	If you would like to"
+		einfo "switch to the newly installed gcc version, do the"
+		einfo "following:"
+		echo
+		einfo "eselect compiler set <profile>"
+		echo
+		ebeep
+		return 1
+	fi
+}
+
+do_eselect_compiler() {
+	if ! should_we_eselect_compiler; then
+		eselect compiler update
+		return 0
+	fi
+
+	for abi in $(get_all_abis) ; do
+		local ctarget=$(get_abi_CHOST ${abi})
+		local current_specs=$(env -i eselect compiler show ${ctarget} | cut -f2 -d/)
+
+		if [[ -n ${current_specs} && ${current_specs} != "(none)" ]] && eselect compiler set ${CTARGET}-${GCC_CONFIG_VER}/${current_specs} &> /dev/null; then
+			einfo "The following compiler profile has been activated based on your previous profile:"
+			einfo "${CTARGET}-${GCC_CONFIG_VER}/${current_specs}"
+		else
+			# We couldn't choose based on the old specs, so fall back on vanilla/hardened based on USE
+
+			local spec
+			if use hardened ; then
+				spec="hardened"
+			else
+				spec="vanilla"
+			fi
+
+			local profile
+			local isset=0
+			for profile in "${current_specs%-*}-${spec}" "${abi}-${spec}" "${spec}" ; do
+				if eselect compiler set ${CTARGET}-${GCC_CONFIG_VER}/${profile} &> /dev/null ; then
+					ewarn "The newly installed version of gcc does not have a profile that matches the name of your"
+					ewarn "currently selected profile for ${ctarget}, so we have enabled the following instead:"
+					ewarn "${CTARGET}-${GCC_CONFIG_VER}/${profile}"
+					ewarn "If this is incorrect, please use 'eselect compiler set' to"
+					ewarn "select another profile."
+
+					isset=1
+					break
+				fi
+			done
+
+			if [[ ${isset} == 0 ]] ; then
+				eerror "We were not able to automatically set the current compiler for ${ctarget}"
+				eerror "to your newly emerged gcc.	Please use 'eselect compiler set'"
+				eerror "to select your compiler."
+			fi
+		fi
+	done
+}
+
 # This function allows us to gentoo-ize gcc's version number and bugzilla
 # URL without needing to use patches.
 gcc_version_patch() {
 	# gcc-4.3+ has configure flags (whoo!)
-	tc_version_is_at_least 4.3 && einfo "Building ${version_string} (${BRANDING_GCC_PKGVERSION})" && return 0
+	tc_version_is_at_least 4.3 && return 0
 
 	local version_string=${GCC_CONFIG_VER}
 	[[ -n ${BRANCH_UPDATE} ]] && version_string="${version_string} ${BRANCH_UPDATE}"
