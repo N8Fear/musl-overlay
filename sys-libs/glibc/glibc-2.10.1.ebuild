@@ -189,6 +189,9 @@ eblit-src_unpack-post() {
 		epatch "${FILESDIR}"/2.10/glibc-2.10-hardened-configure-picdefault.patch
 		epatch "${FILESDIR}"/2.10/glibc-2.10-hardened-inittls-nosysenter.patch
 
+		einfo "Patching Glibc to support older SSP __guard"
+		epatch "${FILESDIR}"/2.10/glibc-2.10-hardened-ssp-compat.patch
+
 		einfo "Installing Hardened Gentoo SSP and FORTIFY_SOURCE handler"
 		cp -f "${FILESDIR}"/2.6/glibc-2.6-gentoo-stack_chk_fail.c \
 			debug/stack_chk_fail.c || die
