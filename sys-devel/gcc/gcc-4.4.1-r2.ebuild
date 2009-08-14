@@ -1,39 +1,38 @@
 # Copyright 1999-2009 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/sys-devel/gcc/gcc-4.3.3-r2.ebuild,v 1.1 2009/03/27 20:52:29 loki_val Exp $
+# $Header: /var/cvsroot/gentoo-x86/sys-devel/gcc/gcc-4.4.1-r2.ebuild,v 1.2 2009/08/10 03:00:00 zorry Exp $
 
-PATCH_VER="1.1"
+PATCH_VER="1.0"
 UCLIBC_VER="1.1"
 
 ETYPE="gcc-compiler"
 GCC_FILESDIR="${PORTDIR}/sys-devel/gcc/files"
 
 # Hardened gcc 4 stuff
-PIE_VER="10.2.1"
-SPECS_VER="0.9.12"
-SPECS_GCC_VER="4.3.2"
+ESPF_VER="0.3.3"
+SPECS_VER="0.1.5"
 
 # arch/libc configurations known to be stable or untested with {PIE,SSP,FORTIFY}-by-default
-SSP_STABLE="amd64 x86 ppc ppc64"
-SSP_UCLIBC_STABLE=""
-PIE_GLIBC_STABLE="x86 amd64 ppc ppc64"
-PIE_UCLIBC_STABLE=""
-FORTIFY_STABLE="x86 amd64 ppc ppc64"
-FORTIFY_UCLIBC_STABLE=""
+ESPF_GLIBC_SUPPORT="amd64 x86 ppc ppc64 arm sparc sparc64"
+ESPF_UCLIBC_SUPPORT="x86 arm"
 # Hardened end
 
 inherit toolchain
 
 DESCRIPTION="The GNU Compiler Collection.  Includes C/C++, java compilers, pie+ssp extensions, Haj Ten Brugge runtime bounds checking"
 
-LICENSE="GPL-2 LGPL-2.1"
-KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~x86-fbsd"
+LICENSE="GPL-3 LGPL-2.1 libgcc libstdc++ gcc-runtime-library-exception-3.1"
+KEYWORDS="~amd64 ~arm -hppa ~ppc ~ppc64 ~x86 -x86-fbsd"
 
 RDEPEND=">=sys-libs/zlib-1.1.4
 	>=sys-devel/gcc-config-1.4
 	virtual/libiconv
 	>=dev-libs/gmp-4.2.1
 	>=dev-libs/mpfr-2.3
+	graphite? (
+		>=dev-libs/ppl-0.10
+		>=dev-libs/cloog-ppl-0.15
+	)
 	!build? (
 		gcj? (
 			gtk? (
@@ -57,9 +56,7 @@ DEPEND="${RDEPEND}
 	>=sys-apps/texinfo-4.2-r4
 	>=sys-devel/bison-1.875
 	amd64? ( multilib? ( gcj? ( app-emulation/emul-linux-x86-xlibs ) ) )
-	ppc? ( >=${CATEGORY}/binutils-2.17 )
-	ppc64? ( >=${CATEGORY}/binutils-2.17 )
-	>=${CATEGORY}/binutils-2.15.94"
+	>=${CATEGORY}/binutils-2.18"
 PDEPEND=">=sys-devel/gcc-config-1.4"
 if [[ ${CATEGORY} != cross-* ]] ; then
 	PDEPEND="${PDEPEND} elibc_glibc? ( >=sys-libs/glibc-2.8 )"
@@ -74,10 +71,10 @@ src_unpack() {
 
 	[[ ${CHOST} == ${CTARGET} ]] && epatch "${GCC_FILESDIR}"/gcc-spec-env.patch
 
-	[[ ${CTARGET} == *-softfloat-* ]] && epatch "${GCC_FILESDIR}"/4.3.2/gcc-4.3.2-softfloat.patch
+	[[ ${CTARGET} == *-softfloat-* ]] && epatch "${GCC_FILESDIR}"/4.4.0/gcc-4.4.0-softfloat.patch
 
 	if use hardened ; then
-		einfo "Hardened toolchain for GCC 4 is made by zorry, psm and xake"
+		einfo "Hardened toolchain for GCC 4.4 is made by Zorry, Blueness and Xake"
 		einfo "http://forums.gentoo.org/viewtopic-t-668885.html"
 		einfo "http://hardened.gentooexperimental.org/trac/secure"
 		einfo "Thanks KernelOfTruth, dw and everyone else helping testing,"
