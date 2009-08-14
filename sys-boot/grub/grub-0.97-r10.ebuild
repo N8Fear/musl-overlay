@@ -1,13 +1,13 @@
 # Copyright 1999-2009 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/sys-boot/grub/grub-0.97-r9.ebuild,v 1.1 2009/01/02 01:51:05 robbat2 Exp $
+# $Header: /var/cvsroot/gentoo-x86/sys-boot/grub/grub-0.97-r10.ebuild,v 1.56 2009/08/14 18:46:05 zorry Exp $
 
 # XXX: we need to review menu.lst vs grub.conf handling.  We've been converting
 #      all systems to grub.conf (and symlinking menu.lst to grub.conf), but
 #      we never updated any of the source code (it still all wants menu.lst),
 #      and there is no indication that upstream is making the transition.
 
-inherit mount-boot eutils flag-o-matic toolchain-funcs autotools
+inherit mount-boot eutils flag-o-matic toolchain-funcs autotools linux-info
 
 PATCHVER="1.9" # Should match the revision ideally
 DESCRIPTION="GNU GRUB Legacy boot loader"
@@ -19,7 +19,7 @@ SRC_URI="mirror://gentoo/${P}.tar.gz
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="~amd64 ~x86 ~x86-fbsd"
+KEYWORDS="amd64 x86 ~x86-fbsd"
 IUSE="custom-cflags ncurses netboot static"
 
 DEPEND="ncurses? (
@@ -27,6 +27,13 @@ DEPEND="ncurses? (
 		amd64? ( app-emulation/emul-linux-x86-baselibs )
 	)"
 PROVIDE="virtual/bootloader"
+
+pkg_setup() {
+	local arch="$(tc-arch)"
+	case ${arch} in
+		amd64) CONFIG_CHECK='~IA32_EMULATION' check_extra_config ;;
+	esac
+}
 
 src_unpack() {
 	unpack ${A}
@@ -56,7 +63,7 @@ src_unpack() {
 		"${S}"/grub/asmstub.c \
 		|| die "Failed to hack memory size"
 
-	# Ticket 20 http://hardened.gentooexperimental.org/secure/report/1
+	# Bug #279536 sys-boot/grub-0.97 segfaults with >=sys-devel/gcc-4.1 SSP
 	epatch "${FILESDIR}"/grub-0.97-gcc4-hardened.patch
 
 	if [[ -n ${PATCHVER} ]] ; then
@@ -172,7 +179,7 @@ setup_boot_dir() {
 	local boot_dir=$1
 	local dir=${boot_dir}
 
-	[[ ! -e ${dir} ]] && die "${dir} does not exist!"
+	mkdir -p "${dir}"
 	[[ ! -L ${dir}/boot ]] && ln -s . "${dir}/boot"
 	dir="${dir}/grub"
 	if [[ ! -e ${dir} ]] ; then
