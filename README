@@ -12,4 +12,4 @@ You need a least glibc 2.8, grub and gcc from the overlay to make it work.
 It may need to be unmasked or add as unstable.
 Notice: pieworld.README is not up-to-date, it is mostly here for reference since it is the work we based this overlay on.
 The working gcc 4.3.2-r2 in portage only have PIE/PIC support yet.
-/Zorry 2009-08-14
+/Zorry 2009-08-20
