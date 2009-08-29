@@ -1,11 +1,18 @@
-This overlay is for Hardened Development ther we can test hardened toolchain, bugfixes, packages and eclasses before
+This overlay is for Hardened Development, this is where we can test hardened toolchain, bugfixes, packages and eclasses before
 commiting to the tree.
-Kipe it to Gentoo policy.
+
+Keep the entire overlay to that of gentoo policy, all functions of the overlay will work there way to the tree, once we reach a state
+that is acceptable for use by the users.
+
+For help on using and testing the overlay please refer to :
 Forum tread http://forums.gentoo.org/viewtopic-t-790110.html
+
+
 Bugs and more info http://hardened.gentooexperimental.org/trac/secure/
 The testing branch is for GCC 4.5 and if we need to do major change on this overlay.
 
 Commiters:
 Magnus Ganberg (Zorry) <zorry@ume.nu>
+Jory A. Pratt	(Anarchy)	<anarchy@gento.org>
 
 2009-08-29 Magnus Granberg (Zorry) <zorry@ume.nu>
