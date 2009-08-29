@@ -1,15 +1,11 @@
-This overlay is based on the pieworld work done by former gentoo developer kevquinn and psm.
-Changes by Xake and zorry.
-Thanks KernelOfTruth, dw and everyone else helping testing, suggesting fixes and other things we have missed.
-For questions there is a tread @ forums.gentoo.org
-This overlay has support for PIE/PIC, -fstack-protector{,-all} and -D_FORTIFY_SOURCE=0,1,2 via built-in specs for GCC-4.x
-We have disable -fstrict-overflow and -fdelete-null-pointer-check flag.
--Wformat-security is on as default.
-For uclibc support you need uclibc-0.9.30.1 and update uclibc before gcc
-Glibc 2.10 have all the patches from bug #270274@bugs.gentoo.org
-If you want GCC 4.5 then use the testing branch.
-You need a least glibc 2.8, grub and gcc from the overlay to make it work.
-It may need to be unmasked or add as unstable.
-Notice: pieworld.README is not up-to-date, it is mostly here for reference since it is the work we based this overlay on.
-The working gcc 4.3.2-r2 in portage only have PIE/PIC support yet.
-/Zorry 2009-08-20
+This overlay is for Hardened Development ther we can test hardened toolchain, bugfixes, packages and eclasses before
+commiting to the tree.
+Kipe it to Gentoo policy.
+Forum tread http://forums.gentoo.org/viewtopic-t-790110.html
+Bugs and more info http://hardened.gentooexperimental.org/trac/secure/
+The testing branch is for GCC 4.5 and if we need to do major change on this overlay.
+
+Commiters:
+Magnus Ganberg (Zorry) <zorry@ume.nu>
+
+2009-08-29 Magnus Granberg (Zorry) <zorry@ume.nu>
