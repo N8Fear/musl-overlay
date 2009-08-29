@@ -12,7 +12,7 @@ Bugs and more info http://hardened.gentooexperimental.org/trac/secure/
 The testing branch is for GCC 4.5 and if we need to do major change on this overlay.
 
 Commiters:
-Magnus Ganberg (Zorry) <zorry@ume.nu>
-Jory A. Pratt	(Anarchy)	<anarchy@gento.org>
+Magnus Ganberg	(Zorry)		<zorry@ume.nu>
+Jory A. Pratt	(Anarchy)	<anarchy@gentoo.org>
 
 2009-08-29 Magnus Granberg (Zorry) <zorry@ume.nu>
