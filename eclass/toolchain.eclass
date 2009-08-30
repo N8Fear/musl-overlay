@@ -1,6 +1,6 @@
 # Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/eclass/toolchain.eclass,v 1.405 2009/08/16 00:16:12 vapier Exp $
+# $Header: /var/cvsroot/gentoo-x86/eclass/toolchain.eclass,v 1.406 2009/08/26 21:47:56 vapier Exp $
 #
 # Maintainer: Toolchain Ninjas <toolchain@gentoo.org>
 
@@ -1027,12 +1027,13 @@ gcc-compiler_pkg_postrm() {
 gcc-compiler_src_unpack() {
 	# For the old gcc < 3.4
 	if ! tc_version_is_at_least 4.3 ; then
-	# Fail if using pie patches, building hardened, and glibc doesn't have
-	# the necessary support
+		# Fail if using pie patches, building hardened, and glibc doesn't have
+		# the necessary support
 		want_pie && use hardened && glibc_have_pie
-		einfo "updating configuration to build GCC gcc-3 style"
+		einfo "updating configuration to build hardened GCC-3 style"
 		make_gcc_hard || die "failed to make gcc hard"
 	fi
+
 	# For the newer gcc > 3.4
 	if tc_version_is_at_least 4.3.2 && use hardened ; then
 		if [[ ${PIE_VER} ]] ; then
@@ -1121,7 +1122,7 @@ gcc_src_unpack() {
 	do_gcc_HTB_patches
 	do_gcc_SSP_patches
 	do_gcc_PIE_patches
-	do_gcc_USER_patches
+	epatch_user
 	do_gcc_ESPF_patches
 
 	${ETYPE}_src_unpack || die "failed to ${ETYPE}_src_unpack"
@@ -1830,6 +1831,7 @@ gcc-compiler_src_install() {
 		fi
 		create_gcc_env_entry vanilla
 	fi
+
 	if  want_espf ; then
 		create_gcc_env_entry hardenednopie
 		create_gcc_env_entry hardenednossp
@@ -2107,6 +2109,7 @@ gcc_quick_unpack() {
 		[[ -n ${SPECS_VER} ]] && \
 			unpack gcc-${SPECS_GCC_VER}-specs-${SPECS_VER}.tar.bz2
 	fi
+
 	if [[ -n ${ESPF_VER} ]] ; then
 		unpack gcc-${GCC_RELEASE_VER}-espf-${ESPF_VER}.tar.bz2
 		unpack gcc-${GCC_RELEASE_VER}-specs-${SPECS_VER}.tar.bz2
@@ -2154,22 +2157,6 @@ do_gcc_stub() {
 			EPATCH_SINGLE_MSG="Applying stub patch for $1 ..." \
 			epatch "${stub_patch}"
 			return 0
-		fi
-	done
-}
-
-do_gcc_USER_patches() {
-	local check base=${PORTAGE_CONFIGROOT}/etc/portage/patches
-	for check in {${CATEGORY}/${PF},${CATEGORY}/${P},${CATEGORY}/${PN}}; do
-		EPATCH_SOURCE=${base}/${CTARGET}/${check}
-		[[ -r ${EPATCH_SOURCE} ]] || EPATCH_SOURCE=${base}/${CHOST}/${check}
-		[[ -r ${EPATCH_SOURCE} ]] || EPATCH_SOURCE=${base}/${check}
-		if [[ -d ${EPATCH_SOURCE} ]] ; then
-			EPATCH_SUFFIX="patch"
-			EPATCH_FORCE="yes" \
-			EPATCH_MULTI_MSG="Applying user patches from ${EPATCH_SOURCE} ..." \
-			epatch
-			break
 		fi
 	done
 }
