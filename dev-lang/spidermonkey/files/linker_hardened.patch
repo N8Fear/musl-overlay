@@ -1,3 +1,8 @@
+2009-09-05 Dwokfur <atoth@atoth.sote.hu>
+
+	#74 on http://hardened.gentooexperimental.org/trac/secure
+	* src/config/Linux_All.mk: resolve linking difficulting with shared libraries compiled with -fPIC
+
 diff -urN js.dwokfur1/src/config/Linux_All.mk js.dwokfur2/src/config/Linux_All.mk
 --- js.dwokfur1/src/config/Linux_All.mk	2009-08-29 12:11:48.000000000 +0200
 +++ js.dwokfur2/src/config/Linux_All.mk	2009-08-29 12:13:13.000000000 +0200
