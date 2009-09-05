@@ -1,0 +1,17 @@
+# ChangeLog for dev-lang/spidermonkey
+# Copyright 1999-2009 Gentoo Foundation; Distributed under the GPL v2
+# $Header: $
+
+*spidermonkey-1.7.0-r1 (05 Sep 2009)
+
+  05 Sep 2009; Anthony G. Basile <basile@opensource.dyc.edu>
+  +files/spidermonkey-1.5-build.patch, +files/spidermonkey-1.6-header.patch,
+  +spidermonkey-1.7.0-r1.ebuild, +files/spidermonkey-1.7.0-threadsafe.diff,
+  +files/linker_hardened.patch:
+  2009-09-05 Dwokfur <atoth@atoth.sote.hu>
+
+  #74 on http://hardened.gentooexperimental.org/trac/secure
+
+  * src/config/Linux_All.mk: resolve linking difficulting with shared
+  libraries compiled with -fPIC
+
