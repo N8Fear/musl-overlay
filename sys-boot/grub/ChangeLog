@@ -1,0 +1,10 @@
+# ChangeLog for sys-boot/grub
+# Copyright 1999-2009 Gentoo Foundation; Distributed under the GPL v2
+# $Header: $
+
+*grub-0.97-r11 (05 Sep 2009)
+
+  05 Sep 2009; Magnus Granberg <zorry@ume.nu> +grub-0.97-r11.ebuild,
+  +files/grub-0.97-fpie_check.patch, +metadata.xml:
+  Ported the -fPIE check from Grub2 Revision 2564
+
