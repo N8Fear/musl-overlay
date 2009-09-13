@@ -26,8 +26,8 @@ LIBIDN_VER=${RELEASE_VER}
 fi
 MANPAGE_VER=""                                 # pregenerated manpages
 INFOPAGE_VER=""                                # pregenerated infopages
-PATCH_VER="1"                                  # Gentoo patchset
-PORTS_VER="" #${RELEASE_VER}                   # version of glibc ports addon
+PATCH_VER="2"                                  # Gentoo patchset
+PORTS_VER=${RELEASE_VER}                       # version of glibc ports addon
 LT_VER=""                                      # version of linuxthreads addon
 NPTL_KERN_VER=${NPTL_KERN_VER:-"2.6.9"}        # min kernel version nptl requires
 #LT_KERN_VER=${LT_KERN_VER:-"2.4.1"}           # min kernel version linuxthreads requires
@@ -94,7 +94,8 @@ DEPEND=">=sys-devel/gcc-3.4.4
 	>=sys-apps/sandbox-1.2.18.1-r2
 	>=sys-apps/portage-2.1.2
 	selinux? ( sys-libs/libselinux )"
-RDEPEND="nls? ( sys-devel/gettext )
+RDEPEND="!sys-kernel/ps3-sources
+	nls? ( sys-devel/gettext )
 	selinux? ( sys-libs/libselinux )"
 
 if [[ ${CATEGORY/cross-} != ${CATEGORY} ]] ; then
