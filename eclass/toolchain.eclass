@@ -2106,14 +2106,14 @@ gcc_quick_unpack() {
 		else
 			unpack gcc-${PIE_GCC_VER}-piepatches-v${PIE_VER}.tar.bz2
 		fi
-		[[ -n ${SPECS_VER} ]] && \
-			unpack gcc-${SPECS_GCC_VER}-specs-${SPECS_VER}.tar.bz2
 	fi
 
 	if [[ -n ${ESPF_VER} ]] ; then
 		unpack gcc-${GCC_RELEASE_VER}-espf-${ESPF_VER}.tar.bz2
-		unpack gcc-${GCC_RELEASE_VER}-specs-${SPECS_VER}.tar.bz2
 	fi
+	
+	[[ -n ${SPECS_VER} ]] && \
+			unpack gcc-${SPECS_GCC_VER}-specs-${SPECS_VER}.tar.bz2
 
 	want_boundschecking && \
 		unpack "bounds-checking-gcc-${HTB_GCC_VER}-${HTB_VER}.patch.bz2"
