@@ -1,4 +1,4 @@
-This overlay is for Hardened Development, this is where we can test hardened toolchain, bugfixes, packages and eclasses before
+This overlay is for Hardened Development, this is where we can test hardened toolchain, bugfixes, packages, profiles and eclasses before
 commiting to the tree.
 
 Keep the entire overlay to that of gentoo policy, all functions of the overlay will work there way to the tree, once we reach a state
@@ -17,4 +17,4 @@ Jory A. Pratt		(Anarchy)		<anarchy@gentoo.org>
 Peter Hjalmarsson	(Xake)			<xake@rymdraket.net>
 Anthony G. Basile	(blueness)		<basile@opensource.dyc.edu>
 
-2009-08-30 Peter Hjalmarsson (Xake) <xake@rymdraket.net>
+2009-09-18 Magnus Granberg (Zorry) <zorry@ume.nu>
