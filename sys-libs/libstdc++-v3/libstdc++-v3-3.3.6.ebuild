@@ -101,9 +101,8 @@ do_filter_flags() {
 
 	# ...sure, why not?
 	strip-unsupported-flags
-	
+
 	strip-flags
-	
 }
 
 PATCH_VER="1.6"

@@ -37,7 +37,7 @@ src_compile() {
 
 	# Ticket 69
 	filter-flags -fPIE
-	
+
 	# UNSTABLE=true enables building of buddy-ng, easside-ng, tkiptun-ng and wesside-ng
 	emake CC="$(tc-getCC)" LD="$(tc-getLD)" sqlite=$(have_sqlite) UNSTABLE=true || die "emake failed"
 }

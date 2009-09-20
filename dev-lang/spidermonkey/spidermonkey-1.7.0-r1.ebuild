@@ -49,4 +49,3 @@ src_install() {
 	dodoc ../jsd/README
 	dohtml README.html
 }
-
