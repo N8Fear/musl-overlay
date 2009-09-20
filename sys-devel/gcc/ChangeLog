@@ -1,0 +1,8 @@
+# ChangeLog for sys-devel/gcc
+# Copyright 1999-2009 Gentoo Foundation; Distributed under the GPL v2
+# $Header: $
+
+*gcc-4.4.1-r3 (20 Sep 2009)
+
+  20 Sep 2009; <zorry@ume.nu> +gcc-4.4.1-r3.ebuild, +metadata.xml:
+  Update espf to 0.3.4 and specs to 0.1.6 that support crtbeginTS.o.
