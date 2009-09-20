@@ -1,6 +1,6 @@
 # Copyright 1999-2009 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/sys-devel/gcc/gcc-4.3.4-r1.ebuild,v 1.2 2009/08/10 03:00:00 zorry Exp $
+# $Header: /var/cvsroot/gentoo-x86/sys-devel/gcc/gcc-4.3.4-r1.ebuild,v 1.2 2009/09/21 01:23:00 zorry Exp $
 
 # Fixed in 4.3.4 and should be removed from the patchset
 GENTOO_PATCH_EXCLUDE="69_all_gcc43-pr39013.patch" #262567
@@ -12,8 +12,8 @@ ETYPE="gcc-compiler"
 GCC_FILESDIR="${PORTDIR}/sys-devel/gcc/files"
 
 # Hardened gcc 4 stuff
-ESPF_VER="0.3.3"
-SPECS_VER="0.1.5"
+ESPF_VER="0.3.4"
+SPECS_VER="0.1.6"
 
 # arch/libc configurations known to be stable or untested with {PIE,SSP,FORTIFY}-by-default
 ESPF_GLIBC_SUPPORT="amd64 x86 ppc ppc64 arm sparc sparc64"
@@ -75,13 +75,4 @@ src_unpack() {
 	[[ ${CHOST} == ${CTARGET} ]] && epatch "${GCC_FILESDIR}"/gcc-spec-env.patch
 
 	[[ ${CTARGET} == *-softfloat-* ]] && epatch "${GCC_FILESDIR}"/4.3.2/gcc-4.3.2-softfloat.patch
-
-	if use hardened ; then
-		einfo "Hardened toolchain for GCC 4.4 is made by Zorry, Blueness and Xake "
-		einfo "http://forums.gentoo.org/viewtopic-t-668885.html"
-		einfo "http://hardened.gentooexperimental.org/trac/secure"
-		einfo "Thanks KernelOfTruth, dw and everyone else helping testing,"
-		einfo "suggesting fixes and other things we have missed."
-		einfo "/zorry"
-	fi
 }

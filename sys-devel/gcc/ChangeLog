@@ -2,7 +2,15 @@
 # Copyright 1999-2009 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+*gcc-4.4.1-r1 (21 Sep 2009)
+
+  20 Sep 2009; Magnus Granberg <zorry@ume.nu> gcc-4.3.4-r1.ebuild,
+  +gcc-4.4.1-r1.ebuild, -gcc-4.4.1-r2.ebuild, -gcc-4.4.1-r3.ebuild:
+  Updated espf patchset to 0.3.4 and specs to 0.1.6. Added crtbeginTS.o
+  support.
+
 *gcc-4.4.1-r3 (20 Sep 2009)
 
-  20 Sep 2009; <zorry@ume.nu> +gcc-4.4.1-r3.ebuild, +metadata.xml:
+  20 Sep 2009; Magnus Granberg <zorry@ume.nu> +gcc-4.4.1-r3.ebuild,
+  +metadata.xml:
   Update espf to 0.3.4 and specs to 0.1.6 that support crtbeginTS.o.
