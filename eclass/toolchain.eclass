@@ -1,6 +1,6 @@
 # Copyright 1999-2008 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/eclass/toolchain.eclass,v 1.406 2009/08/26 21:47:56 vapier Exp $
+# $Header: /var/cvsroot/gentoo-x86/eclass/toolchain.eclass,v 1.407 2009/09/08 02:48:46 vapier Exp $
 #
 # Maintainer: Toolchain Ninjas <toolchain@gentoo.org>
 
@@ -2019,6 +2019,7 @@ gcc_movelibs() {
 				fi
 			fi
 		done
+		fix_libtool_libdir_paths "${LIBPATH}/${MULTIDIR}"
 	done
 
 	# We remove directories separately to avoid this case:
@@ -2029,8 +2030,6 @@ gcc_movelibs() {
 		rmdir "${D}"${FROMDIR} >& /dev/null
 	done
 	find "${D}" -type d | xargs rmdir >& /dev/null
-
-	fix_libtool_libdir_paths
 }
 
 #----<< src_* >>----
@@ -2551,9 +2550,11 @@ disable_multilib_libjava() {
 fix_libtool_libdir_paths() {
 	pushd "${D}" >/dev/null
 
-	local dir=${LIBPATH}
-	local allarchives=$(cd ./${dir}; echo *.la)
+	pushd "${1}" >/dev/null
+	local dir="${PWD#${D}}"
+	local allarchives=$(echo *.la)
 	allarchives="\(${allarchives// /\\|}\)"
+	popd >/dev/null
 
 	sed -i \
 		-e "/^libdir=/s:=.*:='${dir}':" \
