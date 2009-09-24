@@ -24,7 +24,7 @@ inherit toolchain
 
 DESCRIPTION="The GNU Compiler Collection.  Includes C/C++, java compilers, pie+ssp extensions, Haj Ten Brugge runtime bounds checking"
 
-LICENSE="GPL-3 LGPL-2.1 libgcc libstdc++"
+LICENSE="GPL-3 LGPL-3 libgcc libstdc++"
 KEYWORDS="~amd64 ~arm -hppa ~ppc ~ppc64 ~x86 -x86-fbsd"
 
 RDEPEND=">=sys-libs/zlib-1.1.4
