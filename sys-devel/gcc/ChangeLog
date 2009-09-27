@@ -2,6 +2,11 @@
 # Copyright 1999-2009 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+*gcc-4.4.1-r2 (27 Sep 2009)
+
+  27 Sep 2009; Magnus Granberg <zorry@ume.nu> +gcc-4.4.1-r2.ebuild:
+  New espf-0.3.5 and specs-0.1.7
+
   24 Sep 2009; Peter Hjalmarsson <xake@gentoo.org> gcc-4.3.4-r1.ebuild,
   gcc-4.4.1-r1.ebuild:
   License updated, deps bumped, Vapier usually has a point.
