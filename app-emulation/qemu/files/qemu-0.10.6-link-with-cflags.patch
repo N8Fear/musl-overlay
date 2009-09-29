@@ -1,0 +1,12 @@
+diff -urN qemu-0.10.6.org/rules.mak qemu-0.10.6/rules.mak
+--- qemu-0.10.6.org/rules.mak	2009-09-29 16:17:03.206825319 +0200
++++ qemu-0.10.6/rules.mak	2009-09-29 16:17:27.923696017 +0200
+@@ -8,7 +8,7 @@
+ %.o: %.m
+ 	$(call quiet-command,$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<,"  OBJC  $(TARGET_DIR)$@")
+ 
+-LINK = $(call quiet-command,$(CC) $(LDFLAGS) -o $@ $^ $(LIBS),"  LINK  $(TARGET_DIR)$@")
++LINK = $(call quiet-command,$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LIBS),"  LINK  $(TARGET_DIR)$@")
+ 
+ %$(EXESUF): %.o
+ 	$(LINK)
