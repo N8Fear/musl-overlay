@@ -749,7 +749,7 @@ copy_minispecs_gcc_specs() {
 	fi
 	if want_espf ; then
 		insinto ${LIBPATH}
-		doins "${WORKDIR}"/specs/*.specs || die "failed to install specs"
+		doins "${WORKDIR}"/specs/* || die "failed to install specs"
 	fi
 }
 add_profile_eselect_conf() {
