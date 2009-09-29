@@ -2304,7 +2304,7 @@ do_gcc_PIE_patches() {
 
 # do various updates to ESPF
 do_gcc_ESPF_patches() {
-	if [[ -n ${ESPF_VER} ]] || ! use vanilla; then
+	if [[ -n ${ESPF_VER} ]] && ! use vanilla; then
 		guess_patch_type_in_dir "${WORKDIR}"/espf-gcc-"${GCC_RELEASE_VER}"
 		  EPATCH_MULTI_MSG="Applying espf patches ..." \
 		  epatch "${WORKDIR}"/espf-gcc-"${GCC_RELEASE_VER}"
