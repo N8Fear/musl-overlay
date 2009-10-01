@@ -2,6 +2,11 @@
 # Copyright 1999-2009 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+  01 Oct 2009; Magnus Granberg <zorry@ume.nu>
+  files/grub-0.97-fpie_check.patch:
+  GCC 3.4.6 Hardened defines __PIC__ instead of __PIE__
+
+
 *grub-0.97-r11 (05 Sep 2009)
 
   05 Sep 2009; Magnus Granberg <zorry@ume.nu> +grub-0.97-r11.ebuild,

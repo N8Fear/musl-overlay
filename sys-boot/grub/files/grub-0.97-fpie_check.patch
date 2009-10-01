@@ -1,4 +1,4 @@
-2009-09-05	Magnus Granberg		<zorry@ume.nu>
+2009-10-01	Magnus Granberg		<zorry@ume.nu>
 
 		# #139277 #168834 #281246
 		* configure.ac: Add grub_CHECK_PIE. It check if the compiler
@@ -18,12 +18,12 @@
 +AC_MSG_CHECKING([whether `$CC' has `-fPIE' as default])
 +# Is this a reliable test case?
 +AC_LANG_CONFTEST([[
-+#ifdef __PIE__
++#if defined (__PIE__) || defined (__PIC__)
 +int main() {
 +	return 0;
 +}
 +#else
-+#error NO __PIE__ DEFINED
++#error NO __PIE__ OR __PIC__ DEFINED
 +#endif
 +]])
 +
