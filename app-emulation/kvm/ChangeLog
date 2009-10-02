@@ -2,6 +2,11 @@
 # Copyright 1999-2009 Gentoo Foundation; Distributed under the GPL v2
 # $Header: /var/cvsroot/gentoo-x86/app-emulation/kvm/ChangeLog,v 1.39 2009/09/21 14:57:21 dang Exp $
 
+  02 Oct 2009; Peter Hjalmarsson <xake@gentoo.org>
+  files/kvm-88-link-with-cflags.patch:
+  Update patch to catch some more missing CFLAGS, for you filter-flags
+  pleasure
+
   29 Sep 2009; Peter Hjalmarsson <xake@gentoo.org> +files/kvm-83-vtd.patch,
   +kvm-88-r1.ebuild, +files/kvm-88-link-with-cflags.patch, +metadata.xml:
   Patch to make filter-flags work with kvm, and sanitize the ebuilds broken

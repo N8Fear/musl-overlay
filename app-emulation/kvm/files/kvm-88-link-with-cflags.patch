@@ -1,12 +1,73 @@
-diff -urN qemu-kvm-devel-88.org/rules.mak qemu-kvm-devel-88/rules.mak
---- qemu-kvm-devel-88.org/rules.mak	2009-09-29 18:17:00.256105826 +0200
-+++ qemu-kvm-devel-88/rules.mak	2009-09-29 18:17:22.349435304 +0200
-@@ -8,7 +8,7 @@
+From 1a2728d5a62a437c0ee57a74439d4d91967a480b Mon Sep 17 00:00:00 2001
+From: Xake <xake@rymdraket.net>
+Date: Fri, 2 Oct 2009 08:54:48 +0200
+Subject: [PATCH] Use *FLAGS where appropriate, or hardened (and some other stuff) break.
+
+---
+ kvm/libkvm/Makefile |    2 --
+ kvm/user/Makefile   |    5 +----
+ rules.mak           |    8 ++++----
+ 3 files changed, 5 insertions(+), 10 deletions(-)
+
+diff --git a/kvm/libkvm/Makefile b/kvm/libkvm/Makefile
+index 4db773d..f0c2000 100644
+--- a/kvm/libkvm/Makefile
++++ b/kvm/libkvm/Makefile
+@@ -23,8 +23,6 @@ CFLAGS += $(call cc-option, -fno-stack-protector, "")
+ CFLAGS += $(call cc-option, -fno-stack-protector-all, "")
+ CFLAGS += $(KVM_CFLAGS)
+ 
+-LDFLAGS += $(CFLAGS)
+-
+ CXXFLAGS = $(autodepend-flags)
+ 
+ VPATH:=$(VPATH)/kvm/libkvm
+diff --git a/kvm/user/Makefile b/kvm/user/Makefile
+index d9fbf17..897b140 100644
+--- a/kvm/user/Makefile
++++ b/kvm/user/Makefile
+@@ -5,9 +5,6 @@ DESTDIR :=
+ 
+ .PHONY: arch_clean clean
+ 
+-#make sure env CFLAGS variable is not used
+-CFLAGS =
+-
+ libgcc := $(shell $(CC) --print-libgcc-file-name)
+ 
+ libcflat := test/lib/libcflat.a
+@@ -32,7 +29,7 @@ CFLAGS += $(call cc-option, -fno-stack-protector-all, "")
+ CFLAGS += -I../include
+ CFLAGS += -I ../libkvm
+ 
+-LDFLAGS += $(CFLAGS) -L ../libkvm
++LDFLAGS += -L ../libkvm
+ 
+ CXXFLAGS = $(autodepend-flags)
+ 
+diff --git a/rules.mak b/rules.mak
+index 8d6d96e..b697a9d 100644
+--- a/rules.mak
++++ b/rules.mak
+@@ -1,14 +1,14 @@
+ 
+ %.o: %.c
+-	$(call quiet-command,$(CC) $(CPPFLAGS) $(CFLAGS) -c -o $@ $<,"  CC    $(TARGET_DIR)$@")
++	$(call quiet-command,$(CC) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) -c -o $@ $<,"  CC    $(TARGET_DIR)$@")
+ 
+ %.o: %.S
+-	$(call quiet-command,$(CC) $(CPPFLAGS) -c -o $@ $<,"  AS    $(TARGET_DIR)$@")
++	$(call quiet-command,$(CC) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) -c -o $@ $<,"  AS    $(TARGET_DIR)$@")
+ 
  %.o: %.m
- 	$(call quiet-command,$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<,"  OBJC  $(TARGET_DIR)$@")
+-	$(call quiet-command,$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<,"  OBJC  $(TARGET_DIR)$@")
++	$(call quiet-command,$(CC) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) -c -o $@ $<,"  OBJC  $(TARGET_DIR)$@")
  
 -LINK = $(call quiet-command,$(CC) $(LDFLAGS) -o $@ $(1) $(ARLIBS_BEGIN) $(ARLIBS) $(ARLIBS_END) $(LIBS),"  LINK  $(TARGET_DIR)$@")
-+LINK = $(call quiet-command,$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(1) $(ARLIBS_BEGIN) $(ARLIBS) $(ARLIBS_END) $(LIBS),"  LINK  $(TARGET_DIR)$@")
++LINK = $(call quiet-command,$(CC) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) -o $@ $(1) $(ARLIBS_BEGIN) $(ARLIBS) $(ARLIBS_END) $(LIBS),"  LINK  $(TARGET_DIR)$@")
  
  %$(EXESUF): %.o
  	$(call LINK,$^)
+-- 
+1.6.5.rc2
+
