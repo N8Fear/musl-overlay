@@ -2,6 +2,12 @@
 # Copyright 1999-2009 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+*libstdc++-v3-3.3.6-r1 (03 Oct 2009)
+
+  03 Oct 2009; Magnus Granberg <zorry@ume.nu> +libstdc++-v3-3.3.6-r1.ebuild,
+  +files/compile_with_no-SSP.patch:
+  Will fix bug #285956
+
   06 Sep 2009; Magnus Granberg <zorry@ume.nu> -Manifest:
   Fix ticket #78 Thanks for testing blueness.
 
