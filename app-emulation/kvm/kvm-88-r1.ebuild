@@ -92,12 +92,13 @@ src_prepare() {
 	# evdev patch is upstream
 	rm "${WORKDIR}/${PATCHSET}"/10_all_evdev_keycode_map.patch
 
+	epatch "${FILESDIR}"/${P}-link-with-cflags.patch
+
 	# apply patchset
 	EPATCH_SOURCE="${WORKDIR}/${PATCHSET}"
 	EPATCH_SUFFIX="patch"
 	epatch
 
-	epatch "${FILESDIR}"/${P}-link-with-cflags.patch
 }
 
 src_configure() {
@@ -116,8 +117,11 @@ src_configure() {
 	conf_opts="$conf_opts --prefix=/usr"
 	conf_opts="$conf_opts --disable-strip"
 	conf_opts="$conf_opts --disable-xen"
+#	conf_opts="$conf_opts --extra-cflags='${CFLAGS}'"
+#	conf_opts="$conf_opts --extra-ldflags='${LDFLAGS}'"
 
 	filter-flags -fPIE
+	filter-flags -fstack-protector #286587
 
 	./configure ${conf_opts} --audio-drv-list="$audio_opts" || die "econf failed"
 }
