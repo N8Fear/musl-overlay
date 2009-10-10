@@ -9,12 +9,12 @@ K_GENPATCHES_VER="3"
 inherit kernel-2
 detect_version
 
-HGPV="${KV_MAJOR}.${KV_MINOR}.${KV_PATCH}-4"
+HGPV="${KV_MAJOR}.${KV_MINOR}.${KV_PATCH}-5"
 HGPV_URI="http://dev.gentoo.org/~anarchy/dist/hardened-patches-${HGPV}.extras.tar.bz2"
 SRC_URI="${KERNEL_URI} ${HGPV_URI} ${GENPATCHES_URI} ${ARCH_URI}"
 
 UNIPATCH_LIST="${DISTDIR}/hardened-patches-${HGPV}.extras.tar.bz2"
-UNIPATCH_EXCLUDE="4201_fbcondecor-0.9.6.patch 4435_grsec-kconfig-gentoo.patch"
+UNIPATCH_EXCLUDE="4201_fbcondecor-0.9.6.patch"
 
 DESCRIPTION="Hardened kernel sources (kernel series ${KV_MAJOR}.${KV_MINOR})"
 HOMEPAGE="http://www.gentoo.org/proj/en/hardened/"
