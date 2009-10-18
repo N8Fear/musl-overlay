@@ -2,6 +2,11 @@
 # Copyright 1999-2009 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+*gcc-4.4.2-r1 (18 Oct 2009)
+
+  18 Oct 2009; Magnus Granberg <zorry@ume.nu> +gcc-4.4.2-r1.ebuild:
+  New GCC added (GCC 4.4.2)
+
   01 Oct 2009; Magnus Granberg <zorry@ume.nu> gcc-4.3.4-r2.ebuild:
   Did't update the ESPF and SPECS. Thanks cilly for the note.
 
