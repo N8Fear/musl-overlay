@@ -24,7 +24,7 @@ SNAP_VER=""
 fi
 MANPAGE_VER=""                                 # pregenerated manpages
 INFOPAGE_VER=""                                # pregenerated infopages
-PATCH_VER="5"                                  # Gentoo patchset
+PATCH_VER="6"                                  # Gentoo patchset
 PORTS_VER=${RELEASE_VER}                       # version of glibc ports addon
 LIBIDN_VER=""                                  # version of libidn addon
 LT_VER=""                                      # version of linuxthreads addon
@@ -93,7 +93,8 @@ DEPEND=">=sys-devel/gcc-3.4.4
 	>=sys-apps/sandbox-1.2.18.1-r2
 	>=sys-apps/portage-2.1.2
 	selinux? ( sys-libs/libselinux )"
-RDEPEND="nls? ( sys-devel/gettext )
+RDEPEND="!sys-kernel/ps3-sources
+	nls? ( sys-devel/gettext )
 	selinux? ( sys-libs/libselinux )"
 
 if [[ ${CATEGORY/cross-} != ${CATEGORY} ]] ; then
