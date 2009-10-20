@@ -1,6 +1,6 @@
 # Copyright 1999-2009 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/sys-libs/glibc/files/eblits/pkg_setup.eblit,v 1.3 2009/03/23 18:48:48 vapier Exp $
+# $Header: /var/cvsroot/gentoo-x86/sys-libs/glibc/files/eblits/pkg_setup.eblit,v 1.4 2009/08/21 05:46:04 vapier Exp $
 
 eblit-glibc-pkg_setup() {
 	# prevent native builds from downgrading ... maybe update to allow people
@@ -20,6 +20,17 @@ eblit-glibc-pkg_setup() {
 			eerror "Your patched vendor kernel is broken.  You need to get an"
 			eerror "update from whoever is providing the kernel to you."
 			eerror "http://sourceware.org/bugzilla/show_bug.cgi?id=5227"
+			die "keeping your system alive, say thank you"
+		fi
+
+		# Check for broken kernels #279260
+		cd "${T}"
+		printf '#include <unistd.h>\n#include <sys/syscall.h>\nint main(){return syscall(1000)!=-1;}\n' > kern-enosys-test.c
+		emake kern-enosys-test || die
+		if ! ./kern-enosys-test ; then
+			eerror "Your old kernel is broken.  You need to update it to"
+			eerror "a newer version as syscall(<bignum>) will break."
+			eerror "http://bugs.gentoo.org/279260"
 			die "keeping your system alive, say thank you"
 		fi
 	fi

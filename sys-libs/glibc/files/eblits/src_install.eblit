@@ -1,6 +1,6 @@
 # Copyright 1999-2007 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/sys-libs/glibc/files/eblits/src_install.eblit,v 1.7 2008/12/29 09:22:45 vapier Exp $
+# $Header: /var/cvsroot/gentoo-x86/sys-libs/glibc/files/eblits/src_install.eblit,v 1.8 2009/09/18 15:15:07 flameeyes Exp $
 
 toolchain-glibc_src_install() {
 	local GBUILDDIR
@@ -172,6 +172,8 @@ toolchain-glibc_src_install() {
 	doins nscd/nscd.conf posix/gai.conf nss/nsswitch.conf || die
 	doins "${WORKDIR}"/extra/etc/*.conf || die
 	doinitd "${WORKDIR}"/extra/etc/nscd || die
+
+	sed -i -e "s:@PIDFILE@:$(strings "${D}"/usr/sbin/nscd | grep nscd.pid):" "${D}"/etc/init.d/nscd
 
 	dodoc BUGS ChangeLog* CONFORMANCE FAQ NEWS NOTES PROJECTS README*
 
