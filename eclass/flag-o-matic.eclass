@@ -33,7 +33,7 @@ setup-allowed-flags() {
 		export ALLOWED_FLAGS="-pipe"
 		export ALLOWED_FLAGS="${ALLOWED_FLAGS} -O -O0 -O1 -O2 -mcpu -march -mtune"
 		export ALLOWED_FLAGS="${ALLOWED_FLAGS} -fstack-protector -fstack-protector-all"
-		export ALLOWED_FLAGS="${ALLOWED_FLAGS} -fbounds-checking -fno-strict-overflow"
+		export ALLOWED_FLAGS="${ALLOWED_FLAGS} -fbounds-checking -fno-delete-null-pointer-checks -fno-strict-overflow"
 		export ALLOWED_FLAGS="${ALLOWED_FLAGS} -fno-PIE -fno-pie -fno-unit-at-a-time"
 		export ALLOWED_FLAGS="${ALLOWED_FLAGS} -g -g[0-9] -ggdb -ggdb[0-9] -gstabs -gstabs+"
 		export ALLOWED_FLAGS="${ALLOWED_FLAGS} -fno-ident"
@@ -41,7 +41,7 @@ setup-allowed-flags() {
 	fi
 	# allow a bunch of flags that negate features / control ABI
 	ALLOWED_FLAGS="${ALLOWED_FLAGS} -fno-stack-protector -fno-stack-protector-all \
-		-fno-strict-aliasing -fno-bounds-checking -fstrict-overflow -fno-omit-frame-pointer"
+		-fno-strict-aliasing -fno-bounds-checking -fdelete-null-pointer-checks -fstrict-overflow -fno-omit-frame-pointer"
 	ALLOWED_FLAGS="${ALLOWED_FLAGS} -mregparm -mno-app-regs -mapp-regs \
 		-mno-mmx -mno-sse -mno-sse2 -mno-sse3 -mno-ssse3 -mno-sse4 -mno-sse4.1 \
 		-mno-sse4.2 -mno-avx -mno-aes -mno-pclmul -mno-sse4a -mno-3dnow \
@@ -61,8 +61,30 @@ setup-allowed-flags() {
 	return 0
 }
 
-# inverted filters for hardened compiler.  This is trying to unpick
-# the hardened compiler defaults.
+# Raw appending of the reverse flag.
+# Only supports {-f<flag>,-fno-<flag>} flag types currently.
+_reverse-append() {
+	[[ -z $1 ]] && return 0
+	local f rf
+
+	f=$1
+	if [[ ${f} =~ ^-fno-.* ]]; then
+		rf=${f/-fno-/-f}
+	elif [[ ${f} =~ ^-f.* ]]; then
+		rf=${f/-f/-fno-}
+	else
+		return 0
+	fi
+
+	_is_flagq CFLAGS ${rf} || append-cflags $(test-flags-CC ${rf})
+	_is_flagq CPPFLAGS ${rf} || append-cppflags $(test-flags-CXX ${rf})
+	_is_flagq CXXFLAGS ${rf} || append-cxxflags $(test-flags-CXX ${rf})
+	{ _is_flagq FCFLAGS ${rf} && _is_flagq FFLAGS ${rf} ;} || \
+	append-fflags $(test-flags-FC ${rf})
+}
+
+# Inverted filters for hardened compiler.
+# This is trying to unpick the hardened compiler defaults.
 _filter-hardened() {
 	local f
 	for f in "$@" ; do
@@ -71,19 +93,15 @@ _filter-hardened() {
 			# not -fPIC or -fpic, but too many places filter -fPIC without
 			# thinking about -fPIE.
 			-fPIC|-fpic|-fPIE|-fpie|-Wl,pie|-pie)
-				gcc-specs-pie || continue
-				is-flagq -nopie || append-flags -nopie;;
+				gcc-specs-pie && { is-flagq -nopie || append-flags -nopie ;};;
 			-fstack-protector)
-				gcc-specs-ssp || continue
-				is-flagq -fno-stack-protector || append-flags $(test-flags -fno-stack-protector) 
- 				_is_flagq CFLAGS -fno-stack-protector || append-cflags $(test-flags-CC -fno-stack-protector) 
- 				_is_flagq CXXFLAGS -fno-stack-protector || append-cxxflags $(test-flags-CXX -fno-stack-protector);; 
+				gcc-specs-ssp && _reverse-append ${f};;
 			-fstack-protector-all)
-				gcc-specs-ssp-to-all || continue
-				is-flagq -fno-stack-protector-all || append-flags $(test-flags -fno-stack-protector-all);;
+				gcc-specs-ssp-to-all && _reverse-append ${f};;
+			-fno-delete-null-pointer-checks)
+				gcc-specs-nodelnullptrchks && _reverse-append ${f};;
 			-fno-strict-overflow)
-				gcc-specs-nostrict || continue
-				is-flagq -fstrict-overflow || append-flags $(test-flags -fstrict-overflow);;
+				gcc-specs-nostrictoverflow && _reverse-append ${f};;
 		esac
 	done
 }
