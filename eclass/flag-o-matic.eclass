@@ -33,7 +33,7 @@ setup-allowed-flags() {
 		export ALLOWED_FLAGS="-pipe"
 		export ALLOWED_FLAGS="${ALLOWED_FLAGS} -O -O0 -O1 -O2 -mcpu -march -mtune"
 		export ALLOWED_FLAGS="${ALLOWED_FLAGS} -fstack-protector -fstack-protector-all"
-		export ALLOWED_FLAGS="${ALLOWED_FLAGS} -fbounds-checking -fno-delete-null-pointer-checks -fno-strict-overflow"
+		export ALLOWED_FLAGS="${ALLOWED_FLAGS} -fbounds-checking -fno-strict-overflow"
 		export ALLOWED_FLAGS="${ALLOWED_FLAGS} -fno-PIE -fno-pie -fno-unit-at-a-time"
 		export ALLOWED_FLAGS="${ALLOWED_FLAGS} -g -g[0-9] -ggdb -ggdb[0-9] -gstabs -gstabs+"
 		export ALLOWED_FLAGS="${ALLOWED_FLAGS} -fno-ident"
@@ -41,7 +41,7 @@ setup-allowed-flags() {
 	fi
 	# allow a bunch of flags that negate features / control ABI
 	ALLOWED_FLAGS="${ALLOWED_FLAGS} -fno-stack-protector -fno-stack-protector-all \
-		-fno-strict-aliasing -fno-bounds-checking -fdelete-null-pointer-checks -fstrict-overflow -fno-omit-frame-pointer"
+		-fno-strict-aliasing -fno-bounds-checking -fstrict-overflow -fno-omit-frame-pointer"
 	ALLOWED_FLAGS="${ALLOWED_FLAGS} -mregparm -mno-app-regs -mapp-regs \
 		-mno-mmx -mno-sse -mno-sse2 -mno-sse3 -mno-ssse3 -mno-sse4 -mno-sse4.1 \
 		-mno-sse4.2 -mno-avx -mno-aes -mno-pclmul -mno-sse4a -mno-3dnow \
@@ -98,8 +98,6 @@ _filter-hardened() {
 				gcc-specs-ssp && _reverse-append ${f};;
 			-fstack-protector-all)
 				gcc-specs-ssp-to-all && _reverse-append ${f};;
-			-fno-delete-null-pointer-checks)
-				gcc-specs-nodelnullptrchks && _reverse-append ${f};;
 			-fno-strict-overflow)
 				gcc-specs-nostrictoverflow && _reverse-append ${f};;
 		esac
