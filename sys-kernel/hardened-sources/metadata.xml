@@ -11,6 +11,10 @@
 		<email>gengor@gentoo.org</email>
 		<name>Gordon Malm</name>
 	</maintainer>
+	<maintainer>
+		<email>anarchy@gentoo.org</email>
+		<name>Jory A. Pratt</name>
+	</maintainer>
 	<longdescription>
 		hardened-sources is based upon genpatches, and adds the grsecurity
 		patch from http://www.grsecurity.net, which also includes PaX.
