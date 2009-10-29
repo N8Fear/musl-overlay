@@ -2,6 +2,13 @@
 # Copyright 1999-2009 Gentoo Foundation; Distributed under the GPL v2
 # $Header: /var/cvsroot/gentoo-x86/app-emulation/qemu/ChangeLog,v 1.69 2009/09/05 15:58:52 lu_zero Exp $
 
+*qemu-0.11.0 (29 Oct 2009)
+
+  29 Oct 2009; Peter Hjalmarsson <xake@gentoo.org> qemu-0.10.6.ebuild,
+  -files/qemu-0.10.6-link-with-cflags.patch, +qemu-0.11.0.ebuild,
+  +files/qemu-0.11.0-mips64-user-fix.patch:
+  Version bump, and use sed instead of patch
+
   29 Sep 2009; Peter Hjalmarsson <xake@gentoo.org>
   +files/qemu-0.10.3-nopl-fix.patch, +qemu-0.10.6.ebuild,
   +files/qemu-0.10.6-link-with-cflags.patch, +files/qemu-ifdown,
