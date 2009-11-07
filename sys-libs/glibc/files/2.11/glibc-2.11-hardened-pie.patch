@@ -1,40 +1,46 @@
-Change link commands for glibc executables to build PIEs
+2009-11-07	Magnus Granberg		<zorry@ume.nu>
 
-Patch by Kevin F. Quinn <kevquinn@gentoo.org>
+		bug #292139
+		* Makeconfig	+link-pie:	set +link to +link-pie
+		+link-static:	change $(static-start-installed-name) to S$(static-start-installed-name)
+		change +prector to +prectorS, change +postctor to +postctorS
+		+link-bounded: change +prector to +prectorS, change +postctor to +postctorS
 
---- Makeconfig
-+++ Makeconfig
-@@ -423,10 +423,10 @@
- 
- # Command for linking programs with the C library.
- ifndef +link
--+link = $(CC) -nostdlib -nostartfiles -o $@ \
-++link = $(CC) -nostdlib -nostartfiles -fPIE -pie -o $@ \
- 	      $(sysdep-LDFLAGS) $(config-LDFLAGS) $(LDFLAGS) $(LDFLAGS-$(@F)) \
- 	      $(combreloc-LDFLAGS) $(relro-LDFLAGS) $(hashstyle-LDFLAGS) \
--	      $(addprefix $(csu-objpfx),$(start-installed-name)) \
-+	      $(addprefix $(csu-objpfx),S$(start-installed-name)) \
- 	      $(+preinit) $(+prector) \
- 	      $(filter-out $(addprefix $(csu-objpfx),start.o \
- 						     $(start-installed-name))\
-@@ -451,7 +451,7 @@
+--- Makeconfig	2009-11-06 16:39:18.000000000 +0100
++++ Makeconfig	2009-11-07 16:39:35.000000000 +0100
+@@ -447,29 +447,30 @@
+ 	     $(common-objpfx)libc% $(+postinit),$^) \
+ 	     $(link-extra-libs) $(link-libc) $(+postctorS) $(+postinit)
+ endif
+++link = $(+link-pie)
+ # Command for statically linking programs with the C library.
  ifndef +link-static
  +link-static = $(CC) -nostdlib -nostartfiles -static -o $@ \
  	      $(sysdep-LDFLAGS) $(LDFLAGS) $(LDFLAGS-$(@F))  \
 -	      $(addprefix $(csu-objpfx),$(static-start-installed-name)) \
+-	      $(+preinit) $(+prector) \
 +	      $(addprefix $(csu-objpfx),S$(static-start-installed-name)) \
- 	      $(+preinit) $(+prector) \
++	      $(+preinit) $(+prectorS) \
  	      $(filter-out $(addprefix $(csu-objpfx),start.o \
  						     $(start-installed-name))\
-@@ -549,8 +549,8 @@
- ifeq ($(elf),yes)
- +preinit = $(addprefix $(csu-objpfx),crti.o)
- +postinit = $(addprefix $(csu-objpfx),crtn.o)
--+prector = `$(CC) --print-file-name=crtbegin.o`
--+postctor = `$(CC) --print-file-name=crtend.o`
-++prector = `$(CC) --print-file-name=crtbeginS.o`
-++postctor = `$(CC) --print-file-name=crtendS.o`
- # Variants of the two previous definitions for linking PIE programs.
- +prectorS = `$(CC) --print-file-name=crtbeginS.o`
- +postctorS = `$(CC) --print-file-name=crtendS.o`
-
+ 			   $(+preinit) $(link-extra-libs-static) \
+ 			   $(common-objpfx)libc% $(+postinit),$^) \
+-	      $(link-extra-libs-static) $(link-libc-static) $(+postctor) $(+postinit)
++	      $(link-extra-libs-static) $(link-libc-static) $(+postctorS) $(+postinit)
+ endif
+ # Command for statically linking bounded-pointer programs with the C library.
+ ifndef +link-bounded
+ +link-bounded = $(CC) -nostdlib -nostartfiles -static -fbounded-pointers -o $@ \
+ 	      $(sysdep-LDFLAGS) $(LDFLAGS)  \
+ 	      $(addprefix $(csu-objpfx),b$(static-start-installed-name)) \
+-	      $(+preinit) $(+prector) \
++	      $(+preinit) $(+prectorS) \
+ 	      $(filter-out $(addprefix $(csu-objpfx),start.ob \
+ 						     $(start-installed-name))\
+ 			   $(+preinit) $(link-extra-libs-bounded) \
+ 			   $(common-objpfx)libc% $(+postinit),$^) \
+-	      $(link-extra-libs-bounded) $(link-libc-bounded) $(+postctor) $(+postinit)
++	      $(link-extra-libs-bounded) $(link-libc-bounded) $(+postctorS) $(+postinit)
+ endif
+ ifndef config-LDFLAGS
+ ifeq (yesyes,$(build-shared)$(elf))
