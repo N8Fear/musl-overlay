@@ -4,6 +4,8 @@
 
   09 Nov 2009; <zorry@gentoo.org> -glibc-2.11.ebuild,
   -files/2.11/glibc-2.11-hardened-pie.patch:
+
+
   Fixed in the tree bug #292139
 
   08 Nov 2009; <zorry@gentoo.org> files/2.11/glibc-2.11-hardened-pie.patch:
