@@ -1,6 +1,6 @@
 # Copyright 1999-2009 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/app-emulation/qemu/qemu-0.11.0.ebuild,v 1.1 2009/10/23 10:11:20 lu_zero Exp $
+# $Header: /var/cvsroot/gentoo-x86/app-emulation/qemu/qemu-0.11.0.ebuild,v 1.2 2009/11/05 23:39:24 patrick Exp $
 
 EAPI="2"
 
@@ -87,7 +87,7 @@ src_configure() {
 		einfo "Building following softmmu targets: ${softmmu_targets}"
 		use gnutls || conf_opts="$conf_opts --disable-vnc-tls"
 		use ncurses || conf_opts="$conf_opts --disable-curses"
-		use sdl || conf_opts="$conf_opts --disable-gfx-check --disable-sdl"
+		use sdl || conf_opts="$conf_opts --disable-sdl"
 		use vde || conf_opts="$conf_opts --disable-vde"
 		use bluetooth || conf_opts="$conf_opts --disable-bluez"
 		use kqemu || conf_opts="$conf_opts --disable-kqemu"
@@ -101,7 +101,7 @@ src_configure() {
 	else
 		einfo "Disabling softmmu emulation (no softmmu targets specified)"
 		conf_opts="$conf_opts --disable-system --disable-vnc-tls \
-		--disable-curses --disable-gfx-check --disable-sdl --disable-vde \
+		--disable-curses --disable-sdl --disable-vde \
 		--disable-kqemu --disable-kvm"
 	fi
 

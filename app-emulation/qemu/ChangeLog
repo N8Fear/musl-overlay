@@ -2,6 +2,9 @@
 # Copyright 1999-2009 Gentoo Foundation; Distributed under the GPL v2
 # $Header: /var/cvsroot/gentoo-x86/app-emulation/qemu/ChangeLog,v 1.69 2009/09/05 15:58:52 lu_zero Exp $
 
+  12 Nov 2009; Peter Hjalmarsson <xake@gentoo.org> qemu-0.11.0.ebuild:
+  Update qemu with changes from portage.
+
 *qemu-0.11.0 (29 Oct 2009)
 
   29 Oct 2009; Peter Hjalmarsson <xake@gentoo.org> qemu-0.10.6.ebuild,
