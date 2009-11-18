@@ -12,7 +12,7 @@ do_filter_flags() {
 
 	# Don't build gcc with SSP if gcc < 4.2
 	if [[ gcc-version < 4.2 ]] ; then
- 	filter-flags -fstack-protector-all
+	filter-flags -fstack-protector-all
 	filter-flags -fno-stack-protector-all
 	filter-flags -fstack-protector
 	filter-flags -fno-stack-protector
@@ -42,12 +42,12 @@ src_unpack() {
 	unpack ${A}
 	cd "${S}"
 	EPATCH_SUFFIX="patch" epatch "${WORKDIR}"/patch
-	
+
 	# bug 285956
 	if [[ gcc-version > 4.2 ]] ; then
 		epatch "$FILESDIR"/libstdc++-v3-Makefile.in.patch
 	fi
-	
+
 	elibtoolize --portage --shallow
 	./contrib/gcc_update --touch
 	mkdir -p "${WORKDIR}"/build

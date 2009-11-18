@@ -12,7 +12,7 @@ do_filter_flags() {
 
 	# Don't build gcc with SSP if gcc < 4.2
 	if [[ gcc-version < 4.2 ]] ; then
- 	filter-flags -fstack-protector-all
+	filter-flags -fstack-protector-all
 	filter-flags -fno-stack-protector-all
 	filter-flags -fstack-protector
 	filter-flags -fno-stack-protector

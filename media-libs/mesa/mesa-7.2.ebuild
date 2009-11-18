@@ -149,19 +149,18 @@ src_compile() {
 	myconf="${myconf} $(use_enable !pic asm)"
 
 	if  use sparc; then
-		  elog "Mesa assembly code is currently generally disabled on sparc"	
+		  elog "Mesa assembly code is currently generally disabled on sparc"
 		  myconf="${myconf} --disable-asm"
 	fi
 
 	if use hardened && use x86; then
 		 # Make glx text segments readonly on hardened
 		 myconf="${myconf} --enable-glx-rts"
-		 elog "Mesa assembly code is currently generally disabled on hardened x86"	
+		 elog "Mesa assembly code is currently generally disabled on hardened x86"
 		 # some hithereto unknown part of mesa's x86 assembly code is
 		 # broken by readonly text segments
 		 myconf="${myconf} --disable-asm"
 	fi
-
 
 	myconf="${myconf} --disable-glut"
 
