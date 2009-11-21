@@ -1,6 +1,11 @@
 # ChangeLog for app-emulation/kvm
 # Copyright 1999-2009 Gentoo Foundation; Distributed under the GPL v2
-# $Header: /var/cvsroot/gentoo-x86/app-emulation/kvm/ChangeLog,v 1.39 2009/09/21 14:57:21 dang Exp $
+# $Header: $
+
+*kvm-88-r2 (21 Nov 2009)
+
+  21 Nov 2009; Peter Hjalmarsson <xake@rymdraket.net> +kvm-88-r2.ebuild:
+  Update with changes from portage (kvm rules).
 
   29 Oct 2009; Peter Hjalmarsson <xake@gentoo.org> -files/kvm-83-vtd.patch,
   kvm-88-r1.ebuild, -files/kvm-88-link-with-cflags.patch:
