@@ -9,7 +9,7 @@ K_GENPATCHES_VER="7"
 inherit kernel-2
 detect_version
 
-HGPV="${KV_MAJOR}.${KV_MINOR}.${KV_PATCH}-10"
+HGPV="${KV_MAJOR}.${KV_MINOR}.${KV_PATCH}-11"
 HGPV_URI="http://dev.gentoo.org/~anarchy/dist/hardened-patches-${HGPV}.extras.tar.bz2"
 SRC_URI="${KERNEL_URI} ${HGPV_URI} ${GENPATCHES_URI} ${ARCH_URI}"
 
