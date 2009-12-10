@@ -2,6 +2,18 @@
 # Copyright 1999-2009 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+*glibc-2.9_p20081201-r5 (10 Dec 2009)
+
+  10 Dec 2009; <zorry@gentoo.org> glibc-2.9_p20081201-r4.ebuild,
+  +glibc-2.9_p20081201-r5.ebuild, -files/2.10/glibc-2.10-gentoo-chk_fail.c,
+  -files/2.10/glibc-2.10-hardened-configure-picdefault.patch,
+  -files/2.10/glibc-2.10-hardened-inittls-nosysenter.patch,
+  -files/2.10/glibc-2.10-hardened-ssp-compat.patch,
+  files/eblits/common.eblit,
+  files/eblits/src_compile.eblit, files/eblits/src_unpack.eblit:
+  Bump the patchset to 1.7
+
+
   09 Nov 2009; <zorry@gentoo.org> -glibc-2.11.ebuild,
   -files/2.11/glibc-2.11-hardened-pie.patch:
   Fixed in the tree bug #292139

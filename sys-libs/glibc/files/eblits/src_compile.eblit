@@ -1,6 +1,6 @@
 # Copyright 1999-2007 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/sys-libs/glibc/files/eblits/src_compile.eblit,v 1.9 2009/09/04 07:20:17 vapier Exp $
+# $Header: /var/cvsroot/gentoo-x86/sys-libs/glibc/files/eblits/src_compile.eblit,v 1.10 2009/11/06 00:33:03 vapier Exp $
 
 glibc_do_configure() {
 	local myconf
@@ -136,8 +136,6 @@ toolchain-glibc_headers_compile() {
 		libc_cv_386_tls=yes \
 		libc_cv_asm_cfi_directives=yes \
 		libc_cv_broken_visibility_attribute=no \
-		libc_cv_c_cleanup=yes \
-		libc_cv_forced_unwind=yes \
 		libc_cv_gcc___thread=yes \
 		libc_cv_mlong_double_128=yes \
 		libc_cv_mlong_double_128ibm=yes \
@@ -173,6 +171,12 @@ toolchain-glibc_headers_compile() {
 }
 
 eblit-glibc-src_compile() {
+	if is_crosscompile ; then
+		export \
+			libc_cv_c_cleanup=yes \
+			libc_cv_forced_unwind=yes
+	fi
+
 	if just_headers ; then
 		toolchain-glibc_headers_compile
 		return

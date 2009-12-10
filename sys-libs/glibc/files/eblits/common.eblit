@@ -1,6 +1,6 @@
 # Copyright 1999-2007 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/sys-libs/glibc/files/eblits/common.eblit,v 1.9 2009/01/28 18:11:41 vapier Exp $
+# $Header: /var/cvsroot/gentoo-x86/sys-libs/glibc/files/eblits/common.eblit,v 1.10 2009/12/01 04:57:04 vapier Exp $
 
 # We need to be able to set alternative headers for
 # compiling for non-native platform
@@ -175,9 +175,7 @@ setup_flags() {
 	if use hardened && gcc-specs-pie ; then
 		# Force PIC macro definition for all compilations since they're all
 		# either -fPIC or -fPIE with the default-PIE compiler.
-		if [[ ${GLIBCMAJOR}.${GLIBCMINOR} < 2.11 ]] ; then
-			append-cppflags -DPIC
-		endif
+		append-cppflags -DPIC
 	else
 		# Don't build -fPIE without the default-PIE compiler and the
 		# hardened-pie patch
@@ -238,10 +236,9 @@ want__thread() {
 
 	[[ -n ${WANT__THREAD} ]] && return ${WANT__THREAD}
 
-	echo 'extern __thread int i;' > "${T}"/test-__thread.c
-	$(tc-getCC ${CTARGET}) -c "${T}"/test-__thread.c -o "${T}"/test-__thread.o &> /dev/null
+	# only test gcc -- cant test linking yet
+	tc-has-tls -c ${CTARGET}
 	WANT__THREAD=$?
-	rm -f "${T}"/test-__thread.[co]
 
 	return ${WANT__THREAD}
 }
