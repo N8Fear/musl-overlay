@@ -175,9 +175,7 @@ setup_flags() {
 	if use hardened && gcc-specs-pie ; then
 		# Force PIC macro definition for all compilations since they're all
 		# either -fPIC or -fPIE with the default-PIE compiler.
-		if [[ ${GLIBCMAJOR}.${GLIBCMINOR} < 2.11 ]] ; then
-			append-cppflags -DPIC
-		endif
+		append-cppflags -DPIC
 	else
 		# Don't build -fPIE without the default-PIE compiler and the
 		# hardened-pie patch
