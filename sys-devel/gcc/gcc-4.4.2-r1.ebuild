@@ -14,7 +14,7 @@ SPECS_VER="0.1.7"
 
 # arch/libc configurations known to be stable or untested with {PIE,SSP,FORTIFY}-by-default
 ESPF_GLIBC_SUPPORT="amd64 x86 ppc ppc64 arm sparc sparc64"
-ESPF_UCLIBC_SUPPORT="x86 arm"
+ESPF_UCLIBC_SUPPORT="x86 arm amd64"
 # Hardened end
 
 inherit toolchain
