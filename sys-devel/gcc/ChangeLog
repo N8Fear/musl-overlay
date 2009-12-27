@@ -2,6 +2,11 @@
 # Copyright 1999-2009 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+*gcc-4.4.2-r2 (27 Dec 2009)
+
+  27 Dec 2009; <zorry@gentoo.org> +gcc-4.4.2-r2.ebuild:
+  Bump to support ia64 with new espf-0.3.6 patchest thanks to devurandom.
+
 *gcc-4.4.2-r1 (18 Oct 2009)
 
   18 Oct 2009; Magnus Granberg <zorry@ume.nu> +gcc-4.4.2-r1.ebuild:
