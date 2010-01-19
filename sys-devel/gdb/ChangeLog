@@ -1,0 +1,11 @@
+# ChangeLog for sys-devel/gdb
+# Copyright 1999-2010 Gentoo Foundation; Distributed under the GPL v2
+# $Header: $
+
+*gdb-7.0.50.20100119 (19 Jan 2010)
+
+  19 Jan 2010; Peter Hjalmarsson <xake@gentoo.org>
+  +gdb-7.0.50.20100119.ebuild:
+  Added gdb snapshot for PIE-testing. Do not use unless you know what you
+  are doing.
+
