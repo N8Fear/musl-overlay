@@ -2,6 +2,9 @@
 # Copyright 1999-2010 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+  24 Jan 2010; <zorry@gentoo.org> gdb-7.0.50.20100119.ebuild:
+  Use the weekly build instead.
+
 *gdb-7.0.50.20100119 (19 Jan 2010)
 
   19 Jan 2010; Peter Hjalmarsson <xake@gentoo.org>

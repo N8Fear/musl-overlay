@@ -15,7 +15,7 @@ is_cross() { [[ ${CHOST} != ${CTARGET} ]] ; }
 #PATCH_VER="1"
 DESCRIPTION="GNU debugger"
 HOMEPAGE="http://sources.redhat.com/gdb/"
-SRC_URI="ftp://sources.redhat.com/pub/gdb/snapshots/current/gdb-${PV}.tar.bz2"
+SRC_URI="ftp://sources.redhat.com/pub/gdb/snapshots/current/gdb-weekly-${PV}.tar.bz2"
 #SRC_URI="http://ftp.gnu.org/gnu/gdb/${P}.tar.bz2
 #	ftp://sources.redhat.com/pub/gdb/releases/${P}.tar.bz2
 #	${PATCH_VER:+mirror://gentoo/${P}-patches-${PATCH_VER}.tar.lzma}"
