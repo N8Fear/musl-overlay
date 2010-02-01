@@ -1,4 +1,4 @@
-# Copyright 1999-2009 Gentoo Foundation
+# Copyright 1999-2010 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: /var/cvsroot/gentoo-x86/sys-libs/libstdc++-v3/libstdc++-v3-4.4.2.ebuild,v 1.25 2009/10/18 14.02.00 Zorry Exp $
 
@@ -87,8 +87,7 @@ src_compile() {
 }
 
 src_install() {
-	emake -j1 \
-		-C "${WORKDIR}"/build \
+	emake	-C "${WORKDIR}"/build \
 		DESTDIR="${D}" \
 		install-target-libstdc++-v3 || die
 
