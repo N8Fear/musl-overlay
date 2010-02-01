@@ -3,6 +3,10 @@
 # $Header: $
 
   01 Feb 2010; Peter Hjalmarsson <xake@gentoo.org>
+  -libstdc++-v3-4.4.1.ebuild, -libstdc++-v3-4.4.2.ebuild:
+  Removed after speaking to Magnus
+
+  01 Feb 2010; Peter Hjalmarsson <xake@gentoo.org>
   libstdc++-v3-4.4.2.ebuild:
   Removed "-j1" from install phase
 
