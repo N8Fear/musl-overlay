@@ -336,8 +336,8 @@ get_gcc_src_uri() {
 		GCC_SRC_URI="${GCC_SRC_URI} !nopie? ( $(gentoo_urls ${PIE_CORE}) )"
 
 	# espf patch for gcc >4.4.1 compiler. New hardened patchset
-        [[ -n ${ESPF_VER} ]] && \
-                GCC_SRC_URI="${GCC_SRC_URI} ( $(gentoo_urls gcc-${GCC_RELEASE_VER}-espf-${ESPF_VER}.tar.bz2)
+	[[ -n ${ESPF_VER} ]] && \
+		GCC_SRC_URI="${GCC_SRC_URI} ( $(gentoo_urls gcc-${GCC_RELEASE_VER}-espf-${ESPF_VER}.tar.bz2)
 			http://weaver.gentooenterprise.com/hardened/patches/gcc-${GCC_RELEASE_VER}-espf-${ESPF_VER}.tar.bz2
 		)"
 
