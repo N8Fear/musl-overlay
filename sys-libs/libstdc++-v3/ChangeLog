@@ -3,6 +3,10 @@
 # $Header: $
 
   01 Feb 2010; Peter Hjalmarsson <xake@gentoo.org>
+  libstdc++-v3-3.3.6-r1.ebuild:
+  Updated against portage, and removed unneeded "-j1"
+
+  01 Feb 2010; Peter Hjalmarsson <xake@gentoo.org>
   -libstdc++-v3-3.3.6.ebuild:
   In portage
 
