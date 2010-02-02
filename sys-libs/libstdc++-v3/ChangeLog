@@ -2,6 +2,10 @@
 # Copyright 1999-2010 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+  02 Feb 2010; Anthony G. Basile <basile@opensource.dyc.edu> ChangeLog:
+  libstdc++-v3-3.3.6-r1.ebuild -libstdc++-v3-Makefile.in.patch
+  Fixed gcc version check. Removed unneeded patch.
+
   01 Feb 2010; Peter Hjalmarsson <xake@gentoo.org>
   -libstdc++-v3-4.4.1.ebuild, -libstdc++-v3-4.4.2.ebuild:
   Removed after speaking to Magnus
