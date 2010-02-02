@@ -124,7 +124,7 @@ src_unpack() {
 	EPATCH_SUFFIX="patch" epatch "${WORKDIR}"/patch
 
 	# bug 285956 Fail on GCC 4.3.3 but pass on GCC 4.4.1
-	if [[ get-version > 4.2 ]] ; then
+	if [[ $(gcc-version) > "4.2" ]] ; then
 		epatch "$FILESDIR"/compile_with_no-SSP.patch
 	fi
 
