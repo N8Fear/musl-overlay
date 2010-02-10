@@ -289,9 +289,6 @@ get_gcc_src_uri() {
 	export HTB_GCC_VER=${HTB_GCC_VER:-${GCC_RELEASE_VER}}
 	export SPECS_GCC_VER=${SPECS_GCC_VER:-${GCC_RELEASE_VER}}
 
-	[[ -n ${PIE_VER} ]] && \
-		PIE_CORE=${PIE_CORE:-gcc-${PIE_GCC_VER}-piepatches-v${PIE_VER}.tar.bz2}
-
 	# Set where to download gcc itself depending on whether we're using a
 	# prerelease, snapshot, or release tarball.
 	if [[ -n ${PRERELEASE} ]] ; then
@@ -330,6 +327,9 @@ get_gcc_src_uri() {
 	# various gentoo patches
 	[[ -n ${PATCH_VER} ]] && \
 		GCC_SRC_URI="${GCC_SRC_URI} $(gentoo_urls gcc-${PATCH_GCC_VER}-patches-${PATCH_VER}.tar.bz2)"
+
+	[[ -n ${PIE_VER} ]] && \
+		PIE_CORE=${PIE_CORE:-gcc-${PIE_GCC_VER}-piepatches-v${PIE_VER}.tar.bz2}
 
 	# strawberry pie, Cappuccino and a Gauloises (it's a good thing)
 	[[ -n ${PIE_VER} ]] && \
@@ -514,14 +514,18 @@ want_split_specs() {
 want_minispecs() {
 	if tc_version_is_at_least 4.3.2 && use hardened ; then
 		[[ -n ${SPECS_VER} ]] && want_pie && return 0
-		[[ -n ${ESPF_VER} ]] && [[ -n ${SPECS_VER} ]] && return 1
+		[[ -n ${ESPF_VER} ]] && return 1
 		die "For Hardened to work you need the minispecs files and have the PIE patch"
 	fi
 	return 1	
 }
 want_espf() {
 	if tc_version_is_at_least 4.3.4 && use hardened ; then
-		[[ -n ${ESPF_VER} ]] && [[ -n ${SPECS_VER} ]] && return 0 
+		if ! tc_version_is_at_least 4.4.3 ; then
+			[[ -n ${ESPF_VER} ]] && [[ -n ${SPECS_VER} ]] && return 0
+		else
+			[[ -n ${ESPF_VER} ]] && return 0
+		fi
 		die "For Hardened to work you need the minispecs files and have the espf patch"
 	fi
 	return 1
@@ -1238,11 +1242,9 @@ gcc-compiler-configure() {
 			confgcc="${confgcc} --disable-libssp"
 		fi
 
-		# If we want hardened support on newer espf-patchset
-		if want_espf ; then
-			confgcc="${confgcc} --enable-espf"
-		else
-			[[ ${ESPF_VER} ]] && confgcc="${confgcc} --disable-espf"
+		# If we want hardened support with the newer espf-patchset
+		if [[ ${ESPF_VER} ]] ; then
+			confgcc="${confgcc} $(use_enable hardened espf)"
 		fi
 
 		if tc_version_is_at_least "4.2" ; then
