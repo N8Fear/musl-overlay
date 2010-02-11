@@ -5,6 +5,6 @@
 *hardened-sources-2.6.32-r3 (30 Jan 2010)
 
   30 Jan 2010; <zorry@gentoo.org> +hardened-sources-2.6.32-r3.ebuild:
-  Updated the kernel to 2.6.23.7 and the Grsec/PaX to
+  Updated the kernel to 2.6.32.7 and the Grsec/PaX to
   2.1.14-2.6.32.7-201001291848
 
