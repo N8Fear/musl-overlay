@@ -63,6 +63,9 @@ src_unpack() {
 		"${S}"/grub/asmstub.c \
 		|| die "Failed to hack memory size"
 
+	# Bugs #139277 #168834 #281246
+	epatch "${FILESDIR}"/grub-0.97-fpie_check.patch
+
 	if [[ -n ${PATCHVER} ]] ; then
 		EPATCH_SUFFIX="patch"
 		epatch "${WORKDIR}"/patch
@@ -77,8 +80,6 @@ src_unpack() {
 }
 
 src_compile() {
-	filter-flags -fPIE #168834
-
 	use amd64 && multilib_toolchain_setup x86
 
 	unset BLOCK_SIZE #73499
