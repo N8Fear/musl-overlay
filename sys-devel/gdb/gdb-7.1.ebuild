@@ -15,16 +15,15 @@ is_cross() { [[ ${CHOST} != ${CTARGET} ]] ; }
 #PATCH_VER="1"
 DESCRIPTION="GNU debugger"
 HOMEPAGE="http://sources.redhat.com/gdb/"
-SRC_URI="ftp://sources.redhat.com/pub/gdb/snapshots/current/gdb-weekly-${PV}.tar.bz2"
-#SRC_URI="http://ftp.gnu.org/gnu/gdb/${P}.tar.bz2
-#	ftp://sources.redhat.com/pub/gdb/releases/${P}.tar.bz2
-#	${PATCH_VER:+mirror://gentoo/${P}-patches-${PATCH_VER}.tar.lzma}"
+SRC_URI="http://ftp.gnu.org/gnu/gdb/${P}.tar.bz2
+	ftp://sources.redhat.com/pub/gdb/releases/${P}.tar.bz2
+	${PATCH_VER:+mirror://gentoo/${P}-patches-${PATCH_VER}.tar.lzma}"
 
 LICENSE="GPL-2 LGPL-2"
 is_cross \
 	&& SLOT="${CTARGET}" \
 	|| SLOT="0"
-KEYWORDS=""
+KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~mips ~ppc ~ppc64 ~s390 ~sparc ~x86 ~x86-fbsd"
 IUSE="expat multitarget nls python test vanilla"
 
 RDEPEND=">=sys-libs/ncurses-5.2-r2
@@ -92,7 +91,7 @@ src_install() {
 	docinto sim
 	dodoc sim/ChangeLog sim/MAINTAINERS sim/README-HACKING
 
-	dodoc "${WORKDIR}"/extra/gdbinit.sample
+#	dodoc "${WORKDIR}"/extra/gdbinit.sample
 
 	# Remove shared info pages
 	rm -f "${D}"/usr/share/info/{annotate,bfd,configure,standards}.info*
