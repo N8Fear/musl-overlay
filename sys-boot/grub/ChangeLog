@@ -8,10 +8,9 @@
   +grub-0.97-r12.ebuild, +files/grub-0.97-fix-ssp.patch:
   New patch to fix grub with ssp. See bug #305283
 
-  01 Oct 2009; Magnus Granberg <zorry@ume.nu>
+  19 Mar 2010; Magnus Granberg <zorry@ume.nu>
   files/grub-0.97-fpie_check.patch:
-  GCC 3.4.6 Hardened defines __PIC__ instead of __PIE__
-
+  Clean the old grub-0.97-fpie_check patch up.
 
 *grub-0.97-r11 (05 Sep 2009)
 

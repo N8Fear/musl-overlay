@@ -64,7 +64,7 @@ src_unpack() {
 		|| die "Failed to hack memory size"
 
 	# Bugs #139277 #168834 #281246
-	epatch "${FILESDIR}"/grub-0.97-fpie_check.patch
+	epatch "${FILESDIR}"/nopie_check.patch
 
 	if [[ -n ${PATCHVER} ]] ; then
 		EPATCH_SUFFIX="patch"

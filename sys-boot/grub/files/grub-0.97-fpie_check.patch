@@ -1,53 +1,30 @@
-2009-10-01	Magnus Granberg		<zorry@ume.nu>
+2010-03-19	Magnus Granberg		<zorry@ume.nu>
 
 		# #139277 #168834 #281246
-		* configure.ac: Add grub_CHECK_PIE. It check if the compiler
-		include -fPIE in the default specs.
-		* configure.ac: Check if pie_possible is yes and add -nopie
+		* configure.ac: Check if the compiler
+		compile with -fPIE as default. If add -nopie
 		to STAGE1_CFLAGS and STAGE2_CFLAGS.
 
---- configure.ac.zorry	2009-09-05 15:54:43.000000000 +0200
-+++ configure.ac	2009-09-05 16:35:48.000000000 +0200
-@@ -110,6 +110,42 @@
+--- a/configure.ac	2010-03-07 15:39:03.000000000 +0100
++++ b/configure.ac	2010-03-09 13:04:12.000000000 +0100
+@@ -107,6 +107,20 @@
+     if test "x$grub_cv_cc_no_stack_protector" = xyes; then
+       STAGE2_CFLAGS="$STAGE2_CFLAGS -fno-stack-protector"
+     fi
++    # Position Independent Executables, but GRUB doesn't want this feature.
++    AC_CACHE_CHECK([whether gcc has -fPIE on as default], grub_cv_cc_fpie, [
++      AC_TRY_COMPILE(,[
++		#if ! defined (__PIC__) || ! defined (__PIE__)
++		#error
++		#endif
++		],
++            grub_cv_cc_fpie=yes,
++            grub_cv_cc_fpie=no)
++    ])
++    if test "x$grub_cv_cc_fpie" = xyes; then
++      STAGE1_CFLAGS="$STAGE1_CFLAGS -nopie"
++      STAGE2_CFLAGS="$STAGE2_CFLAGS -nopie"
++    fi
    fi
  fi
  
-+AC_DEFUN(grub_CHECK_PIE,[
-+[# Position independent executable.
-+pie_possible=yes]
-+AC_MSG_CHECKING([whether `$CC' has `-fPIE' as default])
-+# Is this a reliable test case?
-+AC_LANG_CONFTEST([[
-+#if defined (__PIE__) || defined (__PIC__)
-+int main() {
-+	return 0;
-+}
-+#else
-+#error NO __PIE__ OR __PIC__ DEFINED
-+#endif
-+]])
-+
-+[# `$CC -c -o ...' might not be portable.  But, oh, well...  Is calling
-+# `ac_compile' like this correct, after all?
-+if eval "$ac_compile -S -o conftest.s" 2> /dev/null; then]
-+  AC_MSG_RESULT([yes])
-+  [# Should we clear up other files as well, having called `AC_LANG_CONFTEST'?
-+  rm -f conftest.s
-+else
-+  pie_possible=no]
-+  AC_MSG_RESULT([no])
-+[fi]
-+])
-+
-+# Position independent executable.
-+grub_CHECK_PIE
-+[# Need that, because some distributions ship compilers that include
-+# `-fPIE' in the default specs.
-+if [ x"$pie_possible" = xyes ]; then
-+  STAGE1_CFLAGS="$STAGE1_CFLAGS -nopie"
-+  STAGE2_CFLAGS="$STAGE2_CFLAGS -nopie"
-+fi]
-+
- AC_SUBST(STAGE1_CFLAGS)
- AC_SUBST(STAGE2_CFLAGS)
- AC_SUBST(GRUB_CFLAGS)
