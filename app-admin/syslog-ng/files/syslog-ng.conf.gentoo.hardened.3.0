@@ -81,9 +81,9 @@ filter f_crit { level(crit); };
 filter f_err { level(err); };
 
 filter f_avc { message(".*avc: .*"); };
-filter f_audit { message("^(\\[.*\\] )?audit.*") and not message(".*avc: .*"); };
-filter f_pax { message("^(\\[.*\\] )?PAX:.*"); };
-filter f_grsec { message("^(\\[.*\\] )?grsec:.*"); };
+filter f_audit { message("^(\\[.*\..*\] |)audit.*") and not message(".*avc: .*"); };
+filter f_pax { message("^(\\[.*\..*\] |)PAX:.*"); };
+filter f_grsec { message("^(\\[.*\..*\] |)grsec:.*"); };
 
 log { source(src); filter(f_authpriv); destination(authlog); };
 log { source(src); filter(f_syslog); destination(_syslog); };
