@@ -5,7 +5,7 @@
 # Fixed in 4.3.4 and should be removed from the patchset
 GENTOO_PATCH_EXCLUDE="69_all_gcc43-pr39013.patch" #262567
 
-PATCH_VER="1.0"
+PATCH_VER="1.1"
 UCLIBC_VER="1.0"
 
 ETYPE="gcc-compiler"
