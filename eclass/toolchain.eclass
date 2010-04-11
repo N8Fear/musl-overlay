@@ -159,6 +159,7 @@ else
 			tc_version_is_at_least "4.2" && IUSE="${IUSE} openmp"
 			tc_version_is_at_least "4.3" && IUSE="${IUSE} fixed-point"
 			tc_version_is_at_least "4.4" && IUSE="${IUSE} graphite"
+			tc_version_is_at_least "4.5" && IUSE="${IUSE} lto"
 		fi
 	fi
 
@@ -338,13 +339,13 @@ get_gcc_src_uri() {
 	# espf patch for gcc >4.4.1 compiler. New hardened patchset
 	[[ -n ${ESPF_VER} ]] && \
 		GCC_SRC_URI="${GCC_SRC_URI} ( $(gentoo_urls gcc-${GCC_RELEASE_VER}-espf-${ESPF_VER}.tar.bz2)
-			http://weaver.gentooenterprise.com/hardened/patches/gcc-${GCC_RELEASE_VER}-espf-${ESPF_VER}.tar.bz2
+			http://dev.gentoo.org/~zorry/patches/gcc/gcc-${GCC_RELEASE_VER}-espf-${ESPF_VER}.tar.bz2
 		)"
 
 	# gcc minispec for the hardened gcc 4 compiler
 	[[ -n ${SPECS_VER} ]] && \
 		GCC_SRC_URI="${GCC_SRC_URI} ( $(gentoo_urls gcc-${SPECS_GCC_VER}-specs-${SPECS_VER}.tar.bz2)
-		http://weaver.gentooenterprise.com/hardened/patches/gcc-${SPECS_GCC_VER}-specs-${SPECS_VER}.tar.bz2
+		http://dev.gentoo.org/~zorry/patches/gcc/gcc-${SPECS_GCC_VER}-specs-${SPECS_VER}.tar.bz2
 		)"
 
 	# gcc bounds checking patch
@@ -526,7 +527,7 @@ want_espf() {
 		else
 			[[ -n ${ESPF_VER} ]] && return 0
 		fi
-		die "For Hardened to work you need the minispecs files and have the espf patch"
+		die "For Hardened to work you need the espf patch"
 	fi
 	return 1
 }
@@ -1051,6 +1052,7 @@ gcc-compiler_src_unpack() {
 		if [[ ${ESPF_VER} ]] ; then
 		  espf_arch_support || die "ESPF is not supported on this $(tc-arch) arch."
 		fi
+		use hardened && use vanilla && einfo "Hope you know what you are doing"
 		# Rebrand to make bug reports easier
 		use hardened && BRANDING_GCC_PKGVERSION=${BRANDING_GCC_PKGVERSION/Gentoo/Gentoo Hardened}
 	fi
@@ -1128,11 +1130,12 @@ gcc_src_unpack() {
 			epatch "${WORKDIR}"/uclibc
 		fi
 	fi
+
 	do_gcc_HTB_patches
 	do_gcc_SSP_patches
 	do_gcc_PIE_patches
-	epatch_user
 	do_gcc_ESPF_patches
+	epatch_user
 
 	${ETYPE}_src_unpack || die "failed to ${ETYPE}_src_unpack"
 
@@ -1392,7 +1395,8 @@ gcc_do_configure() {
 	tc_version_is_at_least "4.4" && \
 		confgcc="${confgcc} $(use_with graphite ppl) $(use_with graphite cloog)"
 
-
+	tc_version_is_at_least "4.5" && confgcc="${confgcc} $(use_enable lto)"
+	
 	[[ $(tc-is-softfloat) == "yes" ]] && confgcc="${confgcc} --with-float=soft"
 
 	# Native Language Support
