@@ -329,14 +329,14 @@ get_gcc_src_uri() {
 	[[ -n ${PATCH_VER} ]] && \
 		GCC_SRC_URI="${GCC_SRC_URI} $(gentoo_urls gcc-${PATCH_GCC_VER}-patches-${PATCH_VER}.tar.bz2)"
 
+	# strawberry pie, Cappuccino and a Gauloises (it's a good thing)
 	[[ -n ${PIE_VER} ]] && \
 		PIE_CORE=${PIE_CORE:-gcc-${PIE_GCC_VER}-piepatches-v${PIE_VER}.tar.bz2}
-
-	# strawberry pie, Cappuccino and a Gauloises (it's a good thing)
+		
 	[[ -n ${PIE_VER} ]] && \
 		GCC_SRC_URI="${GCC_SRC_URI} !nopie? ( $(gentoo_urls ${PIE_CORE}) )"
 
-	# espf patch for gcc >4.4.1 compiler. New hardened patchset
+	# espf patch for gcc >4.4.3 compiler. New hardened patchset
 	[[ -n ${ESPF_VER} ]] && \
 		GCC_SRC_URI="${GCC_SRC_URI} ( $(gentoo_urls gcc-${GCC_RELEASE_VER}-espf-${ESPF_VER}.tar.bz2)
 			http://dev.gentoo.org/~zorry/patches/gcc/gcc-${GCC_RELEASE_VER}-espf-${ESPF_VER}.tar.bz2
@@ -344,9 +344,7 @@ get_gcc_src_uri() {
 
 	# gcc minispec for the hardened gcc 4 compiler
 	[[ -n ${SPECS_VER} ]] && \
-		GCC_SRC_URI="${GCC_SRC_URI} ( $(gentoo_urls gcc-${SPECS_GCC_VER}-specs-${SPECS_VER}.tar.bz2)
-		http://dev.gentoo.org/~zorry/patches/gcc/gcc-${SPECS_GCC_VER}-specs-${SPECS_VER}.tar.bz2
-		)"
+		GCC_SRC_URI="${GCC_SRC_URI} !nopie? ( $(gentoo_urls gcc-${SPECS_GCC_VER}-specs-${SPECS_VER}.tar.bz2) )"
 
 	# gcc bounds checking patch
 	if [[ -n ${HTB_VER} ]] ; then
@@ -513,17 +511,17 @@ want_split_specs() {
 	[[ ${SPLIT_SPECS} == "true" ]] && want_pie
 }
 want_minispecs() {
-	if tc_version_is_at_least 4.3.2 && use hardened ; then
-		[[ -n ${SPECS_VER} ]] && want_pie && return 0
-		[[ -n ${ESPF_VER} ]] && return 1
-		die "For Hardened to work you need the minispecs files and have the PIE patch"
+	if tc_version_is_at_least 4.3.2 && use hardened && [[ -z ${ESPF_VER} ]] ; then
+		! use vanilla && want_pie && [[ -n ${SPECS_VER} ]] && return 0
+		ewarn "Hope you know what you are doing. Hardened will not work." && return 0
 	fi
 	return 1	
 }
 want_espf() {
-	if tc_version_is_at_least 4.3.4 && use hardened ; then
-		[[ -n ${ESPF_VER} ]] && return 0
-		die "For Hardened to work you need the espf patch"
+	if tc_version_is_at_least 4.3.4 && use hardened && [[ -z ${PIE_VER} ]]; then
+		espf_arch_support || ewarn "ESPF is not supported on this $(tc-arch) arch."
+		! use vanilla && [[ -n ${ESPF_VER} ]] && return 0
+		ewarn "Hope you know what you are doing. Hardened will not work." && return 0
 	fi
 	return 1
 }
@@ -1031,8 +1029,8 @@ gcc-compiler_pkg_postrm() {
 # Travis Tilley <lv@gentoo.org> (03 Sep 2004)
 #
 gcc-compiler_src_unpack() {
-	# For the old gcc < 3.4
-	if ! tc_version_is_at_least 4.3 ; then
+	# For the old gcc < 4.0
+	if ! tc_version_is_at_least 4.0 ; then
 		# Fail if using pie patches, building hardened, and glibc doesn't have
 		# the necessary support
 		want_pie && use hardened && glibc_have_pie
@@ -1040,15 +1038,11 @@ gcc-compiler_src_unpack() {
 		make_gcc_hard || die "failed to make gcc hard"
 	fi
 
-	# For the newer gcc > 3.4
+	# For the newer gcc > 4.1
 	if tc_version_is_at_least 4.3.2 && use hardened ; then
-		if [[ ${PIE_VER} ]] ; then
+		if want_pie ; then
 		  glibc_have_pie || die "failed to make gcc hardened"
 		fi
-		if [[ ${ESPF_VER} ]] ; then
-		  espf_arch_support || die "ESPF is not supported on this $(tc-arch) arch."
-		fi
-		use hardened && use vanilla && einfo "Hope you know what you are doing"
 		# Rebrand to make bug reports easier
 		use hardened && BRANDING_GCC_PKGVERSION=${BRANDING_GCC_PKGVERSION/Gentoo/Gentoo Hardened}
 	fi
@@ -1242,9 +1236,7 @@ gcc-compiler-configure() {
 		fi
 
 		# If we want hardened support with the newer espf-patchset
-		if [[ ${ESPF_VER} ]] ; then
-			confgcc="${confgcc} $(use_enable hardened espf)"
-		fi
+		[[ -n ${ESPF_VER} ]] && espf_arch_support && confgcc="${confgcc} $(use_enable hardened espf)"
 
 		if tc_version_is_at_least "4.2" ; then
 			confgcc="${confgcc} $(use_enable openmp libgomp)"
@@ -2123,15 +2115,14 @@ gcc_quick_unpack() {
 		else
 			unpack gcc-${PIE_GCC_VER}-piepatches-v${PIE_VER}.tar.bz2
 		fi
+		[[ -n ${SPECS_VER} ]] && \
+			unpack gcc-${SPECS_GCC_VER}-specs-${SPECS_VER}.tar.bz2
 	fi
 
-	if [[ -n ${ESPF_VER} ]] ; then
+	if [[ ${ESPF_VER} ]] ; then
 		unpack gcc-${GCC_RELEASE_VER}-espf-${ESPF_VER}.tar.bz2
 	fi
 	
-	[[ -n ${SPECS_VER} ]] && \
-			unpack gcc-${SPECS_GCC_VER}-specs-${SPECS_VER}.tar.bz2
-
 	want_boundschecking && \
 		unpack "bounds-checking-gcc-${HTB_GCC_VER}-${HTB_VER}.patch.bz2"
 
@@ -2322,7 +2313,7 @@ do_gcc_PIE_patches() {
 
 # do various updates to ESPF
 do_gcc_ESPF_patches() {
-	if [[ -n ${ESPF_VER} ]] && ! use vanilla; then
+	if [[ ${ESPF_VER} ]] && ! use vanilla; then
 		guess_patch_type_in_dir "${WORKDIR}"/espf-gcc-"${GCC_RELEASE_VER}"
 		  EPATCH_MULTI_MSG="Applying espf patches ..." \
 		  epatch "${WORKDIR}"/espf-gcc-"${GCC_RELEASE_VER}"
