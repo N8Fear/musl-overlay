@@ -908,6 +908,8 @@ gcc_pkg_setup() {
 
 	want_libssp && libc_has_ssp && \
 		die "libssp cannot be used with a glibc that has been patched to provide ssp symbols"
+	want_minispecs
+	want_espf
 
 	unset LANGUAGES #265283
 }
