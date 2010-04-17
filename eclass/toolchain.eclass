@@ -242,7 +242,17 @@ gcc_get_s_dir() {
 #
 #	SPECS_VER
 #	SPECS_GCC_VER
-#			This is for the minispecs files included in the hardened gcc-4.x
+#			This is for the minispecs files included in the hardened gcc-4.3
+#
+#	ESPF_VER
+#			Enable Stack protector, Position independent executable and FORTIFY_SOURCES 2.
+#			FORTIFY_SOURCES 2 is allready enable by default in Gentoo.
+#			The needed minispecs is included in the specs dir.
+#			This should be set to the version of the gentoo ESPF patch tarball.
+#			An example:
+#					ESPF_VER="0.3.9"
+#			The resulting filename of this tarball will be:
+#			gcc-${GCC_RELEASE_VER}-espf-${ESPF_VER}.tar.bz2
 #
 #	PP_VER
 #	PP_GCC_VER
