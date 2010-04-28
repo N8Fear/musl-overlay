@@ -1,9 +1,9 @@
 # Copyright 1999-2010 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/sys-devel/gcc/gcc-4.4.3.ebuild,v 1.1 2010/02/08 12:58:14 vapier Exp $
+# $Header: /var/cvsroot/gentoo-x86/sys-devel/gcc/gcc-4.5.0.ebuild,v 1.5 2010/04/25 21:35:03 halcy0n Exp $
 
-PATCH_VER=""
-UCLIBC_VER=""
+PATCH_VER="1.0"
+UCLIBC_VER="1.0"
 
 ETYPE="gcc-compiler"
 GCC_FILESDIR="${PORTDIR}/sys-devel/gcc/files"
@@ -24,9 +24,9 @@ KEYWORDS=""
 RDEPEND=">=sys-libs/zlib-1.1.4
 	>=sys-devel/gcc-config-1.4
 	virtual/libiconv
-	>=dev-libs/gmp-4.2.2
-	>=dev-libs/mpfr-2.3.2
-	>=dev-libs/mpc-0.8
+	>=dev-libs/gmp-4.3.2
+	>=dev-libs/mpfr-2.4.2
+	>=dev-libs/mpc-0.8.1
 	graphite? (
 		>=dev-libs/ppl-0.10
 		>=dev-libs/cloog-ppl-0.15.8
@@ -54,20 +54,13 @@ DEPEND="${RDEPEND}
 	test? ( >=dev-util/dejagnu-1.4.4 >=sys-devel/autogen-5.5.4 )
 	>=sys-apps/texinfo-4.8
 	>=sys-devel/bison-1.875
-	>=sys-devel/flex-2.5.4
+	elibc_glibc? ( >=sys-libs/glibc-2.8 )
 	amd64? ( multilib? ( gcj? ( app-emulation/emul-linux-x86-xlibs ) ) )
 	>=${CATEGORY}/binutils-2.18"
 PDEPEND=">=sys-devel/gcc-config-1.4"
 if [[ ${CATEGORY} != cross-* ]] ; then
 	PDEPEND="${PDEPEND} elibc_glibc? ( >=sys-libs/glibc-2.8 )"
 fi
-
-pkg_setup() {
-	if [[ -z ${I_PROMISE_TO_SUPPLY_PATCHES_WITH_BUGS} ]] ; then
-		die "Please \`export I_PROMISE_TO_SUPPLY_PATCHES_WITH_BUGS=1\` or define it in your make.conf if you want to use this ebuild.  This is to try and cut down on people filing bugs for a compiler we do not currently support."
-	fi
-	toolchain_pkg_setup
-}
 
 src_unpack() {
 	gcc_src_unpack
@@ -78,4 +71,5 @@ src_unpack() {
 
 	[[ ${CHOST} == ${CTARGET} ]] && epatch "${GCC_FILESDIR}"/gcc-spec-env.patch
 
+	[[ ${CTARGET} == *-softfloat-* ]] && epatch "${GCC_FILESDIR}"/4.4.0/gcc-4.4.0-softfloat.patch
 }
