@@ -1,6 +1,6 @@
 # Copyright 1999-2010 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/sys-devel/gcc/gcc-4.3.4-r2.ebuild,v 1.2 2009/09/21 01:23:00 zorry Exp $
+# $Header: /var/cvsroot/gentoo-x86/sys-devel/gcc/gcc-4.3.4.ebuild,v 1.13 2010/03/28 20:35:46 halcy0n Exp $
 
 # Fixed in 4.3.4 and should be removed from the patchset
 GENTOO_PATCH_EXCLUDE="69_all_gcc43-pr39013.patch" #262567
@@ -24,7 +24,7 @@ inherit toolchain
 
 DESCRIPTION="The GNU Compiler Collection.  Includes C/C++, java compilers, pie+ssp extensions, Haj Ten Brugge runtime bounds checking"
 
-LICENSE="GPL-3 LGPL-3 libgcc libstdc++"
+LICENSE="GPL-3 LGPL-3 || ( GPL-3 libgcc libstdc++ ) FDL-1.2"
 KEYWORDS="~amd64 ~arm -hppa ~ppc ~ppc64 ~x86 -x86-fbsd"
 
 RDEPEND=">=sys-libs/zlib-1.1.4
