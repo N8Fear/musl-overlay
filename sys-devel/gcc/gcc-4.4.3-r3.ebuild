@@ -1,8 +1,8 @@
 # Copyright 1999-2010 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/sys-devel/gcc/gcc-4.4.3.ebuild,v 1.1 2010/02/08 12:58:14 vapier Exp $
+# $Header: /var/cvsroot/gentoo-x86/sys-devel/gcc/gcc-4.4.3-r2.ebuild,v 1.2 2010/04/27 02:33:26 dirtyepic Exp $
 
-PATCH_VER="1.0"
+PATCH_VER="1.2"
 UCLIBC_VER="1.0"
 
 ETYPE="gcc-compiler"
@@ -73,4 +73,13 @@ src_unpack() {
 	[[ ${CHOST} == ${CTARGET} ]] && epatch "${GCC_FILESDIR}"/gcc-spec-env.patch
 
 	[[ ${CTARGET} == *-softfloat-* ]] && epatch "${GCC_FILESDIR}"/4.4.0/gcc-4.4.0-softfloat.patch
+}
+
+pkg_setup() {
+	gcc_pkg_setup
+
+	if use graphite ; then
+		ewarn "Graphite support is still experimental and unstable."
+		ewarn "Any bugs resulting from the use of Graphite will not be fixed."
+	fi
 }

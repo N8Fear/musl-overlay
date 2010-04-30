@@ -2,6 +2,9 @@
 # Copyright 1999-2010 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+  30 Apr 2010; Peter Hjalmarsson <xake@gentoo.org> gcc-4.4.3-r3.ebuild:
+  Bumped patchset
+
   28 Apr 2010; Peter Hjalmarsson <xake@gentoo.org> gcc-4.5.0.ebuild,
   metadata.xml:
   Updated ebuild against portage, adding patchsets and upping som deps.
