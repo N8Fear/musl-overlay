@@ -143,6 +143,7 @@ else
 		IUSE="${IUSE} altivec build fortran nls nocxx"
 		[[ -n ${PIE_VER} ]] && IUSE="${IUSE} nopie"
 		[[ -n ${PP_VER}	 ]] && IUSE="${IUSE} nossp"
+		[[ -n ${SPECS_VER} ]] && IUSE="${IUSE} nossp"
 		[[ -n ${HTB_VER} ]] && IUSE="${IUSE} boundschecking"
 		[[ -n ${D_VER}	 ]] && IUSE="${IUSE} d"
 
@@ -242,17 +243,7 @@ gcc_get_s_dir() {
 #
 #	SPECS_VER
 #	SPECS_GCC_VER
-#			This is for the minispecs files included in the hardened gcc-4.3
-#
-#	ESPF_VER
-#			Enable Stack protector, Position independent executable and FORTIFY_SOURCES 2.
-#			FORTIFY_SOURCES 2 is allready enable by default in Gentoo.
-#			The needed minispecs is included in the specs dir.
-#			This should be set to the version of the gentoo ESPF patch tarball.
-#			An example:
-#					ESPF_VER="0.3.9"
-#			The resulting filename of this tarball will be:
-#			gcc-${GCC_RELEASE_VER}-espf-${ESPF_VER}.tar.bz2
+#			This is for the minispecs files included in the hardened gcc-4.x
 #
 #	PP_VER
 #	PP_GCC_VER
@@ -288,7 +279,7 @@ gcc_get_s_dir() {
 #
 gentoo_urls() {
 	local devspace="HTTP~lv/GCC/URI HTTP~eradicator/gcc/URI HTTP~vapier/dist/URI
-	HTTP~halcy0n/patches/URI"
+	HTTP~halcy0n/patches/URI HTTP~zorry/patches/gcc/URI"
 	devspace=${devspace//HTTP/http:\/\/dev.gentoo.org\/}
 	echo mirror://gentoo/$1 ${devspace//URI/$1}
 }
@@ -341,20 +332,12 @@ get_gcc_src_uri() {
 
 	# strawberry pie, Cappuccino and a Gauloises (it's a good thing)
 	[[ -n ${PIE_VER} ]] && \
-		PIE_CORE=${PIE_CORE:-gcc-${PIE_GCC_VER}-piepatches-v${PIE_VER}.tar.bz2}
+		PIE_CORE=${PIE_CORE:-gcc-${PIE_GCC_VER}-piepatches-v${PIE_VER}.tar.bz2} && \
+		GCC_SRC_URI="${GCC_SRC_URI} $(gentoo_urls ${PIE_CORE})"
 		
-	[[ -n ${PIE_VER} ]] && \
-		GCC_SRC_URI="${GCC_SRC_URI} !nopie? ( $(gentoo_urls ${PIE_CORE}) )"
-
-	# espf patch for gcc >4.4.3 compiler. New hardened patchset
-	[[ -n ${ESPF_VER} ]] && \
-		GCC_SRC_URI="${GCC_SRC_URI} ( $(gentoo_urls gcc-${GCC_RELEASE_VER}-espf-${ESPF_VER}.tar.bz2)
-			http://dev.gentoo.org/~zorry/patches/gcc/gcc-${GCC_RELEASE_VER}-espf-${ESPF_VER}.tar.bz2
-		)"
-
 	# gcc minispec for the hardened gcc 4 compiler
 	[[ -n ${SPECS_VER} ]] && \
-		GCC_SRC_URI="${GCC_SRC_URI} !nopie? ( $(gentoo_urls gcc-${SPECS_GCC_VER}-specs-${SPECS_VER}.tar.bz2) )"
+		GCC_SRC_URI="${GCC_SRC_URI} $(gentoo_urls gcc-${SPECS_GCC_VER}-specs-${SPECS_VER}.tar.bz2)"
 
 	# gcc bounds checking patch
 	if [[ -n ${HTB_VER} ]] ; then
@@ -408,6 +391,7 @@ hardened_gcc_works() {
 		[[ ${CTARGET} == *-freebsd* ]] && return 1
 
 		want_pie || return 1
+		tc_version_is_at_least 4.3.2 && use nopie && return 1
 		hardened_gcc_is_stable pie && return 0
 		if has "~$(tc-arch)" ${ACCEPT_KEYWORDS} ; then
 			hardened_gcc_check_unsupported pie && return 1
@@ -416,7 +400,7 @@ hardened_gcc_works() {
 		fi
 		return 1
 	elif [[ $1 == "ssp" ]] ; then
-		[[ -z ${PP_VER} ]] && return 1
+		want_ssp || return 1
 		hardened_gcc_is_stable ssp && return 0
 		if has "~$(tc-arch)" ${ACCEPT_KEYWORDS} ; then
 			hardened_gcc_check_unsupported ssp && return 1
@@ -487,14 +471,6 @@ hardened_gcc_check_unsupported() {
 	return 1
 }
 
-espf_arch_support() {
-	if [[ ${CTARGET} == *-uclibc* ]] && has $(tc-arch) ${ESPF_UCLIBC_SUPPORT} || has $(tc-arch) ${ESPF_GLIBC_SUPPORT} ; then
-			return 0
-	else
-			return 1
-	fi
-}
-
 has_libssp() {
 	[[ -e /$(get_libdir)/libssp.so ]] && return 0
 	return 1
@@ -514,27 +490,38 @@ _want_stuff() {
 	return 1
 }
 want_boundschecking() { _want_stuff HTB_VER boundschecking ; }
-want_pie() { _want_stuff PIE_VER !nopie ; }
-want_ssp() { _want_stuff PP_VER !nossp ; }
+want_pie() {
+	if tc_version_is_at_least 4.3.2 ; then
+		[[ -n ${PIE_VER} ]] && [[ -n ${SPECS_VER} ]] && return 0 || return 1
+	else
+		_want_stuff PIE_VER !nopie
+	fi
+}
+want_ssp() {
+	if tc_version_is_at_least 4.3.4 ; then
+		_want_stuff SPECS_VER !nossp
+	else
+		_want_stuff PP_VER !nossp
+	fi
+}
 
 want_split_specs() {
 	[[ ${SPLIT_SPECS} == "true" ]] && want_pie
 }
 want_minispecs() {
-	if tc_version_is_at_least 4.3.2 && use hardened && [[ -z ${ESPF_VER} ]] ; then
-		! use vanilla && want_pie && [[ -n ${SPECS_VER} ]] && return 0
+	if tc_version_is_at_least 4.3.2 && use hardened ; then
+		if ! want_pie ; then
+			ewarn "PIE_VER or SPECS_VER is not defiend in the GCC ebuild."
+		elif use vanilla ; then
+			ewarn "You will not get hardened features if you have the vanilla USE-flag."
+		elif use nopie && use nossp ; then
+			ewarn "You will not get hardened features if you have the nopie and nossp USE-flag."
+		elif ! hardened_gcc_works pie && ! hardened_gcc_works ssp && ! use nopie ; then
+			ewarn "Your $(tc-arch) arch is not supported."
+		else
+			return 0
+		fi
 		ewarn "Hope you know what you are doing. Hardened will not work."
-		ewarn" You have vanilla or nopie in USE when you have enable hardened or you don't have the needed patchset added."
-		return 0
-	fi
-	return 1	
-}
-want_espf() {
-	if tc_version_is_at_least 4.3.4 && use hardened && [[ -z ${PIE_VER} ]]; then
-		espf_arch_support || ewarn "ESPF is not supported on this $(tc-arch) arch."
-		! use vanilla && [[ -n ${ESPF_VER} ]] && return 0
-		ewarn "Hope you know what you are doing. Hardened will not work."
-		ewarn" You have vanilla in USE when you have enable hardened or you don't have the needed patchset added."
 		return 0
 	fi
 	return 1
@@ -742,11 +729,16 @@ create_gcc_env_entry() {
 }
 setup_minispecs_gcc_build_specs() {
 	# Setup the "build.specs" file for gcc to use when building.
-	if want_minispecs ; then
+	if want_minispecs && ! tc_version_is_at_least 4.4.3 ; then
 		if hardened_gcc_works pie ; then
 			cat "${WORKDIR}"/specs/pie.specs >> "${WORKDIR}"/build.specs
 		fi
-		for s in nostrict znow; do
+		if hardened_gcc_works ssp ; then
+			for s in ssp sspall ; do
+				cat "${WORKDIR}"/specs/${s}.specs >> "${WORKDIR}"/build.specs
+			done
+		fi
+		for s in nostrict znow ; do
 			cat "${WORKDIR}"/specs/${s}.specs >> "${WORKDIR}"/build.specs
 		done
 		export GCC_SPECS="${WORKDIR}"/build.specs
@@ -757,13 +749,12 @@ copy_minispecs_gcc_specs() {
 	# specs as it completely and unconditionally overrides the builtin specs.
 	# For gcc 4
 	if want_minispecs ; then
-		$(XGCC) -dumpspecs > "${WORKDIR}"/specs/specs
-		cat "${WORKDIR}"/build.specs >> "${WORKDIR}"/specs/specs
 		insinto ${LIBPATH}
-		doins "${WORKDIR}"/specs/* || die "failed to install specs"
-	fi
-	if want_espf ; then
-		insinto ${LIBPATH}
+		if ! tc_version_is_at_least 4.4.3 ; then
+			$(XGCC) -dumpspecs > "${WORKDIR}"/specs/specs
+			cat "${WORKDIR}"/build.specs >> "${WORKDIR}"/specs/specs
+			doins "${WORKDIR}"/specs/specs || die "failed to install specs"
+		fi
 		doins "${WORKDIR}"/specs/*.specs || die "failed to install specs"
 	fi
 }
@@ -923,7 +914,6 @@ gcc_pkg_setup() {
 	want_libssp && libc_has_ssp && \
 		die "libssp cannot be used with a glibc that has been patched to provide ssp symbols"
 	want_minispecs
-	want_espf
 
 	unset LANGUAGES #265283
 }
@@ -1045,23 +1035,17 @@ gcc-compiler_pkg_postrm() {
 # Travis Tilley <lv@gentoo.org> (03 Sep 2004)
 #
 gcc-compiler_src_unpack() {
-	# For the old gcc < 4.0
-	if ! tc_version_is_at_least 4.0 ; then
-		# Fail if using pie patches, building hardened, and glibc doesn't have
-		# the necessary support
-		want_pie && use hardened && glibc_have_pie
-		einfo "updating configuration to build hardened GCC-3 style"
+	# fail if using pie patches, building hardened, and glibc doesnt have
+	# the necessary support
+	want_pie && use hardened && glibc_have_pie
+
+	if use hardened && ! want_minispecs ; then
+		einfo "updating configuration to build hardened GCC"
 		make_gcc_hard || die "failed to make gcc hard"
 	fi
 
-	# For the newer gcc > 4.1
-	if tc_version_is_at_least 4.3.2 && use hardened ; then
-		if want_pie ; then
-		  glibc_have_pie || die "failed to make gcc hardened"
-		fi
-		# Rebrand to make bug reports easier
-		use hardened && BRANDING_GCC_PKGVERSION=${BRANDING_GCC_PKGVERSION/Gentoo/Gentoo Hardened}
-	fi
+	# Rebrand to make bug reports easier
+	want_minispecs && BRANDING_GCC_PKGVERSION=${BRANDING_GCC_PKGVERSION/Gentoo/Gentoo Hardened}
 
 	if is_libffi ; then
 		# move the libffi target out of gcj and into all
@@ -1136,11 +1120,9 @@ gcc_src_unpack() {
 			epatch "${WORKDIR}"/uclibc
 		fi
 	fi
-
 	do_gcc_HTB_patches
 	do_gcc_SSP_patches
 	do_gcc_PIE_patches
-	do_gcc_ESPF_patches
 	epatch_user
 
 	${ETYPE}_src_unpack || die "failed to ${ETYPE}_src_unpack"
@@ -1251,8 +1233,18 @@ gcc-compiler-configure() {
 			confgcc="${confgcc} --disable-libssp"
 		fi
 
-		# If we want hardened support with the newer espf-patchset
-		[[ -n ${ESPF_VER} ]] && espf_arch_support && confgcc="${confgcc} $(use_enable hardened espf)"
+		# If we want hardened support with the newer pie-patchset for >=gcc 4.4.3
+		if tc_version_is_at_least 4.4.3 && want_minispecs && ! use vanilla ; then
+			if hardened_gcc_works ; then 
+				confgcc="${confgcc} --enable-esp=all"
+			elif ! hardened_gcc_works pie && hardened_gcc_works ssp ; then
+				confgcc="${confgcc} --enable-esp=nopie"
+			elif ! hardened_gcc_works ssp && hardened_gcc_works pie ; then
+				confgcc="${confgcc} --enable-esp=nossp"
+			else
+				confgcc="${confgcc} --disable-esp"
+			fi
+		fi
 
 		if tc_version_is_at_least "4.2" ; then
 			confgcc="${confgcc} $(use_enable openmp libgomp)"
@@ -1760,8 +1752,7 @@ gcc_src_compile() {
 
 	# Do not create multiple specs files for PIE+SSP if boundschecking is in
 	# USE, as we disable PIE+SSP when it is.
-	# minispecs and espf will not need to split out specs.
-	if [[ ${ETYPE} == "gcc-compiler" ]] && want_split_specs && ! want_minispecs && ! want_espf ; then
+	if [[ ${ETYPE} == "gcc-compiler" ]] && want_split_specs && ! want_minispecs; then
 		split_out_specs_files || die "failed to split out specs"
 	fi
 
@@ -1861,20 +1852,19 @@ gcc-compiler_src_install() {
 		insinto ${LIBPATH}
 		doins "${WORKDIR}"/build/*.specs || die "failed to install specs"
 	fi
-	# Setup the gcc_env_entry for hardened gcc 4 with minispecs or espf
+	# Setup the gcc_env_entry for hardened gcc 4 with minispecs
 	if want_minispecs ; then
+		if hardened_gcc_works ; then
+			create_gcc_env_entry hardenednopiessp
+		fi
 		if hardened_gcc_works pie ; then
-		    create_gcc_env_entry hardenednopie
+			create_gcc_env_entry hardenednopie
+		fi
+		if hardened_gcc_works ssp ; then
+			create_gcc_env_entry hardenednossp
 		fi
 		create_gcc_env_entry vanilla
 	fi
-
-	if  want_espf ; then
-		create_gcc_env_entry hardenednopie
-		create_gcc_env_entry hardenednossp
-		create_gcc_env_entry vanilla
-	fi
-	
 	# Make sure we dont have stuff lying around that
 	# can nuke multiple versions of gcc
 
@@ -2134,7 +2124,7 @@ gcc_quick_unpack() {
 	[[ -n ${UCLIBC_VER} ]] && \
 		unpack gcc-${UCLIBC_GCC_VER}-uclibc-patches-${UCLIBC_VER}.tar.bz2
 
-	if want_ssp ; then
+	if want_ssp && [[ -z ${SPECS_VER} ]] ; then
 		if [[ -n ${PP_FVER} ]] ; then
 			# The gcc 3.4 propolice versions are meant to be unpacked to ${S}
 			pushd "${S}" > /dev/null
@@ -2155,10 +2145,6 @@ gcc_quick_unpack() {
 			unpack gcc-${SPECS_GCC_VER}-specs-${SPECS_VER}.tar.bz2
 	fi
 
-	if [[ ${ESPF_VER} ]] ; then
-		unpack gcc-${GCC_RELEASE_VER}-espf-${ESPF_VER}.tar.bz2
-	fi
-	
 	want_boundschecking && \
 		unpack "bounds-checking-gcc-${HTB_GCC_VER}-${HTB_VER}.patch.bz2"
 
@@ -2228,6 +2214,7 @@ do_gcc_SSP_patches() {
 		do_gcc_stub ssp
 		return 0
 	fi
+	[[ -z ${SPECS_VER} ]] || return 0
 
 	local ssppatch
 	local sspdocs
@@ -2345,16 +2332,6 @@ do_gcc_PIE_patches() {
 	fi
 
 	BRANDING_GCC_PKGVERSION="${BRANDING_GCC_PKGVERSION}, pie-${PIE_VER}"
-}
-
-# do various updates to ESPF
-do_gcc_ESPF_patches() {
-	if [[ ${ESPF_VER} ]] && ! use vanilla; then
-		guess_patch_type_in_dir "${WORKDIR}"/espf-gcc-"${GCC_RELEASE_VER}"
-		  EPATCH_MULTI_MSG="Applying espf patches ..." \
-		  epatch "${WORKDIR}"/espf-gcc-"${GCC_RELEASE_VER}"
-		BRANDING_GCC_PKGVERSION="${BRANDING_GCC_PKGVERSION}, espf-${ESPF_VER}"
-	fi
 }
 
 should_we_gcc_config() {

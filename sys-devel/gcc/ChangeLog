@@ -2,6 +2,15 @@
 # Copyright 1999-2010 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+*gcc-4.5.0-r1 (01 May 2010)
+*gcc-4.4.3-r4 (01 May 2010)
+*gcc-4.3.4-r4 (01 May 2010)
+
+  01 May 2010; <zorry@gentoo.org> -gcc-4.3.4-r3.ebuild,
+  +gcc-4.3.4-r4.ebuild, -gcc-4.4.3-r3.ebuild, +gcc-4.4.3-r4.ebuild,
+  -gcc-4.5.0.ebuild, +gcc-4.5.0-r1.ebuild:
+  Bumped to the new piepatchset with the new toolchain.eclass
+
   30 Apr 2010; Peter Hjalmarsson <xake@gentoo.org> gcc-4.4.3-r3.ebuild:
   Bumped patchset
 
