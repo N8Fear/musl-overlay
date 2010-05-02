@@ -333,11 +333,11 @@ get_gcc_src_uri() {
 	# strawberry pie, Cappuccino and a Gauloises (it's a good thing)
 	[[ -n ${PIE_VER} ]] && \
 		PIE_CORE=${PIE_CORE:-gcc-${PIE_GCC_VER}-piepatches-v${PIE_VER}.tar.bz2} && \
-		GCC_SRC_URI="${GCC_SRC_URI} !nopie? && !hardened? $(gentoo_urls ${PIE_CORE})"
+		GCC_SRC_URI="${GCC_SRC_URI} $(gentoo_urls ${PIE_CORE})"
 		
 	# gcc minispec for the hardened gcc 4 compiler
 	[[ -n ${SPECS_VER} ]] && \
-		GCC_SRC_URI="${GCC_SRC_URI} !nopie? && !hardened? $(gentoo_urls gcc-${SPECS_GCC_VER}-specs-${SPECS_VER}.tar.bz2)"
+		GCC_SRC_URI="${GCC_SRC_URI} $(gentoo_urls gcc-${SPECS_GCC_VER}-specs-${SPECS_VER}.tar.bz2)"
 
 	# gcc bounds checking patch
 	if [[ -n ${HTB_VER} ]] ; then
