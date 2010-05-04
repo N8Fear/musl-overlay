@@ -2,6 +2,11 @@
 # Copyright 1999-2010 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+*gcc-4.4.4 (04 May 2010)
+
+  04 May 2010; <zorry@gentoo.org> +gcc-4.4.4.ebuild:
+  New GCC 4.4.4
+
 *gcc-4.5.0-r1 (01 May 2010)
 *gcc-4.4.3-r4 (01 May 2010)
 *gcc-4.3.4-r4 (01 May 2010)
