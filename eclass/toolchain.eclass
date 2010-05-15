@@ -1840,7 +1840,12 @@ gcc-compiler_src_install() {
 		create_gcc_env_entry hardenednopiessp
 
 		insinto ${LIBPATH}
-		doins "${WORKDIR}"/build/*.specs || die "failed to install specs"
+		if want_split_specs ; then
+			doins "${WORKDIR}"/build/*.specs || die "failed to install specs"
+		fi
+		if want_minispecs ; then
+			doins "${WORKDIR}"/specs/*.specs || die "failed to install specs"
+		fi
 		# For gcc 4.3 piepatchset
 		! tc_version_is_at_least 4.4.3 && copy_minispecs_gcc_specs
 	fi
