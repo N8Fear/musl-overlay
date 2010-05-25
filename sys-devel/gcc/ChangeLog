@@ -2,6 +2,15 @@
 # Copyright 1999-2010 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+*gcc-4.5.0-r2 (25 May 2010)
+*gcc-4.4.4-r1 (25 May 2010)
+*gcc-4.4.3-r5 (25 May 2010)
+
+  25 May 2010; <zorry@gentoo.org> -gcc-4.4.3-r4.ebuild,
+  +gcc-4.4.3-r5.ebuild, -gcc-4.4.4.ebuild, +gcc-4.4.4-r1.ebuild,
+  -gcc-4.5.0-r1.ebuild, +gcc-4.5.0-r2.ebuild:
+  Updated the piepatches to 0.4.2
+
   15 May 2010; <zorry@gentoo.org> -gcc-4.3.4-r4.ebuild:
   GCC 4.4.3 going stable soon.
 

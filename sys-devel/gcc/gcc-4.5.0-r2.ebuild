@@ -1,39 +1,41 @@
 # Copyright 1999-2010 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/sys-devel/gcc/gcc-4.4.3-r2.ebuild,v 1.2 2010/04/27 02:33:26 dirtyepic Exp $
+# $Header: /var/cvsroot/gentoo-x86/sys-devel/gcc/gcc-4.5.0.ebuild,v 1.5 2010/04/25 21:35:03 halcy0n Exp $
 
-PATCH_VER="1.2"
+PATCH_VER="1.1"
 UCLIBC_VER="1.0"
 
 ETYPE="gcc-compiler"
 GCC_FILESDIR="${PORTDIR}/sys-devel/gcc/files"
 
 # Hardened gcc 4 stuff
-PIE_VER="0.4.1"
+PIE_VER="0.4.2"
 SPECS_VER="0.1.8"
-# arch/libc configurations known to be stable or untested with {PIE,SSP,FORTIFY}-by-default
-PIE_GLIBC_STABLE="x86 amd64 ~ppc ~ppc64 ~arm ~ia64"
-PIE_UCLIBC_STABLE="x86 ~amd64 ~arm ~pcc ~pcc64"
-SSP_STABLE="amd64 x86 ppc ppc64 ~arm"
+# arch/libc configurations known to be stable or untested with {PIE,SSP}-by-default
+PIE_GLIBC_STABLE="x86 amd64 ppc ppc64 arm ia64"
+PIE_UCLIBC_STABLE="x86 arm ppc ppc64 amd64"
+SSP_STABLE="amd64 x86 ppc ppc64 arm"
 SSP_UCLIBC_STABLE=""
-#end Hardened stuff
+# end Hardened stuff
 
 inherit toolchain
 
 DESCRIPTION="The GNU Compiler Collection.  Includes C/C++, java compilers, pie+ssp extensions, Haj Ten Brugge runtime bounds checking"
 
 LICENSE="GPL-3 LGPL-3 || ( GPL-3 libgcc libstdc++ gcc-runtime-library-exception-3.1 ) FDL-1.2"
-KEYWORDS="~alpha ~amd64 ~arm -hppa ~ia64 ~mips ~ppc ~ppc64 -sparc ~x86 ~x86-fbsd"
+KEYWORDS=""
 
 RDEPEND=">=sys-libs/zlib-1.1.4
 	>=sys-devel/gcc-config-1.4
 	virtual/libiconv
-	>=dev-libs/gmp-4.2.1
-	>=dev-libs/mpfr-2.3.2
+	>=dev-libs/gmp-4.3.2
+	>=dev-libs/mpfr-2.4.2
+	>=dev-libs/mpc-0.8.1
 	graphite? (
 		>=dev-libs/ppl-0.10
-		>=dev-libs/cloog-ppl-0.15.4
+		>=dev-libs/cloog-ppl-0.15.8
 	)
+	lto? ( >=dev-libs/elfutils-0.143 )
 	!build? (
 		gcj? (
 			gtk? (
@@ -76,13 +78,4 @@ src_unpack() {
 	[[ ${CHOST} == ${CTARGET} ]] && epatch "${GCC_FILESDIR}"/gcc-spec-env.patch
 
 	[[ ${CTARGET} == *-softfloat-* ]] && epatch "${GCC_FILESDIR}"/4.4.0/gcc-4.4.0-softfloat.patch
-}
-
-pkg_setup() {
-	gcc_pkg_setup
-
-	if use graphite ; then
-		ewarn "Graphite support is still experimental and unstable."
-		ewarn "Any bugs resulting from the use of Graphite will not be fixed."
-	fi
 }
