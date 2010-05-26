@@ -9,8 +9,9 @@ ETYPE="gcc-compiler"
 GCC_FILESDIR="${PORTDIR}/sys-devel/gcc/files"
 
 # Hardened gcc 4 stuff
-PIE_VER="0.4.3"
-SPECS_VER="0.1.8"
+PIE_VER="0.4.4"
+SPECS_VER="0.2.0"
+SPECS_GCC_VER="4.4.3"
 # arch/libc configurations known to be stable with {PIE,SSP}-by-default
 PIE_GLIBC_STABLE="x86 amd64 ppc ppc64 arm ia64"
 PIE_UCLIBC_STABLE="x86 arm ppc ppc64 amd64"
