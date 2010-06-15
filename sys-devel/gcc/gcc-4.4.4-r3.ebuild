@@ -1,6 +1,6 @@
 # Copyright 1999-2010 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/sys-devel/gcc/gcc-4.4.3-r2.ebuild,v 1.2 2010/04/27 02:33:26 dirtyepic Exp $
+# $Header: /var/cvsroot/gentoo-x86/sys-devel/gcc/gcc-4.4.4-r3.ebuild,v 1.2 2010/04/27 02:33:26 dirtyepic Exp $
 
 PATCH_VER="1.0"
 UCLIBC_VER="1.0"
@@ -9,8 +9,7 @@ ETYPE="gcc-compiler"
 GCC_FILESDIR="${PORTDIR}/sys-devel/gcc/files"
 
 # Hardened gcc 4 stuff
-PIE_VER="0.4.4"
-PIE_GCC_VER="4.4.3"
+PIE_VER="0.4.4.1"
 SPECS_VER="0.2.0"
 SPECS_GCC_VER="4.4.3"
 # arch/libc configurations known to be stable with {PIE,SSP}-by-default
