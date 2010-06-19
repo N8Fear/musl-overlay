@@ -2,6 +2,10 @@
 # Copyright 1999-2010 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+  19 Jun 2010; <zorry@gentoo.org> -gcc-4.4.3-r6.ebuild,
+  -gcc-4.4.4-r3.ebuild:
+  Moved to the tree but you still need the grub from the overlay
+
 *gcc-4.4.4-r3 (15 Jun 2010)
 
   15 Jun 2010; <zorry@gentoo.org> -gcc-4.4.4-r2.ebuild,
