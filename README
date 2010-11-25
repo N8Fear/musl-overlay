@@ -10,13 +10,12 @@ Forum tread http://forums.gentoo.org/viewtopic-t-790110.html
 Bugs should be filled on bugs.gentoo.org, please ensure that you make it clear that the bug is
 caused or a part of the hardened-dev overlay, if you are unsure file an advanced bug report and 
 assign to hardened-dev@gentoo.org and someone from dev team will reassign if needed; more 
-info http://hardened.gentooexperimental.org/trac/secure/
-The testing branch is for GCC 4.5 and if we need to do major change on this overlay.
+The testing branch is if we need to do major change on this overlay.
 
 Commiters:
-Magnus Granberg		(Zorry)			<zorry@ume.nu>
+Magnus Granberg		(Zorry)			<zorry@gentoo.org>
 Jory A. Pratt		(Anarchy)		<anarchy@gentoo.org>
 Peter Hjalmarsson	(Xake)			<xake@rymdraket.net>
 Anthony G. Basile	(blueness)		<basile@opensource.dyc.edu>
 
-2009-09-18 Magnus Granberg (Zorry) <zorry@ume.nu>
+2010-11-25 Magnus Granberg (Zorry) <zorry@gentoo.org>
