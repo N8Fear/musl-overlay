@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+<herd>hardened</herd>
+<maintainer>
+  <email>pebenito@gentoo.org</email>
+  <name>Chris PeBenito</name>
+  <description>Primary Maintainer</description>
+</maintainer>
+<longdescription>Gentoo SELinux base policy.  This contains policy for a system at the end of system installation.  No extra policy is in this package.</longdescription>
+<use>
+	<flag name='peer_perms'>Enable the labeled networking peer permissions (SELinux policy capability).</flag>
+	<flag name='open_perms'>Enable the open permissions for file object classes (SELinux policy capability).</flag>
+</use>
+</pkgmetadata>

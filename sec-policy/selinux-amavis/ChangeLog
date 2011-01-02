@@ -1,0 +1,14 @@
+# ChangeLog for sec-policy/selinux-amavis
+# Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
+# $Header: $
+
+  01 Jan 2011; Chris Richards <gizmo@www.giz-works.com>
+  +selinux-amavis-2.20101213.ebuild, +metadata.xml:
+  New upstream release
+
+*selinux-amavis-2.20101213 (01 Jan 2011)
+
+  01 Jan 2011; Chris Richards <gizmo@www.giz-works.com>
+  +selinux-amavis-2.20101213.ebuild, +metadata.xml:
+  Initial commit
+

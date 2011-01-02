@@ -1,0 +1,164 @@
+# ChangeLog for sec-policy/selinux-spamassassin
+# Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
+# $Header: /var/cvsroot/gentoo-x86/sec-policy/selinux-spamassassin/ChangeLog,v 1.27 2009/12/16 02:54:34 pebenito Exp $
+
+*selinux-spamassassin-2.20101213 (01 Jan 2011)
+
+  01 Jan 2011; Chris Richards <gizmo@www.giz-works.com>
+  +selinux-spamassassin-2.20101213.ebuild, +metadata.xml:
+  New upstream release
+
+*selinux-spamassassin-2.20091215 (16 Dec 2009)
+
+  16 Dec 2009; Chris PeBenito <pebenito@gentoo.org>
+  +selinux-spamassassin-2.20091215.ebuild:
+  New upstream release.
+
+  14 Aug 2009; Chris PeBenito <pebenito@gentoo.org>
+  -selinux-spamassassin-20070329.ebuild,
+  -selinux-spamassassin-20070928.ebuild,
+  selinux-spamassassin-20080525.ebuild:
+  Mark 20080525 stable, clear old ebuilds.
+
+*selinux-spamassassin-2.20090730 (03 Aug 2009)
+
+  03 Aug 2009; Chris PeBenito <pebenito@gentoo.org>
+  +selinux-spamassassin-2.20090730.ebuild:
+  New upstream release.
+
+  18 Jul 2009; Chris PeBenito <pebenito@gentoo.org>
+  selinux-spamassassin-20070329.ebuild,
+  selinux-spamassassin-20070928.ebuild,
+  selinux-spamassassin-20080525.ebuild:
+  Drop alpha, mips, ppc, sparc selinux support.
+
+*selinux-spamassassin-20080525 (25 May 2008)
+
+  25 May 2008; Chris PeBenito <pebenito@gentoo.org>
+  +selinux-spamassassin-20080525.ebuild:
+  New SVN snapshot.
+
+  16 Mar 2008; Chris PeBenito <pebenito@gentoo.org>
+  -selinux-spamassassin-20050813.ebuild,
+  -selinux-spamassassin-20051124.ebuild,
+  -selinux-spamassassin-20061114.ebuild:
+  Remove old ebuilds.
+
+  03 Feb 2008; Chris PeBenito <pebenito@gentoo.org>
+  selinux-spamassassin-20070928.ebuild:
+  Mark stable.
+
+*selinux-spamassassin-20070928 (26 Nov 2007)
+
+  26 Nov 2007; Chris PeBenito <pebenito@gentoo.org>
+  +selinux-spamassassin-20070928.ebuild:
+  New SVN snapshot.
+
+  04 Jun 2007; Chris PeBenito <pebenito@gentoo.org>
+  selinux-spamassassin-20070329.ebuild:
+  Mark stable.
+
+*selinux-spamassassin-20070329 (29 Mar 2007)
+
+  29 Mar 2007; Chris PeBenito <pebenito@gentoo.org>
+  +selinux-spamassassin-20070329.ebuild:
+  New SVN snapshot.
+
+  22 Feb 2007; Markus Ullmann <jokey@gentoo.org> ChangeLog:
+  Redigest for Manifest2
+
+*selinux-spamassassin-20061114 (15 Nov 2006)
+
+  15 Nov 2006; Chris PeBenito <pebenito@gentoo.org>
+  +selinux-spamassassin-20061114.ebuild:
+  New SVN snapshot.
+
+*selinux-spamassassin-20061008 (10 Oct 2006)
+
+  10 Oct 2006; Chris PeBenito <pebenito@gentoo.org>
+  +selinux-spamassassin-20061008.ebuild:
+  First mainstream reference policy testing release.
+
+  02 Dec 2005; petre rodan <kaiowas@gentoo.org>
+  selinux-spamassassin-20051124.ebuild:
+  mark stable on amd64 mips ppc sparc x86
+
+*selinux-spamassassin-20051124 (28 Nov 2005)
+
+  28 Nov 2005; petre rodan <kaiowas@gentoo.org>
+  -selinux-spamassassin-20050219.ebuild,
+  -selinux-spamassassin-20050626.ebuild,
+  +selinux-spamassassin-20051124.ebuild:
+  merge with upstream
+
+  18 Sep 2005; petre rodan <kaiowas@gentoo.org>
+  selinux-spamassassin-20050219.ebuild,
+  selinux-spamassassin-20050626.ebuild,
+  selinux-spamassassin-20050813.ebuild:
+  mark stable, added mips arch
+
+*selinux-spamassassin-20050813 (20 Aug 2005)
+
+  20 Aug 2005; petre rodan <kaiowas@gentoo.org>
+  +selinux-spamassassin-20050813.ebuild:
+  merge with upstream
+
+  26 Jun 2005; petre rodan <kaiowas@gentoo.org>
+  selinux-spamassassin-20050626.ebuild:
+  mark stable
+
+*selinux-spamassassin-20050626 (26 Jun 2005)
+
+  26 Jun 2005; petre rodan <kaiowas@gentoo.org>
+  -selinux-spamassassin-20050516.ebuild,
+  +selinux-spamassassin-20050626.ebuild:
+  added name_connect rules
+
+*selinux-spamassassin-20050516 (16 May 2005)
+
+  16 May 2005; petre rodan <kaiowas@gentoo.org>
+  -selinux-spamassassin-20050502.ebuild,
+  +selinux-spamassassin-20050516.ebuild:
+  spamd_var_run_t:sock_file fix
+
+*selinux-spamassassin-20050502 (05 May 2005)
+
+  05 May 2005; petre rodan <kaiowas@gentoo.org>
+  -selinux-spamassassin-20050408.ebuild,
+  +selinux-spamassassin-20050502.ebuild:
+  small policy fixes
+
+*selinux-spamassassin-20050408 (23 Apr 2005)
+
+  23 Apr 2005; petre rodan <kaiowas@gentoo.org>
+  -selinux-spamassassin-20041119.ebuild,
+  +selinux-spamassassin-20050408.ebuild:
+  merge with upstream
+
+  23 Mar 2005; petre rodan <kaiowas@gentoo.org>
+  selinux-spamassassin-20050219.ebuild:
+  mark stable
+
+*selinux-spamassassin-20050219 (25 Feb 2005)
+
+  25 Feb 2005; petre rodan <kaiowas@gentoo.org>
+  -selinux-spamassassin-20040704.ebuild,
+  +selinux-spamassassin-20050219.ebuild:
+  merge with upstream policy
+
+  20 Jan 2005; petre rodan <kaiowas@gentoo.org>
+  selinux-spamassassin-20041119.ebuild:
+  mark stable
+
+*selinux-spamassassin-20041119 (22 Nov 2004)
+
+  22 Nov 2004; petre rodan <kaiowas@gentoo.org>
+  +selinux-spamassassin-20041119.ebuild:
+  merge with nsa policy
+
+*selinux-spamassassin-20040704 (04 Jul 2004)
+
+  04 Jul 2004; Chris PeBenito <pebenito@gentoo.org> +metadata.xml,
+  +selinux-spamassassin-20040704.ebuild:
+  Initial commit
+

@@ -1,0 +1,14 @@
+# ChangeLog for sec-policy/selinux-vmware
+# Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
+# $Header: $
+
+  02 Jan 2011; Chris Richards <gizmo@giz-works.com>
+  +selinux-vmware-2.20101213.ebuild, +metadata.xml:
+  New upstream release
+
+*selinux-vmware-2.20101213 (02 Jan 2011)
+
+  02 Jan 2011; Chris Richards <gizmo@giz-works.com>
+  +selinux-vmware-2.20101213.ebuild, +metadata.xml:
+  Initial commit
+

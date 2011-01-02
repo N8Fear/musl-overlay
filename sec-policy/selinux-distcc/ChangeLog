@@ -1,0 +1,99 @@
+# ChangeLog for sec-policy/selinux-distcc
+# Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
+# $Header: /var/cvsroot/gentoo-x86/sec-policy/selinux-distcc/ChangeLog,v 1.19 2009/12/16 02:53:43 pebenito Exp $
+
+*selinux-distcc-2.20101213 (01 Jan 2011)
+
+  01 Jan 2011; Chris Richards <gizmo@www.giz-works.com>
+  +selinux-distcc-2.20101213.ebuild, +metadata.xml:
+  New upstream release
+
+*selinux-distcc-2.20091215 (16 Dec 2009)
+
+  16 Dec 2009; Chris PeBenito <pebenito@gentoo.org>
+  +selinux-distcc-2.20091215.ebuild:
+  New upstream release.
+
+  14 Aug 2009; Chris PeBenito <pebenito@gentoo.org>
+  -selinux-distcc-20070329.ebuild, -selinux-distcc-20070928.ebuild,
+  selinux-distcc-20080525.ebuild:
+  Mark 20080525 stable, clear old ebuilds.
+
+*selinux-distcc-2.20090730 (03 Aug 2009)
+
+  03 Aug 2009; Chris PeBenito <pebenito@gentoo.org>
+  +selinux-distcc-2.20090730.ebuild:
+  New upstream release.
+
+  18 Jul 2009; Chris PeBenito <pebenito@gentoo.org>
+  selinux-distcc-20070329.ebuild, selinux-distcc-20070928.ebuild,
+  selinux-distcc-20080525.ebuild:
+  Drop alpha, mips, ppc, sparc selinux support.
+
+*selinux-distcc-20080525 (25 May 2008)
+
+  25 May 2008; Chris PeBenito <pebenito@gentoo.org>
+  +selinux-distcc-20080525.ebuild:
+  New SVN snapshot.
+
+  16 Mar 2008; Chris PeBenito <pebenito@gentoo.org>
+  -selinux-distcc-20040128.ebuild, -selinux-distcc-20061114.ebuild:
+  Remove old ebuilds.
+
+  03 Feb 2008; Chris PeBenito <pebenito@gentoo.org>
+  selinux-distcc-20070928.ebuild:
+  Mark stable.
+
+*selinux-distcc-20070928 (26 Nov 2007)
+
+  26 Nov 2007; Chris PeBenito <pebenito@gentoo.org>
+  +selinux-distcc-20070928.ebuild:
+  New SVN snapshot.
+
+  04 Jun 2007; Chris PeBenito <pebenito@gentoo.org>
+  selinux-distcc-20070329.ebuild:
+  Mark stable.
+
+*selinux-distcc-20070329 (29 Mar 2007)
+
+  29 Mar 2007; Chris PeBenito <pebenito@gentoo.org>
+  +selinux-distcc-20070329.ebuild:
+  New SVN snapshot.
+
+  22 Feb 2007; Markus Ullmann <jokey@gentoo.org> ChangeLog:
+  Redigest for Manifest2
+
+*selinux-distcc-20061114 (15 Nov 2006)
+
+  15 Nov 2006; Chris PeBenito <pebenito@gentoo.org>
+  +selinux-distcc-20061114.ebuild:
+  New SVN snapshot.
+
+*selinux-distcc-20061008 (10 Oct 2006)
+
+  10 Oct 2006; Chris PeBenito <pebenito@gentoo.org>
+  +selinux-distcc-20061008.ebuild:
+  First mainstream reference policy testing release.
+
+*selinux-distcc-20040128 (28 Jan 2004)
+
+  28 Jan 2004; Chris PeBenito <pebenito@gentoo.org>
+  selinux-distcc-20040128.ebuild:
+  Update because of changes in base-policy.
+
+*selinux-distcc-20031101 (01 Nov 2003)
+
+  01 Nov 2003; Chris PeBenito <pebenito@gentoo.org>
+  selinux-distcc-20031101.ebuild:
+  Update for new API.
+
+  10 Aug 2003; Chris PeBenito <pebenito@gentoo.org>
+  selinux-distcc-20030728.ebuild:
+  Specify S since it changed in the eclass.  Mark stable.
+
+*selinux-distcc-20030728 (28 Jul 2003)
+
+  28 Jul 2003; Chris PeBenito <pebenito@gentoo.org> metadata.xml,
+  selinux-distcc-20030728.ebuild:
+  Initial commit.
+
