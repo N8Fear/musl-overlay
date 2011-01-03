@@ -1,0 +1,12 @@
+*** setfiles/setfiles.c	2010-12-03 23:49:12.372000001 +0000
+--- setfiles/setfiles.c	2010-12-03 01:21:09.435000002 +0000
+***************
+*** 12,17 ****
+--- 12,18 ----
+ #include <regex.h>
+ #include <sys/vfs.h>
+ #include <sys/utsname.h>
++#include <sys/stat.h>
+ #define __USE_XOPEN_EXTENDED 1	/* nftw */
+ #define SKIP -2
+ #define ERR -1
