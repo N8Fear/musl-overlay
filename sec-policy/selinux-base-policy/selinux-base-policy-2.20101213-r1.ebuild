@@ -30,16 +30,16 @@ src_unpack() {
 
 	cd "${S}/refpolicy"
 	# Allow modprobe to ask kernel to load module (needed for alsa support)
-	epatch ${FILESDIR}/fix-modutils.patch
+	epatch "${FILESDIR}"/fix-modutils.patch
 	# Add networkmanager interface information (.if fixes always need to be part
 	# of base)
-	epatch ${FILESDIR}/fix-networkmanager.patch
+	epatch "${FILESDIR}"/fix-networkmanager.patch
 	# Allow mdadm_t domain to read block files (needed when swraid is used)
-	epatch ${FILESDIR}/fix-raid.patch
+	epatch "${FILESDIR}"/fix-raid.patch
 	# Allow sysadm_r to run wpa_cli from commandline
-	epatch ${FILESDIR}/fix-sysadm.patch
+	epatch "${FILESDIR}"/fix-sysadm.patch
 	# Allow udev to start init scripts (needed by Gentoo's udev rules)
-	epatch ${FILESDIR}/fix-udev.patch
+	epatch "${FILESDIR}"/fix-udev.patch
 
 	if ! use peer_perms; then
 		sed -i -e '/network_peer_controls/d' \
