@@ -1,0 +1,13 @@
+--- refpolicy.orig/policy/modules/roles/sysadm.te	2010-12-20 20:39:58.886999999 +0100
++++ refpolicy/policy/modules/roles/sysadm.te	2010-12-20 22:53:02.199999992 +0100
+@@ -400,6 +400,10 @@
+ 	yam_run(sysadm_t, sysadm_r)
+ ')
+ 
++optional_policy(`
++	networkmanager_run_wpa_cli(sysadm_t, sysadm_r)
++')
++
+ ifndef(`distro_redhat',`
+ 	optional_policy(`
+ 		auth_role(sysadm_r, sysadm_t)
