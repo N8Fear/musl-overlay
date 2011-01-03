@@ -1,0 +1,9 @@
+# ChangeLog for sys-libs/libsemanage
+# Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
+# $Header: $
+
+*libsemanage-2.0.45 (03 Jan 2011)
+
+  03 Jan 2011; <swift@gentoo.org> +libsemanage-2.0.45.ebuild, +metadata.xml:
+  Update to SELinux userspace 20100525
+

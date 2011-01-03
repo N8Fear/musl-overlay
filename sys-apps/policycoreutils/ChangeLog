@@ -1,6 +1,11 @@
 # ChangeLog for sys-apps/policycoreutils
-# Copyright 1999-2010 Gentoo Foundation; Distributed under the GPL v2
+# Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
 # $Header: /var/cvsroot/gentoo-x86/sys-apps/policycoreutils/ChangeLog,v 1.77 2010/04/04 21:56:32 arfrever Exp $
+
+*policycoreutils-2.0.82 (03 Jan 2011)
+
+  03 Jan 2011; <swift@gentoo.org> +policycoreutils-2.0.82.ebuild:
+  Update to SELinux userspace 20100525
 
   04 Apr 2010; Arfrever Frehtes Taifersar Arahesis <arfrever@gentoo.org>
   policycoreutils-2.0.55.ebuild, policycoreutils-2.0.69.ebuild,
