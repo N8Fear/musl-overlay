@@ -3,7 +3,7 @@
 # $Header: /var/cvsroot/gentoo-x86/eclass/selinux-policy-2.eclass,v 1.4 2009/08/02 02:58:25 pebenito Exp $
 
 # Eclass for installing SELinux policy, and optionally
-# reloading the reference-policy based modules
+# reloading the reference-policy based modules.
 
 inherit eutils
 
@@ -17,7 +17,8 @@ SLOT="0"
 S="${WORKDIR}/"
 
 RDEPEND=">=sys-apps/policycoreutils-1.30.30
-	>=sec-policy/selinux-base-policy-${PV}"
+	>=sec-policy/selinux-base-policy-${PV}
+	${MODDEPEND}"
 
 DEPEND="${RDEPEND}
 	sys-devel/m4
@@ -41,9 +42,12 @@ selinux-policy-2_src_unpack() {
 		cp ${modfiles} "${S}"/${i}
 
 		if [ -n "${POLICY_PATCH}" ]; then
-			cd "${S}"/${i}
-			einfo "Patching ${i}"
-			epatch "${POLICY_PATCH}" || die "failed patch ${POLICY_PATCH}"
+			for POLPATCH in "${POLICY_PATCH}";
+			do
+				cd "${S}"/${i}
+				einfo "Patching ${i}"
+				epatch "${POLPATCH}" || die "failed patch ${POLPATCH}"
+			done
 		fi
 
 	done
