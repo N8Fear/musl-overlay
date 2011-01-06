@@ -2,6 +2,12 @@
 # Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
 # $Header: /var/cvsroot/gentoo-x86/sec-policy/selinux-base-policy/ChangeLog,v 1.68 2009/12/16 02:53:36 pebenito Exp $
 
+*selinux-base-policy-2.20101213-r2 (06 Jan 2011)
+
+  06 Jan 2011; <swift@gentoo.org> +selinux-base-policy-2.20101213-r2.ebuild,
+  +files/fix-sudo.patch:
+  Add fix for sudo (key timing)
+
 *selinux-base-policy-2.20101213 (01 Jan 2011)
 
   01 Jan 2011; Chris Richards <gizmo@www.giz-works.com>

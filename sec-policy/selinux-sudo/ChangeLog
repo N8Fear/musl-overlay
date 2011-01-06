@@ -2,6 +2,13 @@
 # Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
 # $Header: /var/cvsroot/gentoo-x86/sec-policy/selinux-sudo/ChangeLog,v 1.17 2009/12/16 02:54:08 pebenito Exp $
 
+*selinux-sudo-2.20101213-r1 (06 Jan 2011)
+
+  06 Jan 2011; <swift@gentoo.org> +selinux-sudo-2.20101213-r1.ebuild,
+  +files/fix-sudo.patch:
+  Allow for key timing within sudo (do not ask for password within x
+  timeframe)
+
 *selinux-sudo-2.20101213 (01 Jan 2011)
 
   01 Jan 2011; Chris Richards <gizmo@www.giz-works.com>
