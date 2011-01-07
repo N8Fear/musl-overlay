@@ -17,8 +17,7 @@ SLOT="0"
 S="${WORKDIR}/"
 
 RDEPEND=">=sys-apps/policycoreutils-1.30.30
-	>=sec-policy/selinux-base-policy-${PV}
-	${MODDEPEND}"
+	>=sec-policy/selinux-base-policy-${PV}"
 
 DEPEND="${RDEPEND}
 	sys-devel/m4
