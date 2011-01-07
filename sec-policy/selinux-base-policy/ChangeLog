@@ -2,6 +2,14 @@
 # Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
 # $Header: /var/cvsroot/gentoo-x86/sec-policy/selinux-base-policy/ChangeLog,v 1.68 2009/12/16 02:53:36 pebenito Exp $
 
+*selinux-base-policy-2.20101213-r3 (07 Jan 2011)
+
+  07 Jan 2011; <swift@gentoo.org> +files/add-gorg-r3.patch,
+  +files/add-modules-r3.patch, +files/add-skype-r3.patch,
+  +files/fix-staff-r3.patch, +files/fix-sysadm-r3.patch,
+  +selinux-base-policy-2.20101213-r3.ebuild, +files/fix-unprivuser-r3.patch:
+  Adding support for additional modules (gorg, skype)
+
 *selinux-base-policy-2.20101213-r2 (06 Jan 2011)
 
   06 Jan 2011; <swift@gentoo.org> +selinux-base-policy-2.20101213-r2.ebuild,

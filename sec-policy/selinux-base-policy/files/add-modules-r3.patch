@@ -1,0 +1,30 @@
+--- refpolicy.orig/policy/modules/../modules.conf	2010-12-13 15:13:15.000000000 +0100
++++ refpolicy/policy/modules/../modules.conf	2011-01-07 22:52:08.917000109 +0100
+@@ -631,6 +631,13 @@
+ seunshare = module
+ 
+ # Layer: apps
++# Module: skype
++#
++# Skype VoIP and Video-over-IP client
++#
++skype = module
++
++# Layer: apps
+ # Module: slocate
+ #
+ # Update database for mlocate
+@@ -1234,6 +1241,13 @@
+ gnomeclock = module
+ 
+ # Layer: services
++# Module: gorg
++#
++# Gentoo.org XML Transformation Service
++#
++gorg = module
++
++# Layer: services
+ # Module: gpm
+ #
+ # General Purpose Mouse driver

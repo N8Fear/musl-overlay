@@ -1,0 +1,27 @@
+--- refpolicy.orig/policy/modules/roles/sysadm.te	2010-12-13 15:11:01.000000000 +0100
++++ refpolicy/policy/modules/roles/sysadm.te	2011-01-07 22:31:54.994000112 +0100
+@@ -400,6 +400,10 @@
+ 	yam_run(sysadm_t, sysadm_r)
+ ')
+ 
++optional_policy(`
++	networkmanager_run_wpa_cli(sysadm_t, sysadm_r)
++')
++
+ ifndef(`distro_redhat',`
+ 	optional_policy(`
+ 		auth_role(sysadm_r, sysadm_t)
+@@ -448,5 +452,13 @@
+ 	optional_policy(`
+ 		java_role(sysadm_r, sysadm_t)
+ 	')
++
++	optional_policy(`
++		gorg_role(sysadm_r, sysadm_t)
++	')
++
++	optional_policy(`
++		skype_role(sysadm_r, sysadm_t)
++	')
+ ')
+ 
