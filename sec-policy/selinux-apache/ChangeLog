@@ -2,6 +2,11 @@
 # Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
 # $Header: /var/cvsroot/gentoo-x86/sec-policy/selinux-apache/ChangeLog,v 1.23 2009/12/16 02:54:13 pebenito Exp $
 
+*selinux-apache-2.20101213-r1 (16 Jan 2011)
+
+  16 Jan 2011; <swift@gentoo.org> +selinux-apache-2.20101213-r1.ebuild:
+  Properly disregard httpd_keytab_t if no kerberos use flag is set
+
   01 Jan 2011; Chris Richards <gizmo@www.giz-works.com>
   +selinux-apache-2.20101213.ebuild, +metadata.xml:
   New upstream release

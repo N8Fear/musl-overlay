@@ -16,8 +16,8 @@ S="${WORKDIR}/"
 
 src_unpack() {
 	selinux-policy-2_src_unpack
-	if [ ! use kerberos ]; then
-		[ -z "${POLICY_TYPES}" ] && local POLICY_TYPES="strict targeted"
+	if ! use kerberos ; then
+		[ -z "${POLICY_TYPES}" ] && local POLICY_TYPES="strict targeted";
 		for i in ${POLICY_TYPES}; do
 			sed -i -e "/httpd_keytab_t/d" \
 				"${S}/${i}/apache.fc"
@@ -27,7 +27,7 @@ src_unpack() {
 
 pkg_postinst() {
 	selinux-policy-2_pkg_postinst
-	if [ use kerberos ] ; then
+	if use kerberos ; then
 		einfo "If you decide to uninstall Kerberos, you should clear the"
 		einfo "kerberos use flag here, and then emerge this module again."
 		einfo "Failure to do so may result in policy compile errors in the"
