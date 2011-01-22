@@ -1,0 +1,11 @@
+# ChangeLog for sec-policy/selinux-mozilla
+# Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
+# $Header: $
+
+*selinux-mozilla-2.20101213-r1 (22 Jan 2011)
+
+  22 Jan 2011; <swift@gentoo.org> +selinux-mozilla-2.20101213-r1.ebuild,
+  files/fix-mozilla.patch:
+  Support binary firefox, add call to alsa interface and support tmp type
+  for mozilla
+

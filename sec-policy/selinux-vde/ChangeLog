@@ -1,0 +1,10 @@
+# ChangeLog for sec-policy/selinux-vde
+# Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
+# $Header: $
+
+*selinux-vde-2.20101213 (22 Jan 2011)
+
+  22 Jan 2011; <swift@gentoo.org> +selinux-vde-2.20101213.ebuild,
+  +files/add-services-vde.patch, +metadata.xml:
+  Adding SELinux policy module for VDE
+

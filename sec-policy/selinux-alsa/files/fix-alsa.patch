@@ -1,0 +1,10 @@
+--- admin/alsa.fc	2010-09-03 17:23:05.000000000 +0200
++++ ../../../refpolicy/policy/modules/admin/alsa.fc	2011-01-15 20:28:15.015000008 +0100
+@@ -8,6 +8,7 @@
+ /etc/asound\.state	--	gen_context(system_u:object_r:alsa_etc_rw_t,s0)
+ 
+ /sbin/alsactl 		--	gen_context(system_u:object_r:alsa_exec_t,s0)
++/usr/sbin/alsactl	--	gen_context(system_u:object_r:alsa_exec_t,s0)
+ /sbin/salsa 		--	gen_context(system_u:object_r:alsa_exec_t,s0)
+ 
+ /usr/bin/ainit 		--	gen_context(system_u:object_r:alsa_exec_t,s0)

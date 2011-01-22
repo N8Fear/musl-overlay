@@ -2,6 +2,13 @@
 # Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
 # $Header: /var/cvsroot/gentoo-x86/sec-policy/selinux-base-policy/ChangeLog,v 1.68 2009/12/16 02:53:36 pebenito Exp $
 
+*selinux-base-policy-2.20101213-r4 (22 Jan 2011)
+
+  22 Jan 2011; <swift@gentoo.org> +selinux-base-policy-2.20101213-r4.ebuild,
+  +files/patchbundle-selinux-base-policy-2.20101213-r4.tar.bz2:
+  Update on roles, added interfaces for a few additional packages like
+  links, mutt but also vde. Fix build issue when building java-config
+
 *selinux-base-policy-2.20101213-r3 (07 Jan 2011)
 
   07 Jan 2011; <swift@gentoo.org> +files/add-gorg-r3.patch,
