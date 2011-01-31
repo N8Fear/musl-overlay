@@ -7,6 +7,7 @@ IUSE="+peer_perms open_perms"
 
 inherit eutils
 
+PATCHBUNDLE="${FILESDIR}/patchbundle-${PF}.tar.bz2"
 DESCRIPTION="Gentoo base policy for SELinux"
 HOMEPAGE="http://www.gentoo.org/proj/en/hardened/selinux/"
 SRC_URI="http://oss.tresys.com/files/refpolicy/refpolicy-${PV}.tar.bz2"
@@ -28,8 +29,12 @@ src_unpack() {
 
 	unpack ${A}
 
-#	cd "${S}/refpolicy"
-#	epatch ${FILESDIR}/${PN}-${PV}.diff
+	cd "${S}"
+	epatch "${PATCHBUNDLE}"
+	cd "${S}/refpolicy"
+	# Fix bug 257111
+	sed -i -e 's:system_crond_t:system_cronjob_t:g' \
+		"${S}/refpolicy/config/appconfig-standard/default_contexts"
 
 	if ! use peer_perms; then
 		sed -i -e '/network_peer_controls/d' \
@@ -43,6 +48,9 @@ src_unpack() {
 
 	for i in ${POLICY_TYPES}; do
 		cp -a "${S}/refpolicy" "${S}/${i}"
+
+		cd "${S}/${i}";
+		make conf || die "${i} reconfiguration failed"
 
 		cp "${FILESDIR}/modules.conf.${i}.${MOD_CONF_VER}" \
 			"${S}/${i}/policy/modules.conf" \
@@ -66,7 +74,6 @@ src_compile() {
 
 	for i in ${POLICY_TYPES}; do
 		cd "${S}/${i}"
-
 		make base || die "${i} compile failed"
 	done
 }
@@ -100,24 +107,10 @@ src_install() {
 pkg_postinst() {
 	[ -z "${POLICY_TYPES}" ] && local POLICY_TYPES="strict targeted"
 
-	if has "loadpolicy" $FEATURES ; then
-		for i in ${POLICY_TYPES}; do
-			einfo "Inserting base module into ${i} module store."
+	for i in ${POLICY_TYPES}; do
+		einfo "Inserting base module into ${i} module store."
 
-			cd "/usr/share/selinux/${i}"
-			semodule -s "${i}" -b base.pp
-		done
-	else
-		echo
-		echo
-		eerror "Policy has not been loaded.  It is strongly suggested"
-		eerror "that the policy be loaded before continuing!!"
-		echo
-		einfo "Automatic policy loading can be enabled by adding"
-		einfo "\"loadpolicy\" to the FEATURES in make.conf."
-		echo
-		echo
-		ebeep 4
-		epause 4
-	fi
+		cd "/usr/share/selinux/${i}"
+		semodule -s "${i}" -b base.pp
+	done
 }

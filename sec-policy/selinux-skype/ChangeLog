@@ -2,6 +2,12 @@
 # Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+*selinux-skype-2.20101213-r2 (31 Jan 2011)
+
+  31 Jan 2011; <swift@gentoo.org> +files/add-apps-skype-r2.patch,
+  +selinux-skype-2.20101213-r2.ebuild:
+  Allow userhome access, set some dontaudits etc.
+
 *selinux-skype-2.20101213-r1 (22 Jan 2011)
 
   22 Jan 2011; <swift@gentoo.org> +selinux-skype-2.20101213-r1.ebuild,
