@@ -2,6 +2,12 @@
 # Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
 # $Header: /var/cvsroot/gentoo-x86/sec-policy/selinux-base-policy/ChangeLog,v 1.68 2009/12/16 02:53:36 pebenito Exp $
 
+*selinux-base-policy-2.20101213-r7 (02 Feb 2011)
+
+  02 Feb 2011; <swift@gentoo.org> +selinux-base-policy-2.20101213-r7.ebuild,
+  +files/patchbundle-selinux-base-policy-2.20101213-r7.tar.bz2:
+  Allow ipc_info for lvm, add some dontaudits, allow uevent access for mdadm
+
 *selinux-base-policy-2.20101213-r6 (31 Jan 2011)
 
   31 Jan 2011; Chris Richards +selinux-base-policy-2.20101213-r6.ebuild:

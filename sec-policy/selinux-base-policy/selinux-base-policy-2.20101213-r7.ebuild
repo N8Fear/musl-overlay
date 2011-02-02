@@ -16,7 +16,8 @@ SLOT="0"
 
 KEYWORDS="~amd64 ~x86"
 
-RDEPEND=">=sys-apps/policycoreutils-1.30.30"
+RDEPEND=">=sys-apps/policycoreutils-1.30.30
+	>=sys-fs/udev-151"
 DEPEND="${RDEPEND}
 	sys-devel/m4
 	>=sys-apps/checkpolicy-1.30.12"
@@ -32,6 +33,9 @@ src_unpack() {
 	cd "${S}"
 	epatch "${PATCHBUNDLE}"
 	cd "${S}/refpolicy"
+	# Fix bug 257111
+	sed -i -e 's:system_crond_t:system_cronjob_t:g' \
+		"${S}/refpolicy/config/appconfig-standard/default_contexts"
 
 	if ! use peer_perms; then
 		sed -i -e '/network_peer_controls/d' \
