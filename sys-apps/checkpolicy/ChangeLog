@@ -1,9 +1,0 @@
-# ChangeLog for sys-apps/checkpolicy
-# Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
-# $Header: $
-
-*checkpolicy-2.0.21 (03 Jan 2011)
-
-  03 Jan 2011; <swift@gentoo.org> +checkpolicy-2.0.21.ebuild, +metadata.xml:
-  Update to SELinux userspace 20100525
-
