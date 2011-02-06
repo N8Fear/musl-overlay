@@ -1,9 +1,0 @@
-# ChangeLog for dev-python/sepolgen
-# Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
-# $Header: $
-
-*sepolgen-1.0.23 (03 Jan 2011)
-
-  03 Jan 2011; <swift@gentoo.org> +sepolgen-1.0.23.ebuild, +metadata.xml:
-  Update to SELinux userspace 20100525
-
