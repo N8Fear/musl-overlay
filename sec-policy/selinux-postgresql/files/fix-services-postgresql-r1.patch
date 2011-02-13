@@ -1,0 +1,45 @@
+--- services/postgresql.te	2010-12-13 15:11:02.000000000 +0100
++++ services/postgresql.te	2011-02-13 14:36:56.000905046 +0100
+@@ -155,7 +155,7 @@
+ allow postgresql_t self:tcp_socket create_stream_socket_perms;
+ allow postgresql_t self:udp_socket create_stream_socket_perms;
+ allow postgresql_t self:unix_dgram_socket create_socket_perms;
+-allow postgresql_t self:unix_stream_socket create_stream_socket_perms;
++allow postgresql_t self:unix_stream_socket { connectto create_stream_socket_perms };
+ allow postgresql_t self:netlink_selinux_socket create_socket_perms;
+ 
+ allow postgresql_t sepgsql_database_type:db_database *;
+@@ -269,7 +269,8 @@
+ 
+ userdom_dontaudit_use_unpriv_user_fds(postgresql_t)
+ userdom_dontaudit_search_user_home_dirs(postgresql_t)
+-userdom_dontaudit_use_user_terminals(postgresql_t)
++userdom_use_user_terminals(postgresql_t)
++#userdom_dontaudit_use_user_terminals(postgresql_t)
+ 
+ mta_getattr_spool(postgresql_t)
+ 
+--- services/postgresql.fc	2010-08-03 15:11:07.000000000 +0200
++++ services/postgresql.fc	2011-02-13 13:40:48.798905046 +0100
+@@ -5,6 +5,10 @@
+ /etc/rc\.d/init\.d/(se)?postgresql --	gen_context(system_u:object_r:postgresql_initrc_exec_t,s0)
+ /etc/sysconfig/pgsql(/.*)? 		gen_context(system_u:object_r:postgresql_etc_t,s0)
+ 
++ifdef(`distro_gentoo', `
++/etc/postgresql-.*(/.*)?		gen_context(system_u:object_r:postgresql_etc_t,s0)
++')
++
+ #
+ # /usr
+ #
+@@ -23,6 +27,10 @@
+ /usr/share/jonas/pgsql(/.*)?		gen_context(system_u:object_r:postgresql_db_t,s0)
+ ')
+ 
++ifdef(`distro_gentoo', `
++/usr/lib(64)?/postgresql-.*/bin/.*	--	gen_context(system_u:object_r:postgresql_exec_t,s0)
++')
++
+ #
+ # /var
+ #

@@ -1,0 +1,10 @@
+# ChangeLog for sec-policy/selinux-postgresql
+# Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
+# $Header: $
+
+*selinux-postgresql-2.20101213-r1 (13 Feb 2011)
+
+  13 Feb 2011; <swift@gentoo.org> +files/fix-services-postgresql-r1.patch,
+  +selinux-postgresql-2.20101213-r1.ebuild, +metadata.xml:
+  Allow sysadm to manage postgresql
+
