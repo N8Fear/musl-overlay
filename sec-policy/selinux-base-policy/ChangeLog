@@ -2,6 +2,13 @@
 # Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
 # $Header: /var/cvsroot/gentoo-x86/sec-policy/selinux-base-policy/ChangeLog,v 1.70 2011/02/05 12:20:41 blueness Exp $
 
+*selinux-base-policy-2.20101213-r10 (04 Mar 2011)
+
+  04 Mar 2011; <swift@gentoo.org>
+  +selinux-base-policy-2.20101213-r10.ebuild,
+  +files/patchbundle-selinux-base-policy-2.20101213-r10.tar.bz2:
+  Support courier and support python wrapper scripts
+
 *selinux-base-policy-2.20101213-r9 (02 Mar 2011)
 
   02 Mar 2011; <swift@gentoo.org> -selinux-base-policy-2.20101213-r8.ebuild,

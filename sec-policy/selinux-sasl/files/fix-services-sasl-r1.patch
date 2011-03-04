@@ -1,0 +1,9 @@
+--- services/sasl.fc	2010-08-03 15:11:08.000000000 +0200
++++ services/sasl.fc	2011-03-03 17:11:02.896999997 +0100
+@@ -9,3 +9,6 @@
+ # /var
+ #
+ /var/run/saslauthd(/.*)?	gen_context(system_u:object_r:saslauthd_var_run_t,s0)
++ifdef(`distro_gentoo',`
++/var/lib/sasl2(/.*)?		gen_context(system_u:object_r:saslauthd_var_run_t,s0)
++')
