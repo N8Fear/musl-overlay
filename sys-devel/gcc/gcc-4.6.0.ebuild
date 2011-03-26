@@ -8,7 +8,7 @@ PATCH_VER="0.9.2"
 ETYPE="gcc-compiler"
 
 # Hardened gcc 4 stuff
-PIE_VER="0.4.7"
+PIE_VER="0.4.8"
 SPECS_VER="0.2.0"
 SPECS_GCC_VER="4.4.3"
 # arch/libc configurations known to be stable with {PIE,SSP}-by-default
@@ -85,10 +85,6 @@ src_unpack() {
 }
 
 pkg_setup() {
-	if [[ -z ${I_PROMISE_TO_SUPPLY_PATCHES_WITH_BUGS} ]] ; then
-		die "Please \`export I_PROMISE_TO_SUPPLY_PATCHES_WITH_BUGS=1\` or define it in your make.conf if you want to 
-		use this ebuild.  This is to try and cut down on people filing bugs for a compiler we do not currently support."
-	fi
 	gcc_pkg_setup
 
 	if use lto ; then
