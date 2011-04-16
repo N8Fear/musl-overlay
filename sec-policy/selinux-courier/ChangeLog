@@ -4,9 +4,10 @@
 
 *selinux-courier-2.20101213-r3 (13 Apr 2011)
 
-  13 Apr 2011; <swift@gentoo.org> +files/fix-services-courier-r3.patch,
+  16 Apr 2011; <swift@gentoo.org> +files/fix-services-courier-r3.patch,
   +selinux-courier-2.20101213-r3.ebuild:
-  Allow authdaemon to create directories, hide cosmetic denials
+  Allow authdaemon to create directories, hide cosmetic denials, fix 
+  build issue (end-of-line error)
 
 *selinux-courier-2.20101213-r2 (14 Mar 2011)
 
