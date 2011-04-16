@@ -27,7 +27,7 @@
  
 +tunable_policy(`gentoo_try_dontaudit',`
 +	dontaudit courier_authdaemon_t self:capability dac_read_search;
-+)
++')
 +
  ########################################
  #
