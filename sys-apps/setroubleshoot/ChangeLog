@@ -1,0 +1,6 @@
+
+
+  16 Apr 2011; Anthony G. Basile <blueness@gentoo.org>
+  setroubleshoot-3.0.32.1.16.ebuild:
+  Fixed SRC_URI
+
