@@ -9,5 +9,6 @@
 	<use>
 		<flag name='peer_perms'>Enable the labeled networking peer permissions (SELinux policy capability).</flag>
 		<flag name='open_perms'>Enable the open permissions for file object classes (SELinux policy capability).</flag>
+		<flag name='ubac'>Enable User Based Access Control (UBAC) in the SELinux policy</flag>
 	</use>
 </pkgmetadata>
