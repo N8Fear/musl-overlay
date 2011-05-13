@@ -2,6 +2,14 @@
 # Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
 # $Header: /var/cvsroot/gentoo-x86/sec-policy/selinux-base-policy/ChangeLog,v 1.72 2011/04/16 13:02:44 blueness Exp $
 
+*selinux-base-policy-2.20101213-r14 (13 May 2011)
+
+  13 May 2011; <swift@gentoo.org> -selinux-base-policy-2.20101213-r13.ebuild,
+  +selinux-base-policy-2.20101213-r14.ebuild,
+  -files/patchbundle-selinux-base-policy-2.20101213-r13.tar.bz2,
+  +files/patchbundle-selinux-base-policy-2.20101213-r14.tar.bz2:
+  Update with support for openrc
+
 *selinux-base-policy-2.20101213-r13 (02 May 2011)
 
   02 May 2011; <swift@gentoo.org>

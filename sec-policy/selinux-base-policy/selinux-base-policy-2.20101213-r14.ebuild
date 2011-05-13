@@ -3,7 +3,7 @@
 # $Header: /var/cvsroot/gentoo-x86/sec-policy/selinux-base-policy/selinux-base-policy-2.20101213-r12.ebuild,v 1.1 2011/04/16 13:02:44 blueness Exp $
 
 EAPI="1"
-IUSE="+peer_perms open_perms ubac"
+IUSE="+peer_perms +open_perms +ubac"
 
 inherit eutils
 
@@ -121,7 +121,7 @@ pkg_postinst() {
 		einfo "Inserting base module into ${i} module store."
 
 		cd "/usr/share/selinux/${i}"
-		semodule -s "${i}" -b base.pp
+		semodule -s "${i}" -b base.pp || die "Could not load in new base policy"
 	done
 	elog "Updates on policies might require you to relabel files. If you, after installing"
 	elog "new SELinux policies, get 'permission denied' errors, relabelling your system"
