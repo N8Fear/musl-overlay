@@ -1,0 +1,20 @@
+# ChangeLog for sec-policy/selinux-mozilla
+# Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
+# $Header: /var/cvsroot/gentoo-x86/sec-policy/selinux-mozilla/ChangeLog,v 1.1 2011/02/05 20:41:05 blueness Exp $
+
+*selinux-mozilla-2.20101213-r2 (15 May 2011)
+
+  15 May 2011; <swift@gentoo.org> +files/fix-apps-mozilla-r2.patch,
+  +selinux-mozilla-2.20101213-r2.ebuild, +metadata.xml:
+  Remove obsolete privileges
+
+  05 Feb 2011; Anthony G. Basile <blueness@gentoo.org> ChangeLog:
+  Initial commit to portage.
+
+*selinux-mozilla-2.20101213-r1 (22 Jan 2011)
+
+  22 Jan 2011; <swift@gentoo.org> +selinux-mozilla-2.20101213-r1.ebuild,
+  files/fix-mozilla.patch:
+  Support binary firefox, add call to alsa interface and support tmp type
+  for mozilla
+
