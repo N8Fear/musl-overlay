@@ -15,6 +15,8 @@ SEMNG_VER="2.0.45"
 SELNX_VER="2.0.94"
 SEPOL_VER="2.0.41"
 
+IUSE=""
+
 DESCRIPTION="SELinux core utilities"
 HOMEPAGE="http://userspace.selinuxproject.org"
 SRC_URI="http://userspace.selinuxproject.org/releases/20100525/devel/${P}.tar.gz
