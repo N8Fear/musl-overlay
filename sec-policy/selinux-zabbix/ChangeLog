@@ -3,6 +3,9 @@
 # $Header: /var/cvsroot/gentoo-x86/sec-policy/selinux-zabbix/ChangeLog,v 1.2 2011/06/02 13:12:38 blueness Exp $
 
   22 Jun 2011; <swift@gentoo.org> selinux-zabbix-2.20101213-r1.ebuild:
+  Use ~arch first
+
+  22 Jun 2011; <swift@gentoo.org> selinux-zabbix-2.20101213-r1.ebuild:
   Set EAPI=4 on zabbix policy build
 
 *selinux-zabbix-2.20101213-r1 (12 Jun 2011)
