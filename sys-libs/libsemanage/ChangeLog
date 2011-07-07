@@ -1,0 +1,167 @@
+# ChangeLog for sys-libs/libsemanage
+# Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
+# $Header: /var/cvsroot/gentoo-x86/sys-libs/libsemanage/ChangeLog,v 1.36 2011/06/30 10:40:52 blueness Exp $
+
+  07 Jul 2011; <swift@gentoo.org> +libsemanage-2.0.45-r1.ebuild, +metadata.xml:
+  Support python3
+
+*libsemanage-2.0.45-r1 (04 Jul 2011)
+
+  04 Jul 2011; <swift@gentoo.org> +libsemanage-2.0.45-r1.ebuild, +metadata.xml:
+  Swigify'ing to support python 3 ABI
+
+  30 Jun 2011; Anthony G. Basile <blueness@gentoo.org>
+  libsemanage-2.0.45.ebuild:
+  Only build libsemanage for python-2, fixes bug #369089
+
+  28 May 2011; Anthony G. Basile <blueness@gentoo.org>
+  libsemanage-2.0.27.ebuild, libsemanage-2.0.33.ebuild:
+  Make RDEPEND explicit
+
+  28 May 2011; Anthony G. Basile <blueness@gentoo.org>
+  libsemanage-2.0.45.ebuild:
+  Stable amd64 x86
+
+  13 Feb 2011; Anthony G. Basile <blueness@gentoo.org> metadata.xml:
+  Updated metadata.xml to reflect new selinux herd.
+
+  06 Feb 2011; Arfrever Frehtes Taifersar Arahesis <arfrever@gentoo.org>
+  libsemanage-2.0.45.ebuild:
+  Add "python" and "ruby" USE flags.
+
+  05 Feb 2011; Arfrever Frehtes Taifersar Arahesis <arfrever@gentoo.org>
+  libsemanage-2.0.45.ebuild:
+  Set SUPPORT_PYTHON_ABIS (bug #353764). Respect AR and CC.
+
+*libsemanage-2.0.45 (05 Feb 2011)
+
+  05 Feb 2011; Anthony G. Basile <blueness@gentoo.org>
+  +libsemanage-2.0.45.ebuild:
+  New upstream release.
+
+  16 Apr 2010; Arfrever Frehtes Taifersar Arahesis <arfrever@gentoo.org>
+  libsemanage-2.0.27.ebuild, libsemanage-2.0.33.ebuild,
+  libsemanage-2.0.33-r1.ebuild:
+  Delete calls to deprecated python_version().
+
+*libsemanage-2.0.33-r1 (24 Aug 2009)
+
+  24 Aug 2009; Chris PeBenito <pebenito@gentoo.org>
+  +libsemanage-2.0.33-r1.ebuild, +files/libsemanage-2.0.33-bzip.diff:
+  Add patch to make bzip2 compression configurable.
+
+  03 Aug 2009; Chris PeBenito <pebenito@gentoo.org>
+  libsemanage-2.0.33.ebuild:
+  Fix libsepol dependency.
+
+  02 Aug 2009; Chris PeBenito <pebenito@gentoo.org>
+  libsemanage-2.0.27.ebuild, libsemanage-2.0.33.ebuild:
+  Add python_need_rebuild to libsemanage.
+
+*libsemanage-2.0.33 (02 Aug 2009)
+
+  02 Aug 2009; Chris PeBenito <pebenito@gentoo.org>
+  +libsemanage-2.0.33.ebuild:
+  New upstream release.
+
+  18 Jul 2009; Chris PeBenito <pebenito@gentoo.org>
+  -libsemanage-1.10.9.ebuild, libsemanage-2.0.27.ebuild:
+  Mark stable. Remove old ebuilds.
+
+*libsemanage-2.0.27 (03 Oct 2008)
+
+  03 Oct 2008; Chris PeBenito <pebenito@gentoo.org>
+  +libsemanage-2.0.27.ebuild:
+  Initial commit of 2.0 libsemanage.
+
+  10 Sep 2008; Chris PeBenito <pebenito@gentoo.org>
+  libsemanage-1.10.9.ebuild:
+  Tests cannot be run in the ebuild, they are supposed to be ran on the full
+  SELinux userland repo.
+
+  29 May 2008; Ali Polatel <hawking@gentoo.org> libsemanage-1.10.9.ebuild:
+  python_mod_optimize is ROOT aware. Fixed python_mod_cleanup.
+
+  26 May 2008; Chris PeBenito <pebenito@gentoo.org>
+  libsemanage-1.10.9.ebuild:
+  Fix libsepol dependency.
+
+  13 May 2008; Chris PeBenito <pebenito@gentoo.org> -libsemanage-1.4.ebuild,
+  -libsemanage-1.6.ebuild, -libsemanage-1.10.0.ebuild,
+  -libsemanage-1.10.5.ebuild, libsemanage-1.10.9.ebuild:
+  Mark 1.10.9 stable, clear old ebuilds.
+
+*libsemanage-1.10.9 (29 Jan 2008)
+
+  29 Jan 2008; Chris PeBenito <pebenito@gentoo.org>
+  +libsemanage-1.10.9.ebuild:
+  New upstream bugfix release.
+
+*libsemanage-1.10.5 (18 Oct 2007)
+
+  18 Oct 2007; Chris PeBenito <pebenito@gentoo.org>
+  +libsemanage-1.10.5.ebuild:
+  New upstream release.
+
+  04 Jun 2007; Chris PeBenito <pebenito@gentoo.org>
+  libsemanage-1.10.0.ebuild:
+  Mark stable.
+
+*libsemanage-1.10.0 (15 Feb 2007)
+
+  15 Feb 2007; Chris PeBenito <pebenito@gentoo.org>
+  +libsemanage-1.10.0.ebuild:
+  New upstream release.
+
+  09 Oct 2006; Chris PeBenito <pebenito@gentoo.org>
+  libsemanage-1.6.17-r1.ebuild:
+  Stable to make repoman happy.
+
+*libsemanage-1.6.17-r1 (08 Oct 2006)
+
+  08 Oct 2006; Chris PeBenito <pebenito@gentoo.org>
+  -libsemanage-1.6.17.ebuild, +libsemanage-1.6.17-r1.ebuild:
+  Install semanage.conf since this is masked on example policy-based profiles.
+
+*libsemanage-1.6.17 (05 Oct 2006)
+
+  05 Oct 2006; Chris PeBenito <pebenito@gentoo.org>
+  +libsemanage-1.6.17.ebuild:
+  Add SVN snapshot.
+
+  31 Jul 2006; Chris PeBenito <pebenito@gentoo.org> libsemanage-1.6.ebuild:
+  Mark stable, long overdue.
+
+  27 Apr 2006; Alec Warner <antarus@gentoo.org>
+  files/digest-libsemanage-1.4, Manifest:
+  Fixing SHA256 digest, pass four
+
+*libsemanage-1.6 (18 Mar 2006)
+
+  18 Mar 2006; Chris PeBenito <pebenito@gentoo.org> +libsemanage-1.6.ebuild:
+  New upstream release.
+
+  22 Feb 2006; Stephen Bennett <spb@gentoo.org> libsemanage-1.4.ebuild:
+  Alpha stable
+
+  19 Feb 2006; Joshua Kinard <kumba@gentoo.org> libsemanage-1.4.ebuild:
+  Marked stable on mips.
+
+  09 Feb 2006; Chris PeBenito <pebenito@gentoo.org> libsemanage-1.4.ebuild:
+  Set python version to fix compiles on non 2.4 pythons.
+
+  17 Jan 2006; Chris PeBenito <pebenito@gentoo.org> libsemanage-1.4.ebuild:
+  Mark stable, x86, amd64, ppc, sparc.
+
+  14 Jan 2006; Stephen Bennett <spb@gentoo.org> libsemanage-1.4.ebuild:
+  Added ~alpha
+
+  15 Dec 2005; Chris PeBenito <pebenito@gentoo.org> libsemanage-1.4.ebuild:
+  Tighten up versioning to try to prevent mismatch problems as seen in #112348.
+
+*libsemanage-1.4 (09 Dec 2005)
+
+  09 Dec 2005; Chris PeBenito <pebenito@gentoo.org> +metadata.xml,
+  +libsemanage-1.4.ebuild:
+  Initial commit.
+
