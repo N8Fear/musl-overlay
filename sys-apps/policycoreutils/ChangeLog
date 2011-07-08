@@ -2,6 +2,9 @@
 # Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
 # $Header: /var/cvsroot/gentoo-x86/sys-apps/policycoreutils/ChangeLog,v 1.85 2011/06/30 10:35:35 blueness Exp $
 
+  08 Jul 2011; <swift@gentoo.org> policycoreutils-2.0.82-r2.ebuild:
+  Switch towards gogo location
+
   07 Jul 2011; <swift@gentoo.org> +policycoreutils-2.0.82-r2.ebuild,
   +files/policycoreutils-2.0.82-python3.tar.gz, +metadata.xml:
   Initial support for python3
