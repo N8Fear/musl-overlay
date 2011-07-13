@@ -1,0 +1,387 @@
+diff -uNr policycoreutils-2.0.85.orig/sandbox/Makefile policycoreutils-2.0.85/sandbox/Makefile
+--- policycoreutils-2.0.85.orig/sandbox/Makefile	2011-07-13 18:35:00.498002303 +0200
++++ policycoreutils-2.0.85/sandbox/Makefile	2011-07-13 19:32:10.337002401 +0200
+@@ -6,28 +6,37 @@
+ SBINDIR ?= $(PREFIX)/sbin
+ MANDIR ?= $(PREFIX)/share/man
+ LOCALEDIR ?= /usr/share/locale
+-SHAREDIR ?= $(PREFIX)/share/sandbox
++SHAREDIR ?= $(PREFIX)/share/sesandbox
+ override CFLAGS += $(LDFLAGS) -I$(PREFIX)/include -DPACKAGE="\"policycoreutils\""
+ LDLIBS += -lselinux -lcap-ng 
+ 
+-all: sandbox seunshare sandboxX.sh 
++all: sesandbox seunshare sesandboxX.sh 
++
++sesandbox: sandbox
++	cp sandbox sesandbox
++	cp sandbox.8 sesandbox.8
++	cp sandbox.init sesandbox.init
++	cp sandbox.config sesandbox.config
++
++sesandboxX.sh: sandboxX.sh
++	cp sandboxX.sh sesandboxX.sh
+ 
+ seunshare: seunshare.o $(EXTRA_OBJS)
+ 	$(CC) $(LDFLAGS) -o $@ $^ $(LDLIBS)
+ 
+ install: all
+ 	-mkdir -p $(BINDIR)
+-	install -m 755 sandbox $(BINDIR)
++	install -m 755 sesandbox $(BINDIR)
+ 	-mkdir -p $(MANDIR)/man8
+-	install -m 644 sandbox.8 $(MANDIR)/man8/
++	install -m 644 sesandbox.8 $(MANDIR)/man8/
+ 	-mkdir -p $(SBINDIR)
+ 	install -m 4755 seunshare $(SBINDIR)/
+ 	-mkdir -p $(SHAREDIR)
+-	install -m 755 sandboxX.sh $(SHAREDIR)
++	install -m 755 sesandboxX.sh $(SHAREDIR)
+ 	-mkdir -p $(INITDIR)
+-	install -m 755 sandbox.init $(INITDIR)/sandbox
++	install -m 755 sesandbox.init $(INITDIR)/sesandbox
+ 	-mkdir -p $(SYSCONFDIR)
+-	install -m 644 sandbox.config $(SYSCONFDIR)/sandbox
++	install -m 644 sesandbox.config $(SYSCONFDIR)/sesandbox
+ 
+ test:
+ 	@python test_sandbox.py -v
+diff -uNr policycoreutils-2.0.85.orig/sandbox/sandbox policycoreutils-2.0.85/sandbox/sandbox
+--- policycoreutils-2.0.85.orig/sandbox/sandbox	2011-07-13 18:35:00.498002303 +0200
++++ policycoreutils-2.0.85/sandbox/sandbox	2011-07-13 18:39:07.068002310 +0200
+@@ -142,7 +142,7 @@
+        return cmd
+ 
+ class Sandbox:
+-    VERSION = "sandbox .1"
++    VERSION = "sesandbox .1"
+     SYSLOG = "/var/log/messages"
+ 
+     def __init__(self):
+@@ -204,7 +204,7 @@
+                   copyfile(f, "/tmp", self.__tmpdir)
+ 
+     def __setup_sandboxrc(self, wm = "/usr/bin/matchbox-window-manager -use_titlebar no"):
+-           execfile =self.__homedir + "/.sandboxrc"
++           execfile =self.__homedir + "/.sesandboxrc"
+            fd = open(execfile, "w+") 
+            if self.__options.session:
+                   fd.write("""#!/bin/sh
+@@ -230,9 +230,9 @@
+     def __parse_options(self):
+         from optparse import OptionParser
+         usage = _("""
+-sandbox [-h] [-[X|M] [-l level ] [-H homedir] [-T tempdir]] [-I includefile ] [-W windowmanager ] [[-i file ] ...] [ -t type ] command
++sesandbox [-h] [-[X|M] [-l level ] [-H homedir] [-T tempdir]] [-I includefile ] [-W windowmanager ] [[-i file ] ...] [ -t type ] command
+ 
+-sandbox [-h] [-[X|M] [-l level ] [-H homedir] [-T tempdir]] [-I includefile ] [-W windowmanager ] [[-i file ] ...] [ -t type ] -S
++sesandbox [-h] [-[X|M] [-l level ] [-H homedir] [-T tempdir]] [-I includefile ] [-W windowmanager ] [[-i file ] ...] [ -t type ] -S
+ """)
+         
+         parser = OptionParser(version=self.VERSION, usage=usage)
+@@ -240,22 +240,22 @@
+         parser.add_option("-i", "--include", 
+                           action="callback", callback=self.__include, 
+                           type="string",
+-                          help=_("include file in sandbox"))
++                          help=_("include file in sesandbox"))
+         parser.add_option("-I", "--includefile",  action="callback", callback=self.__includefile,
+                           type="string",
+-                          help=_("read list of files to include in sandbox from INCLUDEFILE"))
++                          help=_("read list of files to include in sesandbox from INCLUDEFILE"))
+         parser.add_option("-t", "--type", dest="setype", action="store", default=None,
+-                          help=_("run sandbox with SELinux type"))
++                          help=_("run sesandbox with SELinux type"))
+         parser.add_option("-M", "--mount", 
+                           action="callback", callback=self.__mount_callback, 
+                           help=_("mount new home and/or tmp directory"))
+ 
+         parser.add_option("-S", "--session", action="store_true",  dest="session", 
+-                          default=False,  help=_("run complete desktop session within sandbox"))
++                          default=False,  help=_("run complete desktop session within sesandbox"))
+ 
+         parser.add_option("-X", dest="X_ind", 
+                           action="callback", callback=self.__x_callback, 
+-                          default=False,  help=_("run X application within a sandbox"))
++                          default=False,  help=_("run X application within a sesandbox"))
+ 
+         parser.add_option("-H", "--homedir", 
+                           action="callback", callback=self.__validdir,
+@@ -274,7 +274,7 @@
+                           help=_("alternate window manager"))
+ 
+         parser.add_option("-l", "--level", dest="level", 
+-                          help=_("MCS/MLS level for the sandbox"))
++                          help=_("MCS/MLS level for the sesandbox"))
+ 
+         self.__parser=parser
+ 
+@@ -293,9 +293,9 @@
+                if not self.__options.setype:
+                       self.setype = selinux.getcon()[1].split(":")[2]
+                if not self.__options.homedir or not self.__options.tmpdir:
+-                      self.usage(_("You must specify a Homedir and tempdir when setting up a session sandbox"))
++                      self.usage(_("You must specify a Homedir and tempdir when setting up a session sesandbox"))
+                if len(cmds) > 0:
+-                      self.usage(_("Commands are not allowed in a session sandbox"))
++                      self.usage(_("Commands are not allowed in a session sesandbox"))
+                self.__options.X_ind = True
+                self.__homedir = self.__options.homedir
+                self.__tmpdir = self.__options.tmpdir
+@@ -329,7 +329,7 @@
+     def __setup_dir(self):
+            if self.__options.level or self.__options.session:
+                   return
+-           sandboxdir = HOMEDIR + "/.sandbox"
++           sandboxdir = HOMEDIR + "/.sesandbox"
+            if not os.path.exists(sandboxdir):
+                   os.mkdir(sandboxdir)
+ 
+@@ -338,14 +338,14 @@
+                   self.__homedir = self.__options.homedir
+            else:
+                   selinux.setfscreatecon(self.__filecon)
+-                  self.__homedir = mkdtemp(dir=sandboxdir, prefix=".sandbox")
++                  self.__homedir = mkdtemp(dir=sandboxdir, prefix=".sesandbox")
+ 
+            if self.__options.tmpdir:
+                   selinux.chcon(self.__options.tmpdir, self.__filecon, recursive=True)
+                   self.__tmpdir = self.__options.tmpdir
+            else:
+                   selinux.setfscreatecon(self.__filecon)
+-                  self.__tmpdir = mkdtemp(dir="/tmp", prefix=".sandbox")
++                  self.__tmpdir = mkdtemp(dir="/tmp", prefix=".sesandbox")
+            selinux.setfscreatecon(None)
+            self.__copyfiles()
+ 
+@@ -359,7 +359,7 @@
+ 
+                          self.__setup_sandboxrc(self.__options.wm)
+                          
+-                         cmds = [ '/usr/sbin/seunshare', "-t", self.__tmpdir, "-h", self.__homedir, "--", self.__execcon, "/usr/share/sandbox/sandboxX.sh" ]
++                         cmds = [ '/usr/sbin/seunshare', "-t", self.__tmpdir, "-h", self.__homedir, "--", self.__execcon, "/usr/share/sesandbox/sesandboxX.sh" ]
+                          rc = subprocess.Popen(cmds).wait()
+                          return rc
+ 
+diff -uNr policycoreutils-2.0.85.orig/sandbox/sandbox.8 policycoreutils-2.0.85/sandbox/sandbox.8
+--- policycoreutils-2.0.85.orig/sandbox/sandbox.8	2011-07-13 18:35:00.498002303 +0200
++++ policycoreutils-2.0.85/sandbox/sandbox.8	2011-07-13 18:40:09.803002312 +0200
+@@ -1,8 +1,8 @@
+ .TH SANDBOX "8" "May 2009" "chcat" "User Commands"
+ .SH NAME
+-sandbox \- Run cmd under an SELinux sandbox
++sesandbox \- Run cmd under an SELinux sandbox
+ .SH SYNOPSIS
+-.B sandbox
++.B sesandbox
+ [-l level ] [[-M | -X]  -H homedir -T tempdir ] [-I includefile ] [ -W windowmanager ] [[-i file ]...] [ -t type ] cmd
+ [-l level ] [[-M | -X]  -H homedir -T tempdir ] [-I includefile ] [ -W windowmanager ] [[-i file ]...] [ -t type ] -S
+ .br
+@@ -12,11 +12,8 @@
+ .I cmd 
+ application within a tightly confined SELinux domain.  The default sandbox domain only allows applications the ability to read and write stdin, stdout and any other file descriptors handed to it. It is not allowed to open any other files.  The -M option will mount an alternate homedir and tmpdir to be used by the sandbox.
+ 
+-If you have the 
+-.I policycoreutils-sandbox 
+-package installed, you can use the -X option and the -M option.
+ .B sandbox -X
+-allows you to run X applications within a sandbox.  These applications will start up their own X Server and create a temporary home directory and /tmp.  The default SELinux policy does not allow any capabilities or network access.  It also prevents all access to the users other processes and files.  Files specified on the command that are in the home directory or /tmp will be copied into the sandbox directories.
++allows you to run X applications within a sandbox.  These applications will start up their own X Server and create a temporary home directory and /tmp.  The default SELinux policy does not allow any capabilities or network access.  It also prevents all access to the users other processes and files.  Files specified on the command that are in the home directory or /tmp will be copied into the sesandbox directories.
+ 
+ If directories are specified with -H or -T the directory will have its context modified with chcon(1) unless a level is specified with -l.  If the MLS/MCS security level is specified, the user is responsible to set the correct labels.
+ .PP
+@@ -25,10 +22,10 @@
+ Use alternate homedir to mount over your home directory.  Defaults to temporary. Requires -X or -M.
+ .TP
+ \fB\-i file\fR
+-Copy this file into the appropriate temporary sandbox directory. Command can be repeated.
++Copy this file into the appropriate temporary sesandbox directory. Command can be repeated.
+ .TP
+ \fB\-I inputfile\fR Copy all files listed in inputfile into the
+-appropriate temporary sandbox directories.
++appropriate temporary sesandbox directories.
+ .TP
+ \fB\-l\fR
+ Specify the MLS/MCS Security Level to run the sandbox with.  Defaults to random.
+@@ -44,7 +41,7 @@
+ .TP
+ \fB\-W windowmanager\fR
+ Select alternative window manager to run within 
+-.B sandbox -X.
++.B sesandbox -X.
+ Default to /usr/bin/matchbox-window-manager.
+ .TP
+ \fB\-X\fR 
+diff -uNr policycoreutils-2.0.85.orig/sandbox/sandbox.init policycoreutils-2.0.85/sandbox/sandbox.init
+--- policycoreutils-2.0.85.orig/sandbox/sandbox.init	2011-07-13 18:35:00.498002303 +0200
++++ policycoreutils-2.0.85/sandbox/sandbox.init	2011-07-13 18:38:08.850002308 +0200
+@@ -1,22 +1,22 @@
+ #!/bin/bash
+ ## BEGIN INIT INFO
+-# Provides: sandbox
++# Provides: sesandbox
+ # Default-Start: 3 4 5
+ # Default-Stop: 0 1 2 3 4 6
+ # Required-Start:
+ #              
+ ## END INIT INFO
+-# sandbox:        Set up / mountpoint to be shared, /var/tmp, /tmp, /home/sandbox unshared
++# sesandbox:        Set up / mountpoint to be shared, /var/tmp, /tmp, /home/sesandbox unshared
+ #
+ # chkconfig: 345 1 99
+ #
+-# Description: sandbox and other apps that want to use pam_namespace 
++# Description: sesandbox and other apps that want to use pam_namespace 
+ #              on /var/tmp, /tmp and home directories, requires this script
+ #              to be run at boot time.
+ #              This script sets up the / mount point and all of its 
+ #              subdirectories as shared. The script sets up
+ #              /tmp, /var/tmp, /home and any homedirs listed in 
+-#              /etc/sysconfig/sandbox and all of their subdirectories 
++#              /etc/sysconfig/sesandbox and all of their subdirectories 
+ #              as unshared.
+ #              All processes that use pam_namespace will see 
+ #              modifications to the global mountspace, except for the
+@@ -28,14 +28,14 @@
+ 
+ HOMEDIRS="/home"
+ 
+-. /etc/sysconfig/sandbox
++. /etc/sysconfig/sesandbox
+ 
+-LOCKFILE=/var/lock/subsys/sandbox
++LOCKFILE=/var/lock/subsys/sesandbox
+ 
+ base=${0##*/}
+ 
+ start() {
+-	echo -n "Starting sandbox"
++	echo -n "Starting sesandbox"
+ 
+ 	[ -f "$LOCKFILE" ] && return 1
+ 
+@@ -54,7 +54,7 @@
+ }
+ 
+ stop() {
+-	echo -n "Stopping sandbox"
++	echo -n "Stopping sesandbox"
+ 
+ 	[ -f "$LOCKFILE" ] || return 1
+ }
+diff -uNr policycoreutils-2.0.85.orig/sandbox/sandboxX.sh policycoreutils-2.0.85/sandbox/sandboxX.sh
+--- policycoreutils-2.0.85.orig/sandbox/sandboxX.sh	2011-07-13 18:35:00.498002303 +0200
++++ policycoreutils-2.0.85/sandbox/sandboxX.sh	2011-07-13 18:40:28.382002312 +0200
+@@ -1,13 +1,13 @@
+ #!/bin/bash 
+ context=`id -Z | secon -t -l -P`
+-export TITLE="Sandbox $context -- `grep ^#TITLE: ~/.sandboxrc | /usr/bin/cut -b8-80`"
++export TITLE="Sandbox $context -- `grep ^#TITLE: ~/.sesandboxrc | /usr/bin/cut -b8-80`"
+ export SCREENSIZE="1000x700"
+ #export SCREENSIZE=`xdpyinfo | awk  '/dimensions/ {  print $2 }'`
+ trap "exit 0" HUP
+ 
+ (/usr/bin/Xephyr -title "$TITLE" -terminate -screen $SCREENSIZE -displayfd 5 5>&1 2>/dev/null) | while read D; do 
+     export DISPLAY=:$D
+-    python -c 'import gtk, os, commands; commands.getstatusoutput("%s/.sandboxrc" % os.environ["HOME"])'
++    python -c 'import gtk, os, commands; commands.getstatusoutput("%s/.sesandboxrc" % os.environ["HOME"])'
+     export EXITCODE=$?
+     kill -HUP 0
+     break
+diff -uNr policycoreutils-2.0.85.orig/sandbox/test_sandbox.py policycoreutils-2.0.85/sandbox/test_sandbox.py
+--- policycoreutils-2.0.85.orig/sandbox/test_sandbox.py	2011-07-13 18:35:00.498002303 +0200
++++ policycoreutils-2.0.85/sandbox/test_sandbox.py	2011-07-13 18:42:21.058002316 +0200
+@@ -19,73 +19,73 @@
+                      '"Sandbox should have succeeded for this test %r' %  err)
+ 
+     def test_simple_success(self):
+-        "Verify that we can read file descriptors handed to sandbox"
++        "Verify that we can read file descriptors handed to sesandbox"
+         p1 = Popen(['cat', '/etc/passwd'], stdout = PIPE)
+-        p2 = Popen(['sandbox', 'grep', 'root'], stdin = p1.stdout, stdout=PIPE)
++        p2 = Popen(['sesandbox', 'grep', 'root'], stdin = p1.stdout, stdout=PIPE)
+         out, err = p2.communicate()
+         self.assert_('root' in out)
+ 
+     def test_cant_kill(self):
+-        "Verify that we cannot send kill signal in the sandbox"
++        "Verify that we cannot send kill signal in the sesandbox"
+         pid = os.getpid()
+-        p = Popen(['sandbox', 'kill', '-HUP', str(pid)], stdout=PIPE, stderr=PIPE)
++        p = Popen(['sesandbox', 'kill', '-HUP', str(pid)], stdout=PIPE, stderr=PIPE)
+         out, err = p.communicate()
+         self.assertDenied(err)
+ 
+     def test_cant_ping(self):
+-        "Verify that we can't ping within the sandbox"
+-        p = Popen(['sandbox', 'ping', '-c 1 ', '127.0.0.1'], stdout=PIPE, stderr=PIPE)
++        "Verify that we can't ping within the sesandbox"
++        p = Popen(['sesandbox', 'ping', '-c 1 ', '127.0.0.1'], stdout=PIPE, stderr=PIPE)
+         out, err = p.communicate()
+         self.assertDenied(err)
+     
+     def test_cant_mkdir(self):
+-        "Verify that we can't mkdir within the sandbox"
+-        p = Popen(['sandbox', 'mkdir', '~/test'], stdout=PIPE, stderr=PIPE)
++        "Verify that we can't mkdir within the sesandbox"
++        p = Popen(['sesandbox', 'mkdir', '~/test'], stdout=PIPE, stderr=PIPE)
+         out, err = p.communicate()
+         self.assertFailure(p.returncode)
+ 
+     def test_cant_list_homedir(self):
+-        "Verify that we can't list homedir within the sandbox"
+-        p = Popen(['sandbox', 'ls', '~'], stdout=PIPE, stderr=PIPE)
++        "Verify that we can't list homedir within the sesandbox"
++        p = Popen(['sesandbox', 'ls', '~'], stdout=PIPE, stderr=PIPE)
+         out, err = p.communicate()
+         self.assertFailure(p.returncode)
+ 
+     def test_cant_send_mail(self):
+-        "Verify that we can't send mail within the sandbox"
+-        p = Popen(['sandbox', 'mail'], stdout=PIPE, stderr=PIPE)
++        "Verify that we can't send mail within the sesandbox"
++        p = Popen(['sesandbox', 'mail'], stdout=PIPE, stderr=PIPE)
+         out, err = p.communicate()
+         self.assertDenied(err)
+     
+     def test_cant_sudo(self):
+-        "Verify that we can't run sudo within the sandbox"
+-        p = Popen(['sandbox', 'sudo'], stdout=PIPE, stderr=PIPE)
++        "Verify that we can't run sudo within the sesandbox"
++        p = Popen(['sesandbox', 'sudo'], stdout=PIPE, stderr=PIPE)
+         out, err = p.communicate()
+         self.assertFailure(p.returncode)
+     
+     def test_mount(self):
+         "Verify that we mount a file system"
+-        p = Popen(['sandbox', '-M', 'id'], stdout=PIPE, stderr=PIPE)
++        p = Popen(['sesandbox', '-M', 'id'], stdout=PIPE, stderr=PIPE)
+         out, err = p.communicate()
+         self.assertSuccess(p.returncode, err)
+     
+     def test_set_level(self):
+         "Verify that we set level a file system"
+-        p = Popen(['sandbox', '-l', 's0', 'id'], stdout=PIPE, stderr=PIPE)
++        p = Popen(['sesandbox', '-l', 's0', 'id'], stdout=PIPE, stderr=PIPE)
+         out, err = p.communicate()
+         self.assertSuccess(p.returncode, err)
+     
+     def test_homedir(self):
+         "Verify that we set homedir a file system"
+-        homedir = mkdtemp(dir=".", prefix=".sandbox_test")
+-        p = Popen(['sandbox', '-H', homedir, '-M', 'id'], stdout=PIPE, stderr=PIPE)
++        homedir = mkdtemp(dir=".", prefix=".sesandbox_test")
++        p = Popen(['sesandbox', '-H', homedir, '-M', 'id'], stdout=PIPE, stderr=PIPE)
+         out, err = p.communicate()
+         shutil.rmtree(homedir)
+         self.assertSuccess(p.returncode, err)
+     
+     def test_tmpdir(self):
+         "Verify that we set tmpdir a file system"
+-        tmpdir = mkdtemp(dir="/tmp", prefix=".sandbox_test")
+-        p = Popen(['sandbox', '-T', tmpdir, '-M', 'id'], stdout=PIPE, stderr=PIPE)
++        tmpdir = mkdtemp(dir="/tmp", prefix=".sesandbox_test")
++        p = Popen(['sesandbox', '-T', tmpdir, '-M', 'id'], stdout=PIPE, stderr=PIPE)
+         out, err = p.communicate()
+         shutil.rmtree(tmpdir)
+         self.assertSuccess(p.returncode, err)
