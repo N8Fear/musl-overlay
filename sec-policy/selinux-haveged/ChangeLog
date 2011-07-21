@@ -2,6 +2,11 @@
 # Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+*selinux-haveged-2.20101213-r2 (21 Jul 2011)
+
+  21 Jul 2011; <swift@gentoo.org> +selinux-haveged-2.20101213-r2.ebuild:
+  Do not use a haveged domain, but refer to audio-entropyd
+
   17 Jul 2011; <swift@gentoo.org> +files/fix-services-haveged-r1.patch,
   +selinux-haveged-2.20101213-r1.ebuild, +metadata.xml:
   Initial support for haveged
