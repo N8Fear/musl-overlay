@@ -2,13 +2,13 @@
 # Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
 # $Header: /var/cvsroot/gentoo-x86/sec-policy/selinux-base-policy/ChangeLog,v 1.80 2011/07/11 01:59:36 blueness Exp $
 
-*selinux-base-policy-2.20101213-r19 (17 Jul 2011)
+*selinux-base-policy-2.20101213-r20 (19 Jul 2011)
 
-  17 Jul 2011; <swift@gentoo.org> +selinux-base-policy-2.20101213-r19.ebuild,
-  +files/patchbundle-selinux-base-policy-2.20101213-r19.tar.bz2, +files/config,
-  +files/modules.conf.strict.20090730, +files/modules.conf.targeted.20090730,
-  +metadata.xml:
-  Add haveged and nginx, fix support for our notrans state (openrc)
+  19 Jul 2011; <swift@gentoo.org> -selinux-base-policy-2.20101213-r19.ebuild,
+  +selinux-base-policy-2.20101213-r20.ebuild,
+  -files/patchbundle-selinux-base-policy-2.20101213-r19.tar.bz2,
+  +files/patchbundle-selinux-base-policy-2.20101213-r20.tar.bz2:
+  Start with -r20 series
 
   11 Jul 2011; Anthony G. Basile <blueness@gentoo.org>
   -files/selinux-base-policy-20070329.diff,

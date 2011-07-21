@@ -28,8 +28,7 @@ DEPEND="${RDEPEND}
 S=${WORKDIR}/
 
 src_unpack() {
-	[ -z "${POLICY_TYPES}" ] && local POLICY_TYPES="strict targeted"
-	MOD_CONF_VER="20090730"
+	[ -z "${POLICY_TYPES}" ] && local POLICY_TYPES="targeted strict mls mcs"
 
 	unpack ${A}
 
@@ -56,12 +55,24 @@ src_unpack() {
 		cd "${S}/${i}";
 		make conf || die "Make conf in ${i} failed"
 
-		cp "${FILESDIR}/modules.conf.${i}.${MOD_CONF_VER}" \
+		# Define what we see as "base" and what we want to remain modular
+		cp "${FILESDIR}/modules.conf" \
 			"${S}/${i}/policy/modules.conf" \
 			|| die "failed to set up modules.conf"
+		if [[ "${i}" == "targeted" ]];
+		then
+			echo "unconfined = base" >> "${S}/${i}/policy/modules.conf"
+		fi
 		sed -i -e '/^QUIET/s/n/y/' -e '/^MONOLITHIC/s/y/n/' \
 			-e "/^NAME/s/refpolicy/$i/" "${S}/${i}/build.conf" \
 			|| die "build.conf setup failed."
+
+		if [[ "${i}" == "mls" ]] || [[ "${i}" == "mcs" ]];
+		then
+			# MCS/MLS require additional settings
+			sed -i -e "/^TYPE/s/standard/${i}/" "${S}/${i}/build.conf" \
+				|| die "failed to set type to mls"
+		fi
 
 		if ! use ubac; then
 			sed -i -e 's:^UBAC = y:UBAC = n:g' "${S}/${i}/build.conf"
@@ -78,7 +89,7 @@ src_unpack() {
 }
 
 src_compile() {
-	[ -z "${POLICY_TYPES}" ] && local POLICY_TYPES="strict targeted"
+	[ -z "${POLICY_TYPES}" ] && local POLICY_TYPES="targeted strict mls mcs"
 
 	for i in ${POLICY_TYPES}; do
 		cd "${S}/${i}"
@@ -87,7 +98,7 @@ src_compile() {
 }
 
 src_install() {
-	[ -z "${POLICY_TYPES}" ] && local POLICY_TYPES="strict targeted"
+	[ -z "${POLICY_TYPES}" ] && local POLICY_TYPES="targeted strict mls mcs"
 
 	for i in ${POLICY_TYPES}; do
 		cd "${S}/${i}"
@@ -118,7 +129,7 @@ pkg_preinst() {
 }
 
 pkg_postinst() {
-	[ -z "${POLICY_TYPES}" ] && local POLICY_TYPES="strict targeted"
+	[ -z "${POLICY_TYPES}" ] && local POLICY_TYPES="targeted strict mls mcs"
 
 	for i in ${POLICY_TYPES}; do
 		einfo "Inserting base module into ${i} module store."
