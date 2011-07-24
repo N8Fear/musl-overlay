@@ -2,6 +2,13 @@
 # Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
 # $Header: /var/cvsroot/gentoo-x86/sec-policy/selinux-puppet/ChangeLog,v 1.2 2011/06/02 12:49:09 blueness Exp $
 
+*selinux-puppet-2.20101213-r3 (24 Jul 2011)
+
+  24 Jul 2011; <swift@gentoo.org> +files/fix-services-puppet-r3.patch,
+  +selinux-puppet-2.20101213-r3.ebuild:
+  Allow puppet to call portage domains and ensure that this is supported
+  through the system_r role
+
 *selinux-puppet-2.20101213-r2 (21 Jul 2011)
 
   21 Jul 2011; <swift@gentoo.org> +files/fix-services-puppet-r2.patch,
