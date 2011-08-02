@@ -1,0 +1,33 @@
+# ChangeLog for sec-policy/selinux-skype
+# Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
+# $Header: /var/cvsroot/gentoo-x86/sec-policy/selinux-skype/ChangeLog,v 1.3 2011/06/04 18:10:53 blueness Exp $
+
+*selinux-skype-2.20101213-r3 (02 Aug 2011)
+
+  02 Aug 2011; <swift@gentoo.org> +files/fix-apps-skype-r3.patch,
+  +selinux-skype-2.20101213-r3.ebuild, +metadata.xml:
+  Improve policy style, do not require libs_use_ld_so
+
+  04 Jun 2011; Anthony G. Basile <blueness@gentoo.org>
+  -selinux-skype-2.20101213.ebuild, -selinux-skype-2.20101213-r1.ebuild:
+  Removed deprecated policies
+
+  02 Jun 2011; Anthony G. Basile <blueness@gentoo.org>
+  selinux-skype-2.20101213-r2.ebuild:
+  Stable amd64 x86
+
+  05 Feb 2011; Anthony G. Basile <blueness@gentoo.org> ChangeLog:
+  Initial commit to portage.
+
+*selinux-skype-2.20101213-r2 (31 Jan 2011)
+
+  31 Jan 2011; <swift@gentoo.org> +files/add-apps-skype-r2.patch,
+  +selinux-skype-2.20101213-r2.ebuild:
+  Allow userhome access, set some dontaudits etc.
+
+*selinux-skype-2.20101213-r1 (22 Jan 2011)
+
+  22 Jan 2011; <swift@gentoo.org> +selinux-skype-2.20101213-r1.ebuild,
+  +files/add-apps-skype.patch:
+  Update skype module to 'comply' with suggested approach for domains
+
