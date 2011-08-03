@@ -164,7 +164,7 @@ selinux-policy-2_src_install() {
 
 	for i in ${POLICY_TYPES}; do
 		for j in ${MODS}; do
-			echo "Installing ${i} ${j} policy package"
+			einfo "Installing ${i} ${j} policy package"
 			insinto ${BASEDIR}/${i}
 			doins "${S}"/${i}/${j}.pp
 		done
