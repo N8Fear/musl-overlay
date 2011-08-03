@@ -125,9 +125,7 @@ selinux-policy-2_src_prepare() {
 		for POLPATCH in "${POLICY_PATCH}";
 		do
 			cd "${S}/refpolicy/policy/modules"
-			# Although epatch dies in EAPI=4 by itself, we support other EAPIs
-			# too for the time being, so we explicitly die on it.
-			epatch "${POLPATCH}" || die "Failed to apply patch ${POLPATCH}"
+			epatch "${POLPATCH}"
 		done
 	fi
 
