@@ -151,7 +151,8 @@ selinux-policy-2_src_prepare() {
 # this for each SELinux policy mentioned in POLICY_TYPES
 selinux-policy-2_src_compile() {
 	for i in ${POLICY_TYPES}; do
-		make NAME=$i -C "${S}"/${i} || die "${i} compile failed"
+		# Parallel builds are broken, so we need to force -j1 here
+		emake -j1 NAME=$i -C "${S}"/${i} || die "${i} compile failed"
 	done
 }
 
