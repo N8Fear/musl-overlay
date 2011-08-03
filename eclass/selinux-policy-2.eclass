@@ -51,7 +51,7 @@ inherit eutils
 IUSE=""
 
 HOMEPAGE="http://www.gentoo.org/proj/en/hardened/selinux/"
-if [[ -n "${BASEPOL}" ]];
+if [[ -n ${BASEPOL} ]];
 then
 	SRC_URI="http://oss.tresys.com/files/refpolicy/refpolicy-${PV}.tar.bz2"
 else
@@ -66,7 +66,7 @@ PATCHBUNDLE="${DISTDIR}/patchbundle-selinux-base-policy-${BASEPOL}.tar.bz2"
 
 # Modules should always depend on at least the first release of the
 # selinux-base-policy for which they are generated.
-if [[ -n "${BASEPOL}" ]];
+if [[ -n ${BASEPOL} ]];
 then
 	RDEPEND=">=sys-apps/policycoreutils-2.0.82
 		>=sec-policy/selinux-base-policy-${PV}"
@@ -113,14 +113,14 @@ selinux-policy-2_src_prepare() {
 	local modfiles
 
 	# Patch the sources with the base patchbundle
-	if [[ -n "${BASEPOL}" ]];
+	if [[ -n ${BASEPOL} ]];
 	then
 		cd "${S}"
 		epatch "${PATCHBUNDLE}"
 	fi
 
 	# Apply the additional patches refered to by the module ebuild
-	if [ -n "${POLICY_PATCH}" ];
+	if [[ -n "${POLICY_PATCH}" ]];
 	then
 		for POLPATCH in "${POLICY_PATCH}";
 		do
