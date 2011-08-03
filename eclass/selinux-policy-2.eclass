@@ -93,11 +93,8 @@ EXPORT_FUNCTIONS ${SELINUX_EXPF}
 selinux-policy-2_src_unpack() {
 	unpack ${A}
 
-	if [[ ${EAPI:-0} -le 1 ]];
-	then
-		# Call src_prepare explicitly for EAPI 0 or 1
-		selinux-policy-2_src_prepare
-	fi
+	# Call src_prepare explicitly for EAPI 0 or 1
+	has "${EAPI:-0}" 0 1 && selinux-policy-2_src_prepare
 }
 
 # @FUNCTION: selinux-policy-2_src_prepare
