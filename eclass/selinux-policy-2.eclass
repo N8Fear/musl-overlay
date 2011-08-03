@@ -120,9 +120,9 @@ selinux-policy-2_src_prepare() {
 	fi
 
 	# Apply the additional patches refered to by the module ebuild
-	if [[ -n "${POLICY_PATCH}" ]];
+	if [[ -n ${POLICY_PATCH} ]];
 	then
-		for POLPATCH in "${POLICY_PATCH}";
+		for POLPATCH in ${POLICY_PATCH};
 		do
 			cd "${S}/refpolicy/policy/modules"
 			epatch "${POLPATCH}"
