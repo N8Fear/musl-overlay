@@ -136,10 +136,12 @@ selinux-policy-2_src_prepare() {
 	done
 
 	for i in ${POLICY_TYPES}; do
-		mkdir "${S}"/${i}
-		cp "${S}"/refpolicy/doc/Makefile.example "${S}"/${i}/Makefile
+		mkdir "${S}"/${i} || die "Failed to create directory ${S}/${i}"
+		cp "${S}"/refpolicy/doc/Makefile.example "${S}"/${i}/Makefile \
+			|| die "Failed to copy Makefile.example to ${S}/${i}/Makefile"
 
-		cp ${modfiles} "${S}"/${i}
+		cp ${modfiles} "${S}"/${i} \
+			|| die "Failed to copy the module files to ${S}/${i}"
 	done
 }
 
@@ -183,7 +185,7 @@ selinux-policy-2_pkg_postinst() {
 	for i in ${POLICY_TYPES}; do
 		einfo "Inserting the following modules into the $i module store: ${MODS}"
 
-		cd /usr/share/selinux/${i}
+		cd /usr/share/selinux/${i} || die "Could not enter /usr/share/selinux/${i}"
 		semodule -s ${i} ${COMMAND} || die "Failed to load in modules ${MODS} in the $i policy store"
 	done
 }
