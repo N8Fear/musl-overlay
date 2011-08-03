@@ -151,7 +151,7 @@ selinux-policy-2_src_prepare() {
 # this for each SELinux policy mentioned in POLICY_TYPES
 selinux-policy-2_src_compile() {
 	for i in ${POLICY_TYPES}; do
-		make NAME=$i -C "${S}"/${i} || die "${i} compile failed"
+		emake NAME=$i -C "${S}"/${i} || die "${i} compile failed"
 	done
 }
 
