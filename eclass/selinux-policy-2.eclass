@@ -53,10 +53,10 @@ IUSE=""
 HOMEPAGE="http://www.gentoo.org/proj/en/hardened/selinux/"
 if [[ -n ${BASEPOL} ]];
 then
-	SRC_URI="http://oss.tresys.com/files/refpolicy/refpolicy-${PV}.tar.bz2"
-else
 	SRC_URI="http://oss.tresys.com/files/refpolicy/refpolicy-${PV}.tar.bz2
 		http://dev.gentoo.org/~blueness/patchbundle-selinux-base-policy/patchbundle-selinux-base-policy-${BASEPOL}.tar.bz2"
+else
+	SRC_URI="http://oss.tresys.com/files/refpolicy/refpolicy-${PV}.tar.bz2"
 fi
 
 LICENSE="GPL-2"
@@ -69,10 +69,10 @@ PATCHBUNDLE="${DISTDIR}/patchbundle-selinux-base-policy-${BASEPOL}.tar.bz2"
 if [[ -n ${BASEPOL} ]];
 then
 	RDEPEND=">=sys-apps/policycoreutils-2.0.82
-		>=sec-policy/selinux-base-policy-${PV}"
+		>=sec-policy/selinux-base-policy-${BASEPOL}"
 else
 	RDEPEND=">=sys-apps/policycoreutils-2.0.82
-		>=sec-policy/selinux-base-policy-${BASEPOL}"
+		>=sec-policy/selinux-base-policy-${PV}"
 fi
 DEPEND="${RDEPEND}
 	sys-devel/m4
