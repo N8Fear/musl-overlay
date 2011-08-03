@@ -131,8 +131,8 @@ selinux-policy-2_src_prepare() {
 
 	# Collect only those files needed for this particular module
 	for i in ${MODS}; do
-		modfiles="`find ${S}/refpolicy/policy/modules -iname $i.te` $modfiles"
-		modfiles="`find ${S}/refpolicy/policy/modules -iname $i.fc` $modfiles"
+		modfiles="$(find ${S}/refpolicy/policy/modules -iname $i.te) $modfiles"
+		modfiles="$(find ${S}/refpolicy/policy/modules -iname $i.fc) $modfiles"
 	done
 
 	for i in ${POLICY_TYPES}; do
