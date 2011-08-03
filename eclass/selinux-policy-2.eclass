@@ -34,7 +34,8 @@
 # @ECLASS-VARIABLE: POLICY_PATCH
 # @DESCRIPTION:
 # This variable contains the additional patch(es) that need to be applied on top
-# of the patchset already contained within the BASEPOL variable. 
+# of the patchset already contained within the BASEPOL variable. The variable
+# can be both a simple string (space-separated) or a bash array.
 : ${POLICY_PATCH:=""}
 
 # @ECLASS-VARIABLE: POLICY_TYPES
@@ -119,14 +120,24 @@ selinux-policy-2_src_prepare() {
 		epatch "${PATCHBUNDLE}"
 	fi
 
-	# Apply the additional patches refered to by the module ebuild
-	if [[ -n ${POLICY_PATCH} ]];
+	# Apply the additional patches refered to by the module ebuild.
+	# But first some magic to differentiate between bash arrays and strings
+	if [[ "$(declare -p POLICY_PATCH 2>/dev/null 2>&1)" == "declare -a"* ]];
 	then
-		for POLPATCH in ${POLICY_PATCH};
+		cd "${S}/refpolicy/policy/modules"
+		for POLPATCH in "${POLICY_PATCH[@]}";
 		do
-			cd "${S}/refpolicy/policy/modules"
 			epatch "${POLPATCH}"
 		done
+	else
+		if [[ -n ${POLICY_PATCH} ]];
+		then
+			cd "${S}/refpolicy/policy/modules"
+			for POLPATCH in ${POLICY_PATCH};
+			do
+				epatch "${POLPATCH}"
+			done
+		fi
 	fi
 
 	# Collect only those files needed for this particular module
