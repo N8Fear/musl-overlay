@@ -29,7 +29,7 @@
 # This variable contains the version string of the selinux-base-policy package
 # that this module build depends on. It is used to patch with the appropriate
 # patch bundle(s) that are part of selinux-base-policy. 
-: ${BASEPOL:="0"}
+: ${BASEPOL:=""}
 
 # @ECLASS-VARIABLE: POLICY_PATCH
 # @DESCRIPTION:
@@ -51,7 +51,7 @@ inherit eutils
 IUSE=""
 
 HOMEPAGE="http://www.gentoo.org/proj/en/hardened/selinux/"
-if [[ "${BASEPOL}" == "0" ]];
+if [[ -n "${BASEPOL}" ]];
 then
 	SRC_URI="http://oss.tresys.com/files/refpolicy/refpolicy-${PV}.tar.bz2"
 else
@@ -66,7 +66,7 @@ PATCHBUNDLE="${DISTDIR}/patchbundle-selinux-base-policy-${BASEPOL}.tar.bz2"
 
 # Modules should always depend on at least the first release of the
 # selinux-base-policy for which they are generated.
-if [[ "${BASEPOL}" == "0" ]];
+if [[ -n "${BASEPOL}" ]];
 then
 	RDEPEND=">=sys-apps/policycoreutils-2.0.82
 		>=sec-policy/selinux-base-policy-${PV}"
@@ -116,7 +116,7 @@ selinux-policy-2_src_prepare() {
 	local modfiles
 
 	# Patch the sources with the base patchbundle
-	if [[ "${BASEPOL}" != "0" ]];
+	if [[ -n "${BASEPOL}" ]];
 	then
 		cd "${S}"
 		epatch "${PATCHBUNDLE}"
