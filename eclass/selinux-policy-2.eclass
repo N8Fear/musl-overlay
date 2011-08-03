@@ -166,7 +166,7 @@ selinux-policy-2_src_install() {
 		for j in ${MODS}; do
 			einfo "Installing ${i} ${j} policy package"
 			insinto ${BASEDIR}/${i}
-			doins "${S}"/${i}/${j}.pp
+			doins "${S}"/${i}/${j}.pp || die "Failed to add ${j}.pp to ${i}"
 		done
 	done
 }
