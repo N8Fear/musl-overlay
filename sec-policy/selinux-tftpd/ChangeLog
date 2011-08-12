@@ -1,0 +1,100 @@
+# ChangeLog for sec-policy/selinux-tftpd
+# Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
+# $Header: /var/cvsroot/gentoo-x86/sec-policy/selinux-tftpd/ChangeLog,v 1.19 2011/06/04 18:37:20 blueness Exp $
+
+  04 Jun 2011; Anthony G. Basile <blueness@gentoo.org>
+  -selinux-tftpd-2.20090730.ebuild, -selinux-tftpd-2.20091215.ebuild,
+  -selinux-tftpd-20080525.ebuild:
+  Removed deprecated policies
+
+  02 Jun 2011; Anthony G. Basile <blueness@gentoo.org>
+  selinux-tftpd-2.20101213.ebuild:
+  Stable amd64 x86
+
+*selinux-tftpd-2.20101213 (05 Feb 2011)
+
+  05 Feb 2011; Anthony G. Basile <blueness@gentoo.org>
+  +selinux-tftpd-2.20101213.ebuild:
+  New upstream policy.
+
+*selinux-tftpd-2.20091215 (16 Dec 2009)
+
+  16 Dec 2009; Chris PeBenito <pebenito@gentoo.org>
+  +selinux-tftpd-2.20091215.ebuild:
+  New upstream release.
+
+  14 Aug 2009; Chris PeBenito <pebenito@gentoo.org>
+  -selinux-tftpd-20070329.ebuild, -selinux-tftpd-20070928.ebuild,
+  selinux-tftpd-20080525.ebuild:
+  Mark 20080525 stable, clear old ebuilds.
+
+*selinux-tftpd-2.20090730 (03 Aug 2009)
+
+  03 Aug 2009; Chris PeBenito <pebenito@gentoo.org>
+  +selinux-tftpd-2.20090730.ebuild:
+  New upstream release.
+
+  18 Jul 2009; Chris PeBenito <pebenito@gentoo.org>
+  selinux-tftpd-20070329.ebuild, selinux-tftpd-20070928.ebuild,
+  selinux-tftpd-20080525.ebuild:
+  Drop alpha, mips, ppc, sparc selinux support.
+
+*selinux-tftpd-20080525 (25 May 2008)
+
+  25 May 2008; Chris PeBenito <pebenito@gentoo.org>
+  +selinux-tftpd-20080525.ebuild:
+  New SVN snapshot.
+
+  16 Mar 2008; Chris PeBenito <pebenito@gentoo.org>
+  -selinux-tftpd-20050701.ebuild, -selinux-tftpd-20061114.ebuild:
+  Remove old ebuilds.
+
+  03 Feb 2008; Chris PeBenito <pebenito@gentoo.org>
+  selinux-tftpd-20070928.ebuild:
+  Mark stable.
+
+*selinux-tftpd-20070928 (26 Nov 2007)
+
+  26 Nov 2007; Chris PeBenito <pebenito@gentoo.org>
+  +selinux-tftpd-20070928.ebuild:
+  New SVN snapshot.
+
+  29 Aug 2007; Christian Heim <phreak@gentoo.org> metadata.xml:
+  Removing kaiowas from metadata due to his retirement (see #61930 for
+  reference).
+
+  04 Jun 2007; Chris PeBenito <pebenito@gentoo.org>
+  selinux-tftpd-20070329.ebuild:
+  Mark stable.
+
+*selinux-tftpd-20070329 (29 Mar 2007)
+
+  29 Mar 2007; Chris PeBenito <pebenito@gentoo.org>
+  +selinux-tftpd-20070329.ebuild:
+  New SVN snapshot.
+
+  22 Feb 2007; Markus Ullmann <jokey@gentoo.org> ChangeLog:
+  Redigest for Manifest2
+
+*selinux-tftpd-20061114 (15 Nov 2006)
+
+  15 Nov 2006; Chris PeBenito <pebenito@gentoo.org>
+  +selinux-tftpd-20061114.ebuild:
+  New SVN snapshot.
+
+*selinux-tftpd-20061008 (10 Oct 2006)
+
+  10 Oct 2006; Chris PeBenito <pebenito@gentoo.org>
+  +selinux-tftpd-20061008.ebuild:
+  First mainstream reference policy testing release.
+
+  18 Sep 2005; petre rodan <kaiowas@gentoo.org>
+  selinux-tftpd-20050701.ebuild:
+  mark stable
+
+*selinux-tftpd-20050701 (23 Aug 2005)
+
+  23 Aug 2005; petre rodan <kaiowas@gentoo.org> +metadata.xml,
+  +selinux-tftpd-20050701.ebuild:
+  initial commit
+

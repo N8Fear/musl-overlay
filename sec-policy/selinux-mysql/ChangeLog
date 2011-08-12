@@ -1,0 +1,181 @@
+# ChangeLog for sec-policy/selinux-mysql
+# Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
+# $Header: /var/cvsroot/gentoo-x86/sec-policy/selinux-mysql/ChangeLog,v 1.35 2011/06/04 17:24:31 blueness Exp $
+
+  04 Jun 2011; Anthony G. Basile <blueness@gentoo.org>
+  -selinux-mysql-2.20090730.ebuild, -selinux-mysql-2.20091215.ebuild,
+  -selinux-mysql-2.20101213.ebuild, -selinux-mysql-20080525.ebuild:
+  Removed deprecated policies
+
+  02 Jun 2011; Anthony G. Basile <blueness@gentoo.org>
+  selinux-mysql-2.20101213-r1.ebuild:
+  Stable amd64 x86
+
+*selinux-mysql-2.20101213-r1 (16 Apr 2011)
+
+  16 Apr 2011; Anthony G. Basile <blueness@gentoo.org>
+  +files/fix-services-mysql-r1.patch, +selinux-mysql-2.20101213-r1.ebuild:
+  Hide cosmetic denials
+
+*selinux-mysql-2.20101213 (05 Feb 2011)
+
+  05 Feb 2011; Anthony G. Basile <blueness@gentoo.org>
+  +selinux-mysql-2.20101213.ebuild:
+  New upstream policy.
+
+*selinux-mysql-2.20091215 (16 Dec 2009)
+
+  16 Dec 2009; Chris PeBenito <pebenito@gentoo.org>
+  +selinux-mysql-2.20091215.ebuild:
+  New upstream release.
+
+  14 Aug 2009; Chris PeBenito <pebenito@gentoo.org>
+  -selinux-mysql-20070329.ebuild, -selinux-mysql-20070928.ebuild,
+  selinux-mysql-20080525.ebuild:
+  Mark 20080525 stable, clear old ebuilds.
+
+*selinux-mysql-2.20090730 (03 Aug 2009)
+
+  03 Aug 2009; Chris PeBenito <pebenito@gentoo.org>
+  +selinux-mysql-2.20090730.ebuild:
+  New upstream release.
+
+  18 Jul 2009; Chris PeBenito <pebenito@gentoo.org>
+  selinux-mysql-20070329.ebuild, selinux-mysql-20070928.ebuild,
+  selinux-mysql-20080525.ebuild:
+  Drop alpha, mips, ppc, sparc selinux support.
+
+*selinux-mysql-20080525 (25 May 2008)
+
+  25 May 2008; Chris PeBenito <pebenito@gentoo.org>
+  +selinux-mysql-20080525.ebuild:
+  New SVN snapshot.
+
+  16 Mar 2008; Chris PeBenito <pebenito@gentoo.org>
+  -selinux-mysql-20051023.ebuild, -selinux-mysql-20051122.ebuild,
+  -selinux-mysql-20061114.ebuild:
+  Remove old ebuilds.
+
+  03 Feb 2008; Chris PeBenito <pebenito@gentoo.org>
+  selinux-mysql-20070928.ebuild:
+  Mark stable.
+
+*selinux-mysql-20070928 (26 Nov 2007)
+
+  26 Nov 2007; Chris PeBenito <pebenito@gentoo.org>
+  +selinux-mysql-20070928.ebuild:
+  New SVN snapshot.
+
+  29 Aug 2007; Christian Heim <phreak@gentoo.org> metadata.xml:
+  Removing kaiowas from metadata due to his retirement (see #61930 for
+  reference).
+
+  04 Jun 2007; Chris PeBenito <pebenito@gentoo.org>
+  selinux-mysql-20070329.ebuild:
+  Mark stable.
+
+*selinux-mysql-20070329 (29 Mar 2007)
+
+  29 Mar 2007; Chris PeBenito <pebenito@gentoo.org>
+  +selinux-mysql-20070329.ebuild:
+  New SVN snapshot.
+
+  22 Feb 2007; Markus Ullmann <jokey@gentoo.org> ChangeLog:
+  Redigest for Manifest2
+
+*selinux-mysql-20061114 (15 Nov 2006)
+
+  15 Nov 2006; Chris PeBenito <pebenito@gentoo.org>
+  +selinux-mysql-20061114.ebuild:
+  New SVN snapshot.
+
+*selinux-mysql-20061008 (10 Oct 2006)
+
+  10 Oct 2006; Chris PeBenito <pebenito@gentoo.org>
+  +selinux-mysql-20061008.ebuild:
+  First mainstream reference policy testing release.
+
+  02 Dec 2005; petre rodan <kaiowas@gentoo.org>
+  selinux-mysql-20051122.ebuild:
+  mark stable on amd64 mips ppc sparc x86
+
+*selinux-mysql-20051122 (28 Nov 2005)
+
+  28 Nov 2005; petre rodan <kaiowas@gentoo.org>
+  -selinux-mysql-20050605.ebuild, +selinux-mysql-20051122.ebuild:
+  merge with upstream
+
+  27 Oct 2005; petre rodan <kaiowas@gentoo.org>
+  selinux-mysql-20051023.ebuild:
+  mark stable on amd64 mips ppc sparc x86
+
+*selinux-mysql-20051023 (24 Oct 2005)
+
+  24 Oct 2005; petre rodan <kaiowas@gentoo.org>
+  -selinux-mysql-20050408.ebuild, -selinux-mysql-20050813.ebuild,
+  +selinux-mysql-20051023.ebuild:
+  added support for replication - fix from upstream
+
+  27 Jun 2005; petre rodan <kaiowas@gentoo.org>
+  -selinux-mysql-20050219.ebuild, selinux-mysql-20050605.ebuild:
+  mark stable
+
+*selinux-mysql-20050605 (26 Jun 2005)
+
+  26 Jun 2005; petre rodan <kaiowas@gentoo.org>
+  +selinux-mysql-20050605.ebuild:
+  merge with upstream
+
+  07 May 2005; petre rodan <kaiowas@gentoo.org>
+  selinux-mysql-20050408.ebuild:
+  mark stable
+
+*selinux-mysql-20050408 (23 Apr 2005)
+
+  23 Apr 2005; petre rodan <kaiowas@gentoo.org>
+  -selinux-mysql-20041119.ebuild, +selinux-mysql-20050408.ebuild:
+  merge with upstream, no semantic diff
+
+  23 Mar 2005; petre rodan <kaiowas@gentoo.org>
+  selinux-mysql-20050219.ebuild:
+  mark stable
+
+*selinux-mysql-20050219 (25 Feb 2005)
+
+  25 Feb 2005; petre rodan <kaiowas@gentoo.org>
+  +selinux-mysql-20050219.ebuild:
+  merge with upstream policy
+
+  12 Dec 2004; petre rodan <kaiowas@gentoo.org>
+  -selinux-mysql-20040514.ebuild, -selinux-mysql-20041006.ebuild,
+  -selinux-mysql-20041109.ebuild:
+  removed old builds
+
+  23 Nov 2004; petre rodan <kaiowas@gentoo.org>
+  selinux-mysql-20041119.ebuild:
+  mark stable
+
+*selinux-mysql-20041119 (22 Nov 2004)
+
+  22 Nov 2004; petre rodan <kaiowas@gentoo.org>
+  +selinux-mysql-20041119.ebuild:
+  merge with nsa policy
+
+*selinux-mysql-20041109 (13 Nov 2004)
+
+  13 Nov 2004; petre rodan <kaiowas@gentoo.org>
+  +selinux-mysql-20041109.ebuild:
+  merge with nsa policy
+
+*selinux-mysql-20041006 (23 Oct 2004)
+
+  23 Oct 2004; petre rodan <kaiowas@gentoo.org> metadata.xml,
+  +selinux-mysql-20041006.ebuild:
+  merge with nsa policy. updated primary maintainer
+
+*selinux-mysql-20040514 (14 May 2004)
+
+  14 May 2004; Chris PeBenito <pebenito@gentoo.org> +metadata.xml,
+  +selinux-mysql-20040514.ebuild:
+  Initial commit.  Additional fixes from Petre Rodan.
+

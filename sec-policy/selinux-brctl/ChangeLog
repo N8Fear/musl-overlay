@@ -1,0 +1,11 @@
+# ChangeLog for sec-policy/selinux-brctl
+# Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
+# $Header: /var/cvsroot/gentoo-x86/sec-policy/selinux-brctl/ChangeLog,v 1.2 2011/06/02 12:08:29 blueness Exp $
+
+  02 Jun 2011; Anthony G. Basile <blueness@gentoo.org>
+  selinux-brctl-2.20101213.ebuild:
+  Stable amd64 x86
+
+  05 Feb 2011; Anthony G. Basile <blueness@gentoo.org> ChangeLog:
+  Initial commit to portage.
+
