@@ -5,6 +5,8 @@ EAPI="4"
 
 IUSE=""
 MODS="dkim"
+DEPEND=">=sec-policy/selinux-base-policy-2.20110726-r1
+	>=sec-policy/selinux-milter-2.20110726"
 
 inherit selinux-policy-2
 
