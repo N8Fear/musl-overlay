@@ -3,11 +3,11 @@
 # $Header: $
 EAPI="4"
 
+DEPEND=">=sec-policy/selinux-ipsec-2.20110726"
+
 IUSE=""
-MODS="ipsec-tools"
-
-inherit selinux-policy-2
-
-DESCRIPTION="SELinux policy for ipsec-tools"
-
+DESCRIPTION="SELinux policy for ipsec-tools (meta-package for ipsec)"
+HOMEPAGE="http://hardened.gentoo.org/selinux"
 KEYWORDS="~amd64 ~x86"
+SLOT="0"
+LICENSE="public-domain"

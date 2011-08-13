@@ -2,6 +2,9 @@
 # Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
 # $Header: /var/cvsroot/gentoo-x86/sec-policy/selinux-ipsec-tools/ChangeLog,v 1.25 2011/06/04 16:49:39 blueness Exp $
 
+  13 Aug 2011; <swift@gentoo.org> selinux-ipsec-tools-2.20110726.ebuild:
+  Revamp to selinux-ipsec
+
   04 Jun 2011; Anthony G. Basile <blueness@gentoo.org>
   -selinux-ipsec-tools-2.20090730.ebuild,
   -selinux-ipsec-tools-2.20091215.ebuild, -selinux-ipsec-tools-20080525.ebuild:
