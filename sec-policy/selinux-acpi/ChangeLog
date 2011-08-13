@@ -2,6 +2,9 @@
 # Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
 # $Header: /var/cvsroot/gentoo-x86/sec-policy/selinux-acpi/ChangeLog,v 1.14 2011/06/04 15:55:12 blueness Exp $
 
+  13 Aug 2011; <swift@gentoo.org> selinux-acpi-2.20110726.ebuild:
+  Depend on selinux-apm, acpi is no SELinux module
+
   04 Jun 2011; Anthony G. Basile <blueness@gentoo.org>
   -selinux-acpi-2.20090730.ebuild, -selinux-acpi-2.20091215.ebuild,
   -selinux-acpi-20080525.ebuild:
