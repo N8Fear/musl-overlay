@@ -5,6 +5,7 @@ EAPI="4"
 
 IUSE=""
 MODS="consolekit"
+POLICY_PATCH="${FILESDIR}/fix-services-consolekit.patch"
 
 inherit selinux-policy-2
 
