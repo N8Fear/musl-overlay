@@ -3,11 +3,11 @@
 # $Header: $
 EAPI="4"
 
+DEPEND=">=sec-policy/selinux-sasl-2.20110726"
+
 IUSE=""
-MODS="cyrus-sasl"
-
-inherit selinux-policy-2
-
-DESCRIPTION="SELinux policy for cyrus-sasl"
-
+DESCRIPTION="SELinux policy for Cyrus-sasl (meta-package for sasl)"
+HOMEPAGE="http://hardened.gentoo.org/selinux"
 KEYWORDS="~amd64 ~x86"
+SLOT="0"
+LICENSE="public-domain"

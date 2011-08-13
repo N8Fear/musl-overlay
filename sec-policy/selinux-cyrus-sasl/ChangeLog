@@ -2,6 +2,11 @@
 # Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
 # $Header: /var/cvsroot/gentoo-x86/sec-policy/selinux-cyrus-sasl/ChangeLog,v 1.20 2011/06/04 16:27:43 blueness Exp $
 
+*selinux-cyrus-sasl-2.20110726 (13 Aug 2011)
+
+  13 Aug 2011; <swift@gentoo.org> +selinux-cyrus-sasl-2.20110726.ebuild:
+  Cyrus-sasl selinux module does not exist, refer to selinux-sasl
+
   04 Jun 2011; Anthony G. Basile <blueness@gentoo.org>
   -selinux-cyrus-sasl-2.20090730.ebuild, -selinux-cyrus-sasl-2.20091215.ebuild,
   -selinux-cyrus-sasl-20080525.ebuild:
