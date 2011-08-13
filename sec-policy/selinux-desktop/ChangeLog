@@ -2,6 +2,9 @@
 # Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
 # $Header: /var/cvsroot/gentoo-x86/sec-policy/selinux-desktop/ChangeLog,v 1.16 2011/06/04 16:38:20 blueness Exp $
 
+  13 Aug 2011; <swift@gentoo.org> selinux-desktop-2.20110726.ebuild:
+  Bump to 2.20110726, make meta-package
+
   04 Jun 2011; Anthony G. Basile <blueness@gentoo.org>
   -selinux-desktop-2.20090730.ebuild, -selinux-desktop-2.20091215.ebuild,
   -selinux-desktop-20080525.ebuild:
