@@ -2,6 +2,9 @@
 # Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
 # $Header: /var/cvsroot/gentoo-x86/sec-policy/selinux-tcpd/ChangeLog,v 1.11 2011/06/04 18:36:12 blueness Exp $
 
+  14 Aug 2011; <swift@gentoo.org> selinux-tcpd-2.20110726.ebuild:
+  Depend in inetd definition
+
   04 Jun 2011; Anthony G. Basile <blueness@gentoo.org>
   -selinux-tcpd-2.20090730.ebuild, -selinux-tcpd-2.20091215.ebuild,
   -selinux-tcpd-20080525.ebuild:

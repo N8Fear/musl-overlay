@@ -9,5 +9,6 @@ MODS="tcpd"
 inherit selinux-policy-2
 
 DESCRIPTION="SELinux policy for tcpd"
+DEPEND="${DEPEND} >=sec-policy/selinux-inetd-2.20110726"
 
 KEYWORDS="~amd64 ~x86"
