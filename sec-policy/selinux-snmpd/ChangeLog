@@ -2,6 +2,9 @@
 # Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
 # $Header: /var/cvsroot/gentoo-x86/sec-policy/selinux-snmpd/ChangeLog,v 1.27 2011/06/04 18:11:52 blueness Exp $
 
+  14 Aug 2011; <swift@gentoo.org> selinux-snmpd-2.20110726.ebuild:
+  Switch package from snmpd to snmp (cfr policy)
+
   04 Jun 2011; Anthony G. Basile <blueness@gentoo.org>
   -selinux-snmpd-2.20090730.ebuild, -selinux-snmpd-2.20091215.ebuild,
   -selinux-snmpd-20080525.ebuild:
