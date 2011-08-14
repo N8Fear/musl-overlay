@@ -5,7 +5,7 @@ EAPI="4"
 
 IUSE=""
 MODS="puppet"
-BASEPOL="2.20110726-r1"
+POLICY_PATCH="${FILESDIR}/fix-services-puppet-r1.patch"
 
 inherit selinux-policy-2
 

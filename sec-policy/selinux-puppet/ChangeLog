@@ -2,6 +2,11 @@
 # Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
 # $Header: /var/cvsroot/gentoo-x86/sec-policy/selinux-puppet/ChangeLog,v 1.3 2011/07/25 23:14:24 blueness Exp $
 
+  14 Aug 2011; <swift@gentoo.org> +files/fix-services-puppet-r1.patch,
+  selinux-puppet-2.20110726-r1.ebuild:
+  Duplicate code so we do not hit seutil_relabelto_bin_policy which causes a
+  build failure
+
 *selinux-puppet-2.20101213-r3 (25 Jul 2011)
 *selinux-puppet-2.20101213-r2 (25 Jul 2011)
 *selinux-puppet-2.20101213-r1 (25 Jul 2011)
