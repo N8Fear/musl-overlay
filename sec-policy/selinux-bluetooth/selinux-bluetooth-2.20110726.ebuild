@@ -9,6 +9,6 @@ MODS="bluetooth"
 inherit selinux-policy-2
 
 DESCRIPTION="SELinux policy for bluetooth"
-DEPEND=">=sec-policy/selinux-base-policy-2.20110726-r1
+RDEPEND=">=sec-policy/selinux-base-policy-2.20110726-r1
 	!<sec-policy/selinux-bluez-2.20110726"
 KEYWORDS="~amd64 ~x86"
