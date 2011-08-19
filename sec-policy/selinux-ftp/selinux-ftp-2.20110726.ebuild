@@ -10,5 +10,5 @@ inherit selinux-policy-2
 
 DESCRIPTION="SELinux policy for ftp"
 KEYWORDS="~amd64 ~x86"
-DEPEND="=sec-policy/selinux-base-policy-2.20110726-r1
+DEPEND=">=sec-policy/selinux-base-policy-2.20110726-r1
 	!<sec-policy/selinux-ftpd-2.20110726"

@@ -9,6 +9,6 @@ MODS="sasl"
 inherit selinux-policy-2
 
 DESCRIPTION="SELinux policy for sasl"
-DEPEND="=sec-policy/selinux-base-policy-2.20110726-r1
+DEPEND=">=sec-policy/selinux-base-policy-2.20110726-r1
 	!<sec-policy/selinux-cyrus-sasl-2.20110726"
 KEYWORDS="~amd64 ~x86"
