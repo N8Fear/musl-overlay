@@ -4,10 +4,11 @@
 EAPI="4"
 
 IUSE=""
-MODS="puppet"
+MODS="consolekit"
 BASEPOL="2.20110726-r2"
 
 inherit selinux-policy-2
 
-DESCRIPTION="SELinux policy for puppet"
+DESCRIPTION="SELinux policy for consolekit"
+
 KEYWORDS="~amd64 ~x86"

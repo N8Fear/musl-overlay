@@ -4,10 +4,10 @@
 EAPI="4"
 
 IUSE=""
-MODS="puppet"
+MODS="zabbix"
 BASEPOL="2.20110726-r2"
 
 inherit selinux-policy-2
 
-DESCRIPTION="SELinux policy for puppet"
+DESCRIPTION="SELinux policy for zabbix"
 KEYWORDS="~amd64 ~x86"
