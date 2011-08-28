@@ -2,6 +2,9 @@
 # Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
 # $Header: /var/cvsroot/gentoo-x86/sec-policy/selinux-puppet/ChangeLog,v 1.3 2011/07/25 23:14:24 blueness Exp $
 
+  28 Aug 2011; <swift@gentoo.org> -files/fix-services-puppet-r1.patch:
+  Remove obsoleted patch
+
   19 Aug 2011; <swift@gentoo.org> selinux-puppet-2.20110726-r1.ebuild:
   Adding updates
 
