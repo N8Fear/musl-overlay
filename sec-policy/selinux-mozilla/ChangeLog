@@ -1,0 +1,51 @@
+# ChangeLog for sec-policy/selinux-mozilla
+# Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
+# $Header: /var/cvsroot/gentoo-x86/sec-policy/selinux-mozilla/ChangeLog,v 1.7 2011/08/28 21:12:42 swift Exp $
+
+*selinux-mozilla-2.20110726-r2 (12 Sep 2011)
+
+  12 Sep 2011; <swift@gentoo.org> +selinux-mozilla-2.20110726-r2.ebuild,
+  +metadata.xml:
+  Support for XDG types
+
+*selinux-mozilla-2.20110726-r1 (28 Aug 2011)
+
+  28 Aug 2011; <swift@gentoo.org> +selinux-mozilla-2.20110726-r1.ebuild:
+  Updating policy builds to refpolicy 20110726
+
+*selinux-mozilla-2.20101213-r4 (07 Aug 2011)
+
+  07 Aug 2011; Anthony G. Basile <blueness@gentoo.org>
+  +files/fix-apps-mozilla-r4.patch, +selinux-mozilla-2.20101213-r4.ebuild:
+  Allow mozilla to read ~/.local
+
+*selinux-mozilla-2.20101213-r3 (10 Jul 2011)
+
+  10 Jul 2011; Anthony G. Basile <blueness@gentoo.org>
+  +files/fix-apps-mozilla-r3.patch, +selinux-mozilla-2.20101213-r3.ebuild:
+  Support proxy plugins and tor
+
+  04 Jun 2011; Anthony G. Basile <blueness@gentoo.org>
+  -selinux-mozilla-2.20101213.ebuild, -selinux-mozilla-2.20101213-r1.ebuild:
+  Removed deprecated policies
+
+  02 Jun 2011; Anthony G. Basile <blueness@gentoo.org>
+  selinux-mozilla-2.20101213-r2.ebuild:
+  Stable amd64 x86
+
+*selinux-mozilla-2.20101213-r2 (20 May 2011)
+
+  20 May 2011; Anthony G. Basile <blueness@gentoo.org>
+  +files/fix-apps-mozilla-r2.patch, +selinux-mozilla-2.20101213-r2.ebuild:
+  Remove obsolete privileges
+
+  05 Feb 2011; Anthony G. Basile <blueness@gentoo.org> ChangeLog:
+  Initial commit to portage.
+
+*selinux-mozilla-2.20101213-r1 (22 Jan 2011)
+
+  22 Jan 2011; <swift@gentoo.org> +selinux-mozilla-2.20101213-r1.ebuild,
+  files/fix-mozilla.patch:
+  Support binary firefox, add call to alsa interface and support tmp type
+  for mozilla
+

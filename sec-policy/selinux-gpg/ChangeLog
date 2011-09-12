@@ -1,0 +1,29 @@
+# ChangeLog for sec-policy/selinux-gpg
+# Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
+# $Header: /var/cvsroot/gentoo-x86/sec-policy/selinux-gpg/ChangeLog,v 1.2 2011/08/28 21:12:43 swift Exp $
+
+*selinux-gpg-2.20110726-r2 (12 Sep 2011)
+
+  12 Sep 2011; <swift@gentoo.org> +selinux-gpg-2.20110726-r2.ebuild,
+  +metadata.xml:
+  Introduce gpg_exec
+
+*selinux-gpg-2.20110726-r1 (28 Aug 2011)
+
+  28 Aug 2011; <swift@gentoo.org> +selinux-gpg-2.20110726-r1.ebuild:
+  Updating policy builds to refpolicy 20110726
+
+  25 Jul 2011; Anthony G. Basile <blueness@gentoo.org>
+  +files/fix-apps-gpg-r2.patch, +selinux-gpg-2.20101213-r2.ebuild,
+  +metadata.xml:
+  Initial commit to tree
+
+  22 Jul 2011; <swift@gentoo.org> selinux-gpg-2.20101213-r2.ebuild:
+  Add proper blocker to automatically switch from gnupg to gpg
+
+*selinux-gpg-2.20101213-r2 (22 Jul 2011)
+
+  22 Jul 2011; <swift@gentoo.org> +selinux-gpg-2.20101213-r2.ebuild,
+  +metadata.xml:
+  Use module-based naming as per Gentoo Hardened SELinux guidelines
+
