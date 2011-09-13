@@ -6,7 +6,6 @@ EAPI="4"
 IUSE=""
 MODS="puppet"
 BASEPOL="2.20110726-r4"
-POLICY_PATCH="${FILESDIR}/puppet_support_gentoo_calls-r2.patch"
 
 inherit selinux-policy-2
 
