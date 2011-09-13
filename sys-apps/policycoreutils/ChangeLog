@@ -2,6 +2,9 @@
 # Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
 # $Header: /var/cvsroot/gentoo-x86/sys-apps/policycoreutils/ChangeLog,v 1.89 2011/08/12 18:46:59 blueness Exp $
 
+  13 Sep 2011; <swift@gentoo.org> policycoreutils-2.1.0-r1.ebuild:
+  Fix paths to patches
+
   12 Sep 2011; <swift@gentoo.org> +policycoreutils-2.1.0-r1.ebuild,
   +metadata.xml:
   Support for semodule permissive
