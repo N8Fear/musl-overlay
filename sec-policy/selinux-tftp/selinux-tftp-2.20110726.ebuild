@@ -11,3 +11,6 @@ inherit selinux-policy-2
 DESCRIPTION="SELinux policy for tftp"
 
 KEYWORDS="~amd64 ~x86"
+RDEPEND="!<=sec-policy/selinux-tftpd-2.20110726
+	>=sys-apps/policycoreutils-2.1.0
+	>=sec-policy/selinux-base-policy-2.20110726"
