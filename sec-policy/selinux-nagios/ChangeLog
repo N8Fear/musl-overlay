@@ -1,0 +1,25 @@
+# ChangeLog for sec-policy/selinux-nagios
+# Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
+# $Header: /var/cvsroot/gentoo-x86/sec-policy/selinux-nagios/ChangeLog,v 1.4 2011/10/23 12:42:54 swift Exp $
+
+*selinux-nagios-2.20110726-r2 (12 Nov 2011)
+
+  12 Nov 2011; <swift@gentoo.org> +selinux-nagios-2.20110726-r2.ebuild,
+  +metadata.xml:
+  Bumping to rev6
+
+  23 Oct 2011; <swift@gentoo.org> selinux-nagios-2.20110726-r1.ebuild:
+  Stabilization (tracker #384231)
+
+*selinux-nagios-2.20110726-r1 (28 Aug 2011)
+
+  28 Aug 2011; <swift@gentoo.org> +selinux-nagios-2.20110726-r1.ebuild:
+  Updating policy builds to refpolicy 20110726
+
+  02 Jun 2011; Anthony G. Basile <blueness@gentoo.org>
+  selinux-nagios-2.20101213.ebuild:
+  Stable amd64 x86
+
+  05 Feb 2011; Anthony G. Basile <blueness@gentoo.org> ChangeLog:
+  Initial commit to portage.
+
