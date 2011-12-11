@@ -1,0 +1,46 @@
+# ChangeLog for sec-policy/selinux-xserver
+# Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
+# $Header: /var/cvsroot/gentoo-x86/sec-policy/selinux-xserver/ChangeLog,v 1.6 2011/11/12 20:53:15 swift Exp $
+
+*selinux-xserver-2.20110726-r1 (06 Dec 2011)
+
+  06 Dec 2011; <swift@gentoo.org> +selinux-xserver-2.20110726-r1.ebuild,
+  +metadata.xml:
+  Introduce context for lxdm and slim
+
+  12 Nov 2011; <swift@gentoo.org> -files/fix-services-xserver-r1.patch,
+  -files/fix-services-xserver-r2.patch, -selinux-xserver-2.20101213-r2.ebuild,
+  -files/fix-xserver.patch:
+  Removing old policies
+
+  23 Oct 2011; <swift@gentoo.org> selinux-xserver-2.20110726.ebuild:
+  Stabilization (tracker #384231)
+
+*selinux-xserver-2.20110726 (28 Aug 2011)
+
+  28 Aug 2011; <swift@gentoo.org> +selinux-xserver-2.20110726.ebuild:
+  Updating policy builds to refpolicy 20110726
+
+  04 Jun 2011; Anthony G. Basile <blueness@gentoo.org>
+  -selinux-xserver-2.20101213.ebuild, -selinux-xserver-2.20101213-r1.ebuild:
+  Removed deprecated policies
+
+  02 Jun 2011; Anthony G. Basile <blueness@gentoo.org>
+  selinux-xserver-2.20101213-r2.ebuild:
+  Stable amd64 x86
+
+  05 Feb 2011; Anthony G. Basile <blueness@gentoo.org> ChangeLog:
+  Initial commit to portage.
+
+*selinux-xserver-2.20101213-r2 (02 Feb 2011)
+
+  02 Feb 2011; <swift@gentoo.org> +files/fix-services-xserver-r2.patch,
+  +selinux-xserver-2.20101213-r2.ebuild:
+  Allow use of ttys (improves console logging)
+
+*selinux-xserver-2.20101213-r1 (31 Jan 2011)
+
+  31 Jan 2011; <swift@gentoo.org> +files/fix-services-xserver-r1.patch,
+  +selinux-xserver-2.20101213-r1.ebuild:
+  Fix large timewait issues with xserver policy
+
