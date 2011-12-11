@@ -11,3 +11,4 @@ inherit selinux-policy-2
 
 DESCRIPTION="SELinux policy for qemu"
 KEYWORDS="~amd64 ~x86"
+RDEPEND="sec-policy/selinux-virt"
