@@ -1,5 +1,8 @@
 
 
   20 Dec 2011; Anthony G. Basile <blueness@gentoo.org> ChangeLog:
+  Added patch from bug #308477
+
+  20 Dec 2011; Anthony G. Basile <blueness@gentoo.org> ChangeLog:
   Initial commit
 

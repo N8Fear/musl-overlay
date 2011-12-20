@@ -170,7 +170,7 @@ src_unpack() {
 		epatch "${WORKDIR}"/patch
 	fi
 
-	epatch "${FILESDIR}"/${P}-BJA-sandbox.diff
+	epatch "${FILESDIR}"/${P}-BJA-sandbox.patch
 
 	########## CPU SELECTION ##########
 
