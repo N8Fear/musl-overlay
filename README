@@ -1,23 +1,5 @@
-This overlay is for Hardened Development, this is where we can test hardened toolchain, bugfixes, packages, profiles and eclasses before
-commiting to the tree.
+This is the README only for the uclibc branch.  See the README in main branch
+for information about the entire overlay.
 
-Keep the entire overlay to that of gentoo policy, all functions of the overlay will work there way to the tree, once we reach a state
-that is acceptable for use by the users.
-
-For help on using and testing the overlay please refer to :
-Forum tread http://forums.gentoo.org/viewtopic-t-790110.html
-
-Bugs should be filled on bugs.gentoo.org, please ensure that you make it clear that the bug is
-caused or a part of the hardened-dev overlay, if you are unsure file an advanced bug report and 
-assign to hardened-dev@gentoo.org and someone from dev team will reassign if needed; more 
-The testing branch is if we need to do major change on this overlay.
-
-Commiters:
-Magnus Granberg		(Zorry)			<zorry@gentoo.org>
-Jory A. Pratt		(Anarchy)		<anarchy@gentoo.org>
-Peter Hjalmarsson	(Xake)			<xake@rymdraket.net>
-Anthony G. Basile	(blueness)		<blueness@gentoo.org>
-Chris Richards		(gizmo)			<gizmo@giz-works.com> - SELinux
-Sven Vermeulen		(SwifT)			<sven.vermeulen@siphos.be> - SELinux
-
-2010-11-25 Magnus Granberg (Zorry) <zorry@gentoo.org>
+This overlay/branch is to set up a profile for hardened x86 and x86_64 uclibc
+based system.

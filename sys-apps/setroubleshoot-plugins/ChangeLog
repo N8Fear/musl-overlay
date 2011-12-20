@@ -1,8 +1,0 @@
-
-
-*setroubleshoot-plugins-3.0.14.2.15 (17 Apr 2011)
-
-  17 Apr 2011; Anthony G. Basile <blueness@gentoo.org>
-  +setroubleshoot-plugins-3.0.14.2.15.ebuild, +metadata.xml:
-  Initial commit
-
