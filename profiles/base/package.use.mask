@@ -1,0 +1,342 @@
+# Copyright 1999-2011 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+# $Header: /var/cvsroot/gentoo-x86/profiles/base/package.use.mask,v 1.295 2011/12/06 22:00:09 vapier Exp $
+
+# This file requires >=portage-2.1.1
+# New entries go on top.
+
+# Mike Frysinger <vapier@gentoo.org> (06 Dec 2011)
+# No one should be mucking with libssp unless they really know what they're
+# doing.  Force extra work on the smart peeps to protect the not-so-smart.
+sys-devel/gcc libssp
+
+# Samuli Suominen <ssuominen@gentoo.org> (06 Dec 2011)
+# NuppelVideo is available on x86 only
+media-video/transcode nuv pic
+
+# Andreas K. Huettel <dilfridge@gentoo.org> (01 Dec 2011)
+# The phonon xine backend is unmaintained and makes trouble
+media-libs/phonon xine
+kde-base/phonon-kde xine
+
+# Davide Pesavento <pesa@gentoo.org> (30 Nov 2011)
+# JavaScriptCore JIT is supported only on amd64/arm/x86, so
+# mask USE="jit" here and unmask it in the relevant arch profiles
+>=x11-libs/qt-webkit-4.7 jit
+
+# Samuli Suominen <ssuominen@gentoo.org> (25 Nov 2011)
+# Expose USE="suid" for USE="svga" only for x86 users,
+# see arch/x86/package.use.mask
+www-client/links suid
+
+# Kacper Kowalik <xarthisius@gentoo.org> (09 Nov 2011)
+# pathdb works only as a SIGSEGV generator, mask until upstream
+# fixes it bug #385683
+dev-lang/path64 debugger
+
+# Alexandre Rostovtsev <tetromino@gentoo.org> (31 Oct 2011)
+# Let's not suddenly enable clutter on stable evolution versions
+<mail-client/evolution-3 clutter
+
+# Samuli Suominen <ssuominen@gentoo.org> (16 Oct 2011)
+# Mask libbluray support here, and enable it per arch instead
+gnome-base/gvfs bluray
+
+# Alex Legler <a3li@gentoo.org> (13 Oct 2011)
+# The Ubuntu ALSA patch for tvtime is still somewhat unstable
+# c.f. bug 384215
+media-tv/tvtime alsa
+
+# Pawel Hajdan jr <phajdan.jr@gentoo.org> (12 Oct 2011)
+# Upstream support not yet ready:
+# http://code.google.com/p/chromium/issues/detail?id=32757
+# Feel free to file a Gentoo bug to unmask the flag
+# when above upstream bug is closed.
+www-client/chromium pulseaudio
+
+# Nirbheek Chauhan <nirbheek@gentoo.org> (17 Sep 2011)
+# Systemtap is not keyworded on anything except amd64/x86
+# Temporarily mask instead of dropping keywords, bug 384647
+dev-libs/glib systemtap
+
+# Markos Chandras <hwoarang@gentoo.org> (19 Aug 2011)
+# Masking rbd spice from qemu-kvm per bug #364889
+app-emulation/qemu-kvm rbd
+
+# Nirbheek Chauhan <nirbheek@gentoo.org> (16 Aug 2011)
+# Mask introspection on ebuilds that went stable before it was unmasked.
+# As these ebuilds are cleaned from the tree, the masks can be removed.
+<dev-libs/glib-2.30.0 introspection
+<dev-libs/atk-1.32.0-r1 introspection
+<app-cdr/brasero-2.32.1-r1 introspection
+<app-crypt/seahorse-2.32.0-r1 introspection
+<app-text/evince-2.32.0-r4 introspection
+<dev-libs/libgdata-0.8.1-r1 introspection
+<dev-libs/libunique-1.1.6-r1 introspection
+<dev-libs/totem-pl-parser-2.32.5-r1 introspection
+<dev-python/pygobject-2.28 introspection
+<dev-util/anjuta-2.32.1.1-r1 introspection
+<gnome-base/dconf-0.5.1-r3 introspection
+<gnome-base/gconf-2.32.4 introspection
+<gnome-base/gnome-menus-2.30.5-r1 introspection
+<gnome-base/gnome-panel-2.32.1-r3 introspection
+<gnome-base/nautilus-2.32.2.1-r2 introspection
+<gnome-extra/gucharmap-2.32.1-r1 introspection
+<media-libs/babl-0.1.4-r1 introspection
+<media-libs/clutter-1.6 introspection
+<media-libs/clutter-gtk-1 introspection
+<media-libs/gstreamer-0.10.33 introspection
+<media-libs/gst-plugins-base-0.10.33 introspection
+<media-libs/libchamplain-0.9 introspection
+<net-libs/gssdp-0.8 introspection
+<net-libs/gupnp-0.15 introspection
+<net-libs/libsoup-2.34 introspection
+<net-libs/libsoup-gnome-2.34 introspection
+<net-wireless/gnome-bluetooth-2.32.0-r1 introspection
+<www-client/epiphany-3 introspection
+<x11-libs/libwnck-2.30.6-r1 introspection
+<x11-libs/pango-1.28.4 introspection
+
+# Anthony G. Basile <blueness@gentoo.org> (22 Jul 2011)
+# nat-pmp and upnp are only stable on amd64/x86 for this package
+>=net-misc/tor-0.2.3 nat-pmp upnp
+
+# Robin H. Johnson <robbat2@gentoo.org> (10 Jul 2011)
+# PPS should work on all arches, but only keyworded on amd64/x86
+>=net-misc/ntp-4.2.6_p3-r1 parse-clocks
+
+# Bernard Cafarelli <voyageur@gentoo.org> (6 Jun 2011)
+# libobjc2/clang only works on some arches
+gnustep-base/gnustep-make libobjc2
+
+# Andrey Grozin <grozin@gentoo.org> (29 Mar 2011)
+# dev-lang/swig-2.0.2 with -octave generated .cpp files
+# incompatible with >=sci-mathematics/octave-3.4.0
+sci-libs/mathgl octave
+
+# Samuli Suominen <ssuominen@gentoo.org> (29 Mar 2011)
+# This would need x11-libs/gtk+:3 stable.
+x11-libs/libnotify test
+
+# Luca Barbato <lu_zero@gentoo.org> (28 Mar 2011)
+# Mask mplayer2 arch specific flags
+media-video/mplayer2 vdpau bluray
+
+# Diego E. Pettenò <flameeyes@gentoo.org> (27 Mar 2011)
+#
+# Mask pdnsd's Linux-specific USE flags.
+net-dns/pdnsd isdn urandom
+
+# Gilles Dartiguelongue <eva@gentoo.org> (26 Mar 2011)
+# Mask due to unsatisfied dependencies
+# applet is required for the search panel applet
+>=app-misc/tracker-0.10 applet
+
+# Ultrabug <ultrabug@gentoo.org> (20 Mar 2011)
+# Mask clustering support until new sys-cluster/cman is pushed.
+sys-fs/lvm2 clvm cman
+
+# Gilles Dartiguelongue <eva@gentoo.org> (23 Feb 2011)
+# libgnome[esd] ABI broken, bug #348644 and bug #352260.
+>=gnome-base/libgnome-2.32 esd
+app-text/stardict pronounce
+
+# Raúl Porcel <armin76@gentoo.org> (13 Feb 2011)
+# Masked until devs know how to use repoman
+<media-video/mplayer-9999 bluray
+
+# Diego Elio Pettenò <flameeyes@gentoo.org> (02 Dec 2010)
+# Unmask as soon as bio2jack is back into stable (0.9-r1 or later).
+media-plugins/audacious-plugins jack
+
+# Robin H. Johnson <robbat2@gentoo.org> (28 Nov 2010)
+# bug 344885: USE=debug causes compile to fail presently.
+=dev-db/mysql-5.1.51* debug
+=dev-db/mysql-5.1.52* debug
+=dev-db/mysql-5.1.53* debug
+
+# Chí-Thanh Christopher Nguyễn <chithanh@gentoo.org> (28 Nov 2010)
+# sys-devel/llvm is not keyworded on many arches, bug #320221
+media-libs/mesa llvm
+
+# Justin Lecher <jlec@gentoo.org> (17 Nov 2010)
+# Upstream didn't release patches for aria yet
+>=sci-chemistry/cns-1.3 aria
+
+# Patrick Lauer <patrick@gentoo.org> (15 Sep 2010)
+# Feature broken in dovecot-1, see #337014
+<net-mail/dovecot-2 bzip2
+
+# Tomáš Chvátal <scarabeus@gentoo.org> (8 Sep 2010)
+# drm don't even build here so mask everywhere expect live.
+# openvg require openvg-1.1 implemenatation so mask until there is some
+<x11-libs/cairo-9999 drm openvg
+
+# Alex Legler <a3li@gentoo.org> (1 Sep 2010)
+# This feature is marked as experimental by upstream.
+dev-lang/ruby-enterprise fastthreading
+
+# Chí-Thanh Christopher Nguyễn <chithanh@gentoo.org> (12 Jul 2010)
+# lirc support is broken in the snapshot
+>=www-plugins/gnash-0.8.7_p20100706 lirc
+
+# Nirbheek Chauhan <nirbheek@gentoo.org> (29 Jun 2010)
+# Mask clutter till clutter games are usable
+=gnome-extra/gnome-games-2.3* clutter
+
+# Nirbheek Chauhan <nirbheek@gentoo.org> (26 Jun 2010)
+# Inter-process communication doesn't work on anything except x86/amd64/arm
+# due to lack of atomic ops, bug 325185
+net-libs/xulrunner ipc
+www-client/firefox ipc
+www-client/icecat ipc
+
+# Tomas Touceda <chiiph@gentoo.org> (13 Apr 2010)
+# Masked because libsvm module is broken with this release on every arch.
+dev-lisp/clisp svm
+
+# Tomáš Chvátal <scarabeus@gentoo.org> (4 Apr 2010)
+# Masked because tools pulled in are not supported on most archs.
+sys-power/pm-utils video_cards_intel video_cards_radeon
+
+# Diego E. Pettenò <flameeyes@gmail.com> (18 Jan 2010)
+# Don't use system-wide mode unless you *really* know what you're doing.
+# Keep it masked here so that I don't need to manage two versions every time.
+media-sound/pulseaudio system-wide
+
+# Jeremy Olexa <darkside@gentoo.org> (10 Jan 2010)
+# Upsteam doesn't support ioctl backend and neither does Gentoo. ioctl USE flag
+# will eventually be removed unless the backend is re-written by upstream. bug
+# 299674
+>net-misc/wicd-1.6.2.2 ioctl
+
+# Andrey Grozin <grozin@gentoo.org> (7 Jan 2010)
+# gcl is, unfortunately, masked
+# I have problems with cmucl, masked for investigation
+sci-mathematics/fricas gcl cmucl
+
+# Tomáš Chvátal <scarabeus@gentoo.org> (6 Jan 2010)
+# Still not really functional, upstream requires not building it.
+x11-libs/cairo gallium
+
+# Alexey Shvetsov <alexxy@gentoo.org> (3 Dec 2009)
+# Mask very experimental mpi use flag dfor gamess
+sci-chemistry/gamess mpi
+
+# Mounir Lamouri <volkmar@gentoo.org> (07 Nov 2009)
+# Mask cuda for k3d. Works only on amd64/x86. Bug 267264
+media-gfx/k3d cuda
+
+# Gilles Dartiguelongue <eva@gentoo.org> (01 Nov 2009)
+# Broken on so many setups it is just insane.
+# 0.7 is API/ABI incompatible but is the way to go.
+# Masking to lower maintainance headache, bug #291501.
+media-video/totem tracker
+
+# Tomáš Chvátal <scarabeus@gentoo.org> (27 Oct 2009)
+# Broken on so many setups it is just insane.
+# Unmask if you really know what you are doing.
+<sys-apps/groff-1.20.1-r2 linguas_ja
+
+# Samuli Suominen <ssuominen@gentoo.org) (14 Oct 2009)
+# Conflict with dev-libs/libffi in ld.so.conf.
+sys-devel/gcc libffi
+
+# Samuli Suominen <ssuominen@gentoo.org> (09 Oct 2009)
+# log4cxx has known memory leaking issues wrt bug #287697,
+# unmask when log4cxx is fixed and stable.
+app-misc/strigi log
+
+# Jean-Noël Rivasseau <elvanor@gentoo.org> (23 Sep 2009)
+# X use flag only for amd64/x86, bug 285951.
+media-gfx/iscan X
+
+# Alex Legler <a3li@gentoo.org> (16 Sep 2009)
+# Maintainer of the kolab patch is not available (wrobel).
+# Bump is needed for security bug 285052.
+>=www-apps/horde-webmail-1.2.4 kolab
+
+# Tomáš Chvátal <scarabeus@gentoo.org> (10 Sep 2009)
+# quakeforge has video_cards_tdfx enabled only for x86
+games-fps/quakeforge video_cards_tdfx
+
+# Marijn Schouten <hkBst@gentoo.org> (03 Aug 2009)
+# gcl is an old piece of crap that has a lot of problems
+# Andrey Grozin <grozin@gentoo.org> (24 Dec 2009)
+# openmcl (aka clozurecl) is only available on x86 and amd64
+sci-mathematics/maxima gcl openmcl clozurecl
+
+# Tomas Chvatal <scarabeus@gentoo.org> (31 Jan 2009)
+# mask cuda for boinc. Works only on amd64 and x86
+sci-misc/boinc cuda
+
+# Robert Buchholz <rbu@gentoo.org> (16 Aug 2008)
+# TLS needs dev-libs/cryptlib, which is x86 only
+dev-python/kaa-base tls
+
+# Serkan Kaba <serkan@gentoo.org> (20 Jul 2008)
+# Java is not supported in most of the arches enchant is keyworded
+app-text/enchant zemberek
+
+# Peter Alfredsen <loki_val@gentoo.org> (25 Jun 2008)
+# Php module fails to build due to newer autotools.
+>=media-libs/ming-0.4.0_beta5 php
+
+dev-java/sun-jdk nsplugin
+dev-java/sun-jre-bin nsplugin
+dev-java/ibm-jdk-bin nsplugin
+dev-java/ibm-jre-bin nsplugin
+
+# These are for BSD only
+net-proxy/squid ipf-transparent pf-transparent
+app-admin/sshguard ipfilter
+
+# Linking against libnfsidmap requires libs in /usr #149472
+sys-apps/acl nfs
+
+# Christian Faulhammer <opfer@gentoo.org> (14 Jan 2008)
+# only works on x86, where this will be unmasked
+dev-java/ibm-jdk-bin alsa
+dev-java/ibm-jre-bin alsa
+
+# Raúl Porcel <armin76@gentoo.org> (09 Nov 2008)
+# CPU opts: This needs amd64, x86 and ppc on some of them
+# dvdnav: hard masked dependency
+# vdpau: availble on x86, amd64 only
+media-video/mplayer cpudetection custom-cpuopts bindist vdpau
+
+# Steve Dibb <beandog@gentoo.org> (26 Feb 2009)
+# Unmask internal real player codec support on newer mplayer
+>=media-video/mplayer-1.0_rc2_p20090226 -real
+
+# Arun Raghavan <ford_prefect@gentoo.org> (19 Nov 2010)
+# Mart Raudsepp <leio@gentoo.org> (27 Dec 2010)
+# Arun Raghavan <ford_prefect@gentoo.org> (30 Jan 2011)
+# Mart Raudsepp <leio@gentoo.org> (20 Mar 2011)
+# Mart Raudsepp <leio@gentoo.org> (12 Apr 2011)
+# Arun Raghavan <ford_prefect@gentoo.org> (27 Sep 2011)
+# Orc isn't yet ready to be used on anything other than x86/amd64/arm
+>=media-libs/gst-plugins-base-0.10.30 orc
+>=media-plugins/gst-plugins-a52dec-0.10.16 orc
+>=media-plugins/gst-plugins-ffmpeg-0.10.11 orc
+>=media-libs/gst-plugins-good-0.10.28 orc
+>=media-libs/gst-plugins-bad-0.10.21 orc
+>=media-sound/pulseaudio-1.0 orc
+
+# Alexis Ballier <aballier@gentoo.org> <16 Feb 2011>
+# Win32 specific useflags for vlc. Can be used for cross-compiling.
+media-video/vlc direct2d directx dshow dxva2 waveout wingdi
+# Mac OSX / iPhone OS specific useflags
+media-video/vlc audioqueue ios-vout macosx macosx-audio macosx-dialog-provider macosx-eyetv macosx-quartztext macosx-qtcapture macosx-qtkit macosx-vout
+# media-library does not build
+media-video/vlc media-library
+
+# Alexis Ballier <aballier@gentoo.org> <28 Apr 2011>
+# Requires masked libcelt
+# Leave it unmasked for live ebuild, people should know what they do if they use
+# it anyway
+<media-video/ffmpeg-9999 celt
+
+# Alexis Ballier <aballier@gentoo.org> <5 Oct 2011>
+# harfbuzz support does not build for now, leave the useflag be and unmask it later
+media-libs/libass harfbuzz
