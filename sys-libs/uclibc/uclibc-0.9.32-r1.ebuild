@@ -19,9 +19,9 @@ if [[ ${CTARGET} == ${CHOST} ]] && [[ ${CHOST} != *-uclibc* ]] ; then
 	export CTARGET=${CHOST%%-*}-pc-linux-uclibc
 fi
 
-MY_P=uClibc-0.9.30.1
+MY_P=uClibc-0.9.32
+PATCH_VER=""
 SVN_VER=""
-PATCH_VER="1.0"
 DESCRIPTION="C library for developing embedded Linux systems"
 HOMEPAGE="http://www.uclibc.org/"
 SRC_URI="http://uclibc.org/downloads/${MY_P}.tar.bz2"
@@ -34,12 +34,12 @@ SRC_URI="http://uclibc.org/downloads/${MY_P}.tar.bz2"
 LICENSE="LGPL-2"
 SLOT="0"
 KEYWORDS="-* ~amd64 ~arm ~m68k ~mips ~ppc ~sh ~sparc ~x86"
-IUSE="build uclibc-compat debug hardened ssp ipv6 minimal wordexp crosscompile_opts_headers-only"
+IUSE="build uclibc-compat debug hardened ssp ipv6 minimal nptl wordexp crosscompile_opts_headers-only"
 RESTRICT="strip"
 
 RDEPEND=""
 if [[ -n $CTARGET && ${CTARGET} != ${CHOST} ]]; then
-	DEPEND=""
+	DEPEND=">=cross-${CTARGET}/binutils-2.21.51.0.7"
 	SLOT="${CTARGET}"
 else
 	DEPEND="virtual/os-headers app-misc/pax-utils"
@@ -88,12 +88,12 @@ PIE_STABLE="arm mips ppc x86"
 
 CPU_ALPHA=""
 CPU_AMD64=""
-CPU_ARM="GENERIC_ARM ARM{610,710,7TDMI,720T,920T,922T,926T,10T,1136JF_S,1176JZ{_,F_}S,_{SA110,SA1100,XSCALE,IWMMXT}}"
+CPU_ARM="GENERIC_ARM ARM{610,710,7TDMI,720T,920T,922T,926T,10T,1136JF_S,1176JZ{_,F_}S,_{SA110,SA1100,XSCALE,IWMMXT},_CORTEX_{M3,M1}}"
 CPU_IA64=""
 CPU_M68K=""
-CPU_MIPS="MIPS_ISA_{1,2,3,4,MIPS{32,64}} MIPS_{N64,O32,N32}_ABI"
+CPU_MIPS="MIPS_ISA_{1,2,3,4,MIPS{32{,R2},64}} MIPS_{N64,O32,N32}_ABI"
 CPU_PPC=""
-CPU_SH="SH{2,3,4,5}"
+CPU_SH="SH{2,2A,3,4,5}"
 CPU_SPARC="SPARC_V{7,8,9,9B}"
 CPU_X86="GENERIC_386 {3,4,5,6}86 586MMX PENTIUM{II,III,4} K{6,7} ELAN CRUSOE WINCHIP{C6,2} CYRIXIII NEHEMIAH"
 IUSE_UCLIBC_CPU="${CPU_ARM} ${CPU_MIPS} ${CPU_PPC} ${CPU_SH} ${CPU_SPARC} ${CPU_X86}"
@@ -170,7 +170,7 @@ src_unpack() {
 		epatch "${WORKDIR}"/patch
 	fi
 
-	sed -i 's:getline:get_line:' extra/scripts/unifdef.c #277186
+	epatch "${FILESDIR}"/${P}-BJA-sandbox.patch
 
 	########## CPU SELECTION ##########
 
@@ -247,6 +247,9 @@ src_unpack() {
 	done
 	set_opt UCLIBC_HAS_CTYPE_UNSAFE n
 	set_opt UCLIBC_HAS_LOCALE n
+	set_opt HAS_NO_THREADS n
+
+	use nptl && set_opt LINUXTHREADS_NEW y
 
 	use ipv6 && set_opt UCLIBC_HAS_IPV6 y
 

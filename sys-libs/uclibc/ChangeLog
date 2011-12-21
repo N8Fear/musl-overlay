@@ -1,5 +1,8 @@
 
 
+  21 Dec 2011; Anthony G. Basile <blueness@gentoo.org> ChangeLog:
+  Fix __libc_epoll_pwait compile failure on x86
+
   20 Dec 2011; Anthony G. Basile <blueness@gentoo.org> ChangeLog:
   Added patch from bug #308477
 

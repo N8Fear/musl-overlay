@@ -171,6 +171,7 @@ src_unpack() {
 	fi
 
 	epatch "${FILESDIR}"/${P}-BJA-sandbox.patch
+	epatch "${FILESDIR}"/${P}-fix_epoll.patch
 
 	########## CPU SELECTION ##########
 
