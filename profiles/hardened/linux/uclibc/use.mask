@@ -1,3 +1,5 @@
+nls
+
 emul-linux-x86
 -uclibc
 
