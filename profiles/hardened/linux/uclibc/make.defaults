@@ -2,7 +2,7 @@ CFLAGS="-Os"
 CXXFLAGS="${CFLAGS}"
 PORTAGE_LIBC="uClibc"
 ELIBC=uclibc
-FEATURES="sandbox sfperms strict nodoc noinfo noman"
+FEATURES="sandbox sfperms strict"
 
-USE="ncurses readline zlib uclibc -fortran -pam -berkdb -ipv6 -pppd"
+USE="ncurses readline zlib uclibc -pam"
 BOOTSTRAP_USE="${BOOTSTRAP_USE} uclibc"

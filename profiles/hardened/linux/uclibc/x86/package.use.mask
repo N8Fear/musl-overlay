@@ -1,5 +1,1 @@
-# Copyright 1999-2009 Gentoo Foundation
-# Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/profiles/uclibc/x86/package.use.mask,v 1.4 2010/03/31 16:07:57 caster Exp $
-
 sys-devel/gcc -hardened
