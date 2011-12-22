@@ -1,2 +1,5 @@
 -sys-libs/uclibc
 sys-libs/glibc
+
+# Seriously broken past this version
+>sys-fs/udev-141
