@@ -1,4 +1,5 @@
 nls
+iconv
 
 emul-linux-x86
 -uclibc
