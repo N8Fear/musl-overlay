@@ -33,7 +33,7 @@ SRC_URI="http://uclibc.org/downloads/${MY_P}.tar.bz2"
 
 LICENSE="LGPL-2"
 SLOT="0"
-KEYWORDS="-* ~amd64 ~arm ~m68k ~mips ~ppc ~sh ~sparc ~x86"
+KEYWORDS="-* amd64 x86"
 IUSE="build uclibc-compat debug hardened ssp ipv6 minimal nptl wordexp crosscompile_opts_headers-only"
 RESTRICT="strip"
 

@@ -10,11 +10,10 @@ PIE_VER="0.4.5"
 SPECS_VER="0.2.0"
 SPECS_GCC_VER="4.4.3"
 # arch/libc configurations known to be stable with {PIE,SSP}-by-default
-PIE_GLIBC_STABLE="x86 amd64 ppc ppc64 arm ia64"
-PIE_UCLIBC_STABLE="x86 arm amd64 ppc ppc64"
-SSP_STABLE="amd64 x86 ppc ppc64 arm"
-# uclibc need tls and nptl support for SSP support
-SSP_UCLIBC_STABLE=""
+PIE_GLIBC_STABLE="x86 amd64"
+PIE_UCLIBC_STABLE="x86 amd64"
+SSP_STABLE="amd64 x86"
+SSP_UCLIBC_STABLE="amd64 x86"
 #end Hardened stuff
 
 inherit toolchain

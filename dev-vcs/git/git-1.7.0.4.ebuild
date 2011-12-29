@@ -9,7 +9,7 @@ inherit toolchain-funcs
 DESCRIPTION="GIT - the stupid content tracker, the revision control system heavily used by the Linux kernel team"
 HOMEPAGE="http://www.git-scm.com/"
 SRC_URI="http://dev.gentoo.org/~blueness/misc/${P}.tgz"
-KEYWORDS="~amd64 ~x86"
+KEYWORDS="amd64 x86"
 
 LICENSE="GPL-2"
 SLOT="0"
