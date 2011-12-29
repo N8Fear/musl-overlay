@@ -37,7 +37,7 @@ src_prepare() {
 }
 
 git_emake() {
-	emake ${MY_MAKEOPTS} \
+	emake "NO_NSEC=YesPlease NO_ICONV=YesPlease" \
 		DESTDIR="${D}" \
 		OPTCFLAGS="${CFLAGS}" \
 		OPTLDFLAGS="${LDFLAGS}" \
@@ -45,15 +45,6 @@ git_emake() {
 		OPTAR="$(tc-getAR)" \
 		prefix=/usr \
 		"$@"
-}
-
-src_configure() {
-	local myopts
-
-	[[ "${CHOST}" == *-uclibc* ]] && \
-		myopts="${myopts} NO_NSEC=YesPlease"
-
-	export MY_MAKEOPTS="${myopts}"
 }
 
 src_compile() {
