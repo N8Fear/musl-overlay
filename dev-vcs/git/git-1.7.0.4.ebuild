@@ -61,5 +61,5 @@ src_compile() {
 }
 
 src_install() {
-	git_emake install 
+	git_emake install
 }
