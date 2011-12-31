@@ -7,7 +7,7 @@ dev-libs/glib
 >app-admin/sudo-1.7.4_p5
 >app-text/tree-1.5.3
 >dev-util/pkgconfig-0.25-r2
->dev-vcs/git-1.7.0.4
+>dev-vcs/git-1.7
 >net-misc/dhcp-3.1.2_p1
 >sys-apps/coreutils-8.5-r1
 >sys-apps/util-linux-2.18-r1
