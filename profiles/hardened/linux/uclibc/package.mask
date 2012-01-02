@@ -1,5 +1,4 @@
 -sys-libs/uclibc
 sys-libs/glibc
 
-sys-devel/gettext
 dev-libs/glib
