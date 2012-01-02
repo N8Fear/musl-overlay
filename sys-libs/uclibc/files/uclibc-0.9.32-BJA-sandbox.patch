@@ -1,9 +1,0 @@
---- ./libubacktrace/Makefile.in.ori	2011-07-25 19:14:19.427297221 +0200
-+++ ./libubacktrace/Makefile.in	2011-07-25 19:14:34.380349907 +0200
-@@ -71,5 +71,4 @@
- 	$(do_ar)
- 
- CLEAN_libubacktrace:
--	$(do_rm) $(addprefix $(libubacktrace_OUT)/*., o os oS a) \
--	 $(addprefix $(libubacktrace_ARCH_OUT)/*., o os oS a)
-+	$(do_rm) $(addprefix $(libubacktrace_OUT)/*., o os oS a)
