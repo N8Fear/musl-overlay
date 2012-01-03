@@ -12,31 +12,24 @@ MY_P="${MY_PN}-${PV}"
 HOMEPAGE="http://www.kernel.org/pub/linux/libs/pam/"
 DESCRIPTION="Linux-PAM (Pluggable Authentication Modules)"
 
-SRC_URI="mirror://kernel/linux/libs/pam/library/${MY_P}.tar.bz2
-	mirror://kernel/linux/libs/pam/documentation/${MY_P}-docs.tar.bz2"
+SRC_URI="http://mirror.anl.gov/pub/linux/libs/pam/library/${MY_P}.tar.bz2"
 
 LICENSE="|| ( BSD GPL-2 )"
 SLOT="0"
-KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~amd64-linux ~ia64-linux ~x86-linux"
-IUSE="cracklib nls elibc_FreeBSD selinux vim-syntax audit test elibc_glibc debug berkdb"
+KEYWORDS="~amd64 ~x86"
+IUSE="cracklib nls vim-syntax audit test debug berkdb"
 
 RDEPEND="nls? ( virtual/libintl )
 	cracklib? ( >=sys-libs/cracklib-2.8.3 )
 	audit? ( sys-process/audit )
-	selinux? ( >=sys-libs/libselinux-1.28 )
-	berkdb? ( sys-libs/db )
-	elibc_glibc? ( >=sys-libs/glibc-2.7 )"
+	berkdb? ( sys-libs/db )"
 DEPEND="${RDEPEND}
 	sys-devel/flex
 	nls? ( sys-devel/gettext )"
 PDEPEND="sys-auth/pambase
 	vim-syntax? ( app-vim/pam-syntax )"
-RDEPEND="${RDEPEND}
-	!sys-auth/pam_userdb"
 
 S="${WORKDIR}/${MY_P}"
-
-PROVIDE="virtual/pam"
 
 check_old_modules() {
 	local retval="0"
@@ -88,27 +81,13 @@ src_prepare() {
 	# library suffix but no suffix on the ELF symbols).
 	epatch "${FILESDIR}/${MY_PN}-1.1.1-gentoodb.patch"
 
-	# Fix building of doc/specs, see bug 339174
-	epatch "${FILESDIR}/${MY_PN}-1.0.4-cross-compile.patch"
-
-	# Remove libtool-2 libtool macros, see bug 261167
-	rm m4/libtool.m4 m4/lt*.m4 || die "rm libtool macros failed."
-
 	eautoreconf
-
 	elibtoolize
 }
 
 src_configure() {
 	local myconf
 
-	if use hppa || use elibc_FreeBSD; then
-		myconf="${myconf} --disable-pie"
-	fi
-
-	# Disable automatic detection of libxcrypt; we _don't_ want the
-	# user to link libxcrypt in by default, since we won't track the
-	# dependency and allow to break PAM this way.
 	export ac_cv_header_xcrypt_h=no
 
 	econf \
@@ -120,7 +99,6 @@ src_configure() {
 		--enable-securedir="${EPREFIX}"/$(get_libdir)/security \
 		--enable-isadir="${EPREFIX}"/$(get_libdir)/security \
 		$(use_enable nls) \
-		$(use_enable selinux) \
 		$(use_enable cracklib) \
 		$(use_enable audit) \
 		$(use_enable debug) \
