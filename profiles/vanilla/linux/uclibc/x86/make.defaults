@@ -1,0 +1,6 @@
+ARCH="x86"
+ACCEPT_KEYWORDS="x86"
+CHOST="i386-gentoo-linux-uclibc"
+
+USE="ncurses pic readline uclibc zlib"
+BOOTSTRAP_USE="${BOOTSTRAP_USE} pic"

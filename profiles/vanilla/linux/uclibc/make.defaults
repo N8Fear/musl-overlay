@@ -1,0 +1,8 @@
+CFLAGS="-Os"
+CXXFLAGS="${CFLAGS}"
+PORTAGE_LIBC="uClibc"
+ELIBC=uclibc
+FEATURES="sandbox sfperms strict"
+
+USE="ncurses nptl readline uclibc unicode xattr zlib -pam"
+BOOTSTRAP_USE="${BOOTSTRAP_USE} uclibc"
