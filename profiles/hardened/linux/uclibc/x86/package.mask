@@ -1,3 +1,4 @@
 >sys-apps/util-linux-2.18-r1
 >sys-fs/udev-141
 >sys-libs/readline-5.2_p14
+>sys-libs/pam-1.1.2
