@@ -1,3 +1,0 @@
-dev-lang/python ipv6
-sys-process/psmisc ipv6
-net-misc/iputils ipv6

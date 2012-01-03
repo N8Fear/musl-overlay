@@ -1,7 +1,6 @@
 ARCH="x86"
 ACCEPT_KEYWORDS="x86"
 CHOST="i386-gentoo-linux-uclibc"
-UCLIBC_CPU_DEFAULT="GENERIC_386"
 
-USE="ncurses readline zlib uclibc hardened pic"
+USE="hardened ncurses pic readline uclibc zlib"
 BOOTSTRAP_USE="${BOOTSTRAP_USE} hardened pic"
