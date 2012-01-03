@@ -1,4 +1,2 @@
 -sys-libs/uclibc
 sys-libs/glibc
-
-dev-libs/glib
