@@ -1,0 +1,35 @@
+--- configure.in	2009-05-28 17:05:03.000000000 +0000
++++ configure.in.new	2009-05-28 17:05:25.000000000 +0000
+@@ -129,6 +129,21 @@
+ AC_C___ATTRIBUTE__
+ 
+ dnl
++dnl Get the host compiler if cross-compiling
++dnl
++AM_CONDITIONAL(CROSS_COMPILING, [ test $cross_compiling = yes ])
++AC_MSG_CHECKING([for CC_FOR_BUILD])
++if test "x${CC_FOR_BUILD+set}" != "xset" ; then
++  if test "x$cross_compiling" = "xyes" ; then
++    CC_FOR_BUILD=${CC_FOR_BUILD-gcc}
++  else
++    CC_FOR_BUILD=${CC}
++  fi
++fi
++AC_MSG_RESULT([$CC_FOR_BUILD])
++AC_SUBST(CC_FOR_BUILD)
++
++dnl
+ dnl Check if --version-script is supported by ld
+ dnl
+ AC_CACHE_CHECK(for .symver assembler directive, libc_cv_asm_symver_directive,
+--- doc/specs/Makefile.am	2009-05-28 17:05:03.000000000 +0000
++++ doc/specs/Makefile.am.new	2009-05-28 17:06:06.000000000 +0000
+@@ -19,4 +19,8 @@
+ 
+ padout_LDADD = @LEXLIB@
+ 
++CC = @CC_FOR_BUILD@
++CFLAGS = 
++LDFLAGS = 
++
+ doc_DATA = draft-morgan-pam-current.txt rfc86.0.txt
