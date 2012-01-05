@@ -27,7 +27,16 @@ src_prepare() {
 }
 
 src_configure() {
-	cp "${FILESDIR}"/uclibc.config .config
+	case ${ARCH} in
+		x86)
+			cp "${FILESDIR}"/uclibc-i386.config .config || die "could not copy config file"
+			;;
+		amd64)
+			cp "${FILESDIR}"/uclibc-amd64.config .config || die "could not copy config file"
+			;;
+		*)
+			eerror "${ARCH} is not supported"
+	esac
 	yes "" 2> /dev/null | make -s oldconfig > /dev/null || die "could not make oldconfig"
 }
 
