@@ -97,8 +97,6 @@ S="${WORKDIR}/${MY_P}"
 QA_EXECSTACK="usr/lib*/opengl/xorg-x11/lib/libGL.so*"
 QA_WX_LOAD="usr/lib*/opengl/xorg-x11/lib/libGL.so*"
 
-# Think about: ggi, fbcon, no-X configs
-
 pkg_setup() {
 	# recommended by upstream
 	append-flags -ffast-math
@@ -126,6 +124,7 @@ src_prepare() {
 	epatch "${FILESDIR}"/glx_ro_text_segm.patch
 
 	epatch "${FILESDIR}"/respect-user-defines.patch
+	epatch "${FILESDIR}"/remove-GNU_SOURCE-locale.patch
 
 	base_src_prepare
 

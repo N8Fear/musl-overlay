@@ -1,0 +1,65 @@
+diff -Naur Mesa-7.11.2.orig/src/gallium/auxiliary/util/u_debug_symbol.c Mesa-7.11.2/src/gallium/auxiliary/util/u_debug_symbol.c
+--- Mesa-7.11.2.orig/src/gallium/auxiliary/util/u_debug_symbol.c	2011-07-09 01:32:30.000000000 +0000
++++ Mesa-7.11.2/src/gallium/auxiliary/util/u_debug_symbol.c	2012-01-06 20:45:51.822428420 +0000
+@@ -151,23 +151,6 @@
+ }
+ #endif
+ 
+-#ifdef __GLIBC__
+-#include <execinfo.h>
+-
+-/* This can only provide dynamic symbols, or binary offsets into a file.
+- *
+- * To fix this, post-process the output with tools/addr2line.sh
+- */
+-static INLINE void
+-debug_symbol_name_glibc(const void *addr, char* buf, unsigned size)
+-{
+-   char** syms = backtrace_symbols((void**)&addr, 1);
+-   strncpy(buf, syms[0], size);
+-   buf[size - 1] = 0;
+-   free(syms);
+-}
+-#endif
+-
+ void
+ debug_symbol_name(const void *addr, char* buf, unsigned size)
+ {
+diff -Naur Mesa-7.11.2.orig/src/glsl/strtod.c Mesa-7.11.2/src/glsl/strtod.c
+--- Mesa-7.11.2.orig/src/glsl/strtod.c	2012-01-06 20:45:34.282662359 +0000
++++ Mesa-7.11.2/src/glsl/strtod.c	2012-01-06 20:42:11.303216873 +0000
+@@ -44,13 +44,5 @@
+ double
+ glsl_strtod(const char *s, char **end)
+ {
+-#if defined(_GNU_SOURCE) && !defined(__CYGWIN__) && !defined(__FreeBSD__)
+-   static locale_t loc = NULL;
+-   if (!loc) {
+-      loc = newlocale(LC_CTYPE_MASK, "C", NULL);
+-   }
+-   return strtod_l(s, end, loc);
+-#else
+    return strtod(s, end);
+-#endif
+ }
+diff -Naur Mesa-7.11.2.orig/src/mesa/main/imports.c Mesa-7.11.2/src/mesa/main/imports.c
+--- Mesa-7.11.2.orig/src/mesa/main/imports.c	2012-01-06 20:45:34.283662859 +0000
++++ Mesa-7.11.2/src/mesa/main/imports.c	2012-01-06 20:42:11.305217873 +0000
+@@ -753,17 +753,7 @@
+ float
+ _mesa_strtof( const char *s, char **end )
+ {
+-#if defined(_GNU_SOURCE) && !defined(__CYGWIN__) && !defined(__FreeBSD__)
+-   static locale_t loc = NULL;
+-   if (!loc) {
+-      loc = newlocale(LC_CTYPE_MASK, "C", NULL);
+-   }
+-   return strtof_l(s, end, loc);
+-#elif defined(_ISOC99_SOURCE) || (defined(_XOPEN_SOURCE) && _XOPEN_SOURCE >= 600)
+    return strtof(s, end);
+-#else
+-   return (float)strtod(s, end);
+-#endif
+ }
+ 
+ /** Compute simple checksum/hash for a string */
