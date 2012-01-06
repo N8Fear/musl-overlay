@@ -23,7 +23,7 @@ SRC_URI="ftp://ftp.freedesktop.org/pub/mesa/${FOLDER}/${MY_SRC_P}.tar.bz2
 
 LICENSE="MIT LGPL-3 SGI-B-2.0"
 SLOT="0"
-KEYWORDS="amd64 x86" 
+KEYWORDS="amd64 x86"
 
 INTEL_CARDS="intel"
 RADEON_CARDS="radeon"
