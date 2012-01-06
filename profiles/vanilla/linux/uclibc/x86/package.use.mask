@@ -1,1 +1,2 @@
 net-misc/iputils ipv6
+net-misc/openssh pam
