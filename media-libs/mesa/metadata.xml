@@ -15,5 +15,6 @@
 	<flag name='pic'>disable optimized assembly code that is not PIC friendly</flag>
 	<flag name='shared-dricore'>Enable sharing of common code for classic DRI drivers.</flag>
 	<flag name='shared-glapi'>Enable sharing of common code for the OpenGL API.</flag>
+	<flag name='uclibc'>Disable GLIBC and enabled UCLIBC.</flag>
 </use>
 </pkgmetadata>

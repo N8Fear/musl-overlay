@@ -1,0 +1,19 @@
+diff -Naur Mesa-7.11.2.orig/configure.ac Mesa-7.11.2/configure.ac
+--- Mesa-7.11.2.orig/configure.ac	2011-10-15 00:43:58.000000000 +0000
++++ Mesa-7.11.2/configure.ac	2012-01-06 18:38:58.213283132 +0000
+@@ -20,6 +20,7 @@
+ dnl Save user CFLAGS and CXXFLAGS so one can override the default ones
+ USER_CFLAGS="$CFLAGS"
+ USER_CXXFLAGS="$CXXFLAGS"
++USER_DEFINES="$DEFINES"
+ 
+ dnl Versions for external dependencies
+ LIBDRM_REQUIRED=2.4.24
+@@ -1836,6 +1837,7 @@
+ dnl Add user CFLAGS and CXXFLAGS
+ CFLAGS="$CFLAGS $USER_CFLAGS"
+ CXXFLAGS="$CXXFLAGS $USER_CXXFLAGS"
++DEFINES="$DEFINES $USER_DEFINES"
+ 
+ dnl Substitute the config
+ AC_CONFIG_FILES([configs/autoconf])

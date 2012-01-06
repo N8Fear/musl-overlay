@@ -23,7 +23,7 @@ SRC_URI="ftp://ftp.freedesktop.org/pub/mesa/${FOLDER}/${MY_SRC_P}.tar.bz2
 
 LICENSE="MIT LGPL-3 SGI-B-2.0"
 SLOT="0"
-KEYWORDS="~amd64 ~x86" 
+KEYWORDS="amd64 x86" 
 
 INTEL_CARDS="intel"
 RADEON_CARDS="radeon"
@@ -33,7 +33,7 @@ for card in ${VIDEO_CARDS}; do
 done
 
 IUSE="${IUSE_VIDEO_CARDS}
-	bindist +classic debug +egl +gallium gbm gles +llvm motif +nptl openvg osmesa pic pax_kernel selinux shared-dricore +shared-glapi"
+	bindist +classic debug +egl +gallium gbm gles +llvm motif +nptl openvg osmesa pic pax_kernel selinux shared-dricore +shared-glapi uclibc"
 
 LIBDRM_DEPSTRING=">=x11-libs/libdrm-2.4.24"
 # not a runtime dependency of this package, but dependency of packages which
@@ -112,6 +112,8 @@ src_unpack() {
 }
 
 src_prepare() {
+	use uclibc && export DEFINES="-U__GLIBC__ -D__UCLIBC__"
+
 	# apply patches
 	if [[ -n ${SRC_PATCHES} ]]; then
 		EPATCH_FORCE="yes" \
@@ -123,11 +125,11 @@ src_prepare() {
 	# fix for hardened pax_kernel, bug 240956
 	epatch "${FILESDIR}"/glx_ro_text_segm.patch
 
+	epatch "${FILESDIR}"/respect-user-defines.patch
+
 	base_src_prepare
 
 	eautoreconf
-
-	epatch "${FILESDIR}"/uclibc-defines.patch
 }
 
 src_configure() {
