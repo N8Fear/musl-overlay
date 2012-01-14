@@ -1,2 +1,1 @@
->sys-apps/util-linux-2.18-r1
 >sys-fs/udev-141
