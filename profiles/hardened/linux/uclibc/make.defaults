@@ -3,6 +3,4 @@ CXXFLAGS="${CFLAGS}"
 PORTAGE_LIBC="uClibc"
 ELIBC=uclibc
 FEATURES="sandbox sfperms strict"
-
 USE="hardened ncurses nptl readline uclibc unicode xattr zlib -pam"
-BOOTSTRAP_USE="${BOOTSTRAP_USE} uclibc"
