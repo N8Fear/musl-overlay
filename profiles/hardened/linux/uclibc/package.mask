@@ -1,2 +1,2 @@
->sys-fs/udev-141
->sys-libs/pam-1.1.2
+-sys-libs/uclibc
+sys-libs/glibc
