@@ -1,4 +1,4 @@
 dev-libs/glib
 dev-libs/libiconv **
-sys-kernel/linux-headers
+=sys-kernel/linux-headers-3.1
 sys-devel/gettext
