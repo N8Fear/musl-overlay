@@ -10,10 +10,10 @@ PIE_VER="0.4.7"
 SPECS_VER="0.2.0"
 SPECS_GCC_VER="4.4.3"
 # arch/libc configurations known to be stable with {PIE,SSP}-by-default
-PIE_GLIBC_STABLE="x86 amd64"
-PIE_UCLIBC_STABLE="x86 amd64"
-SSP_STABLE="amd64 x86"
-SSP_UCLIBC_STABLE="amd64 x86"
+PIE_GLIBC_STABLE="x86 amd64 mips"
+PIE_UCLIBC_STABLE="x86 amd64 mips"
+SSP_STABLE="amd64 x86 mips"
+SSP_UCLIBC_STABLE="amd64 x86 mips"
 #end Hardened stuff
 
 inherit toolchain
@@ -21,7 +21,7 @@ inherit toolchain
 DESCRIPTION="The GNU Compiler Collection"
 
 LICENSE="GPL-3 LGPL-3 || ( GPL-3 libgcc libstdc++ gcc-runtime-library-exception-3.1 ) FDL-1.2"
-KEYWORDS="amd64 x86"
+KEYWORDS="amd64 mips x86"
 
 RDEPEND=""
 DEPEND="${RDEPEND}

@@ -16,7 +16,7 @@ SRC_URI="http://mirror.anl.gov/pub/linux/libs/pam/library/${MY_P}.tar.bz2"
 
 LICENSE="|| ( BSD GPL-2 )"
 SLOT="0"
-KEYWORDS="amd64 x86"
+KEYWORDS="amd64 mips x86"
 IUSE="cracklib nls vim-syntax audit test debug berkdb"
 
 RDEPEND="nls? ( virtual/libintl )

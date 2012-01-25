@@ -13,7 +13,7 @@ SRC_URI="http://uclibc.org/downloads/${MY_P}.tar.bz2"
 
 LICENSE="LGPL-2"
 SLOT="0"
-KEYWORDS="-* amd64 x86"
+KEYWORDS="-* amd64 x86 mips"
 IUSE=""
 RESTRICT="strip"
 
@@ -33,6 +33,9 @@ src_configure() {
 			;;
 		amd64)
 			cp "${FILESDIR}"/uclibc-amd64.config .config || die "could not copy config file"
+			;;
+		mips)
+			cp "${FILESDIR}"/uclibc-mips.config .config || die "could not copy config file"
 			;;
 		*)
 			eerror "${ARCH} is not supported"
