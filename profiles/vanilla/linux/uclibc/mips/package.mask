@@ -1,2 +1,3 @@
 >=app-misc/realpath-1.16
 >=app-misc/pax-utils-0.3.0
+>=sys-devel/binutils-2.22
