@@ -29,7 +29,7 @@ src_prepare() {
 src_configure() {
 	case ${ARCH} in
 		x86)
-			cp "${FILESDIR}"/uclibc-i386.config .config || die "could not copy config file"
+			cp "${FILESDIR}"/uclibc-i686.config .config || die "could not copy config file"
 			;;
 		amd64)
 			cp "${FILESDIR}"/uclibc-amd64.config .config || die "could not copy config file"
