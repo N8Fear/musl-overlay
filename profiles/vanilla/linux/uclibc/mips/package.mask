@@ -1,2 +1,2 @@
->=app-misc/realpath-1.16
->=app-misc/pax-utils-0.3.0
+>=app-arch/tar-1.23-r4
+>=sys-apps/coreutils-8.15
