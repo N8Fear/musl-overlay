@@ -1,6 +1,6 @@
 # Copyright 1999-2012 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/sys-apps/util-linux/util-linux-2.19.1-r1.ebuild,v 1.12 2012/01/07 20:54:37 vapier Exp $
+# $Header: /var/cvsroot/gentoo-x86/sys-apps/util-linux/util-linux-2.20.1-r1.ebuild,v 1.1 2012/01/07 21:33:35 vapier Exp $
 
 EAPI="3"
 
@@ -14,13 +14,14 @@ S=${WORKDIR}/${MY_P}
 DESCRIPTION="Various useful Linux utilities"
 HOMEPAGE="http://www.kernel.org/pub/linux/utils/util-linux/"
 SRC_URI="mirror://kernel/linux/utils/util-linux/v${PV:0:4}/${MY_P}.tar.bz2"
-KEYWORDS="amd64 x86"
+KEYWORDS="~mips"
 
 LICENSE="GPL-2 GPL-3 LGPL-2.1 BSD-4 MIT public-domain"
 SLOT="0"
-IUSE="+cramfs crypt ncurses nls old-linux perl selinux slang uclibc unicode"
+IUSE="+cramfs ddate ncurses nls old-linux perl selinux slang static-libs uclibc unicode"
 
 RDEPEND="
+	<sys-apps/sysvinit-2.88-r3
 	!<sys-libs/e2fsprogs-libs-1.41.8
 	!<sys-fs/e2fsprogs-1.41.8
 	cramfs? ( sys-libs/zlib )
@@ -33,8 +34,7 @@ DEPEND="${RDEPEND}
 	virtual/os-headers"
 
 src_prepare() {
-	epatch "${FILESDIR}"/${P}-mount-a-segv.patch #366213
-	epatch "${FILESDIR}"/${P}-umount-l-nfs.patch #370051
+	epatch "${FILESDIR}"/${P}-scanf-as.patch
 	use uclibc && sed -i -e s/versionsort/alphasort/g -e s/strverscmp.h/dirent.h/g mount/lomount.c
 	elibtoolize
 }
@@ -55,15 +55,14 @@ lfs_fallocate_test() {
 usex() { use $1 && echo ${2:-yes} || echo ${3:-no} ; }
 src_configure() {
 	lfs_fallocate_test
-	append-flags -DHAVE_PROGRAM_INVOCATION_SHORT_NAME
 	econf \
 		--enable-fs-paths-extra=/usr/sbin \
 		$(use_enable nls) \
 		--enable-agetty \
 		$(use_enable cramfs) \
+		$(use_enable ddate) \
 		$(use_enable old-linux elvtune) \
 		--with-ncurses=$(usex ncurses $(usex unicode auto yes) no) \
-		--disable-init \
 		--disable-kill \
 		--disable-last \
 		--disable-mesg \
@@ -78,12 +77,14 @@ src_configure() {
 		--without-pam \
 		$(use_with selinux) \
 		$(use_with slang) \
+		$(use_enable static-libs static) \
 		$(tc-has-tls || echo --disable-tls)
 }
 
 src_install() {
 	emake install DESTDIR="${D}" || die "install failed"
 	dodoc AUTHORS NEWS README* TODO docs/*
+	use ddate || find "${ED}"/usr/share/man -name 'ddate.1*' -delete
 
 	if ! use perl ; then #284093
 		rm "${ED}"/usr/bin/chkdupexe || die
@@ -91,7 +92,12 @@ src_install() {
 	fi
 
 	# need the libs in /
-	gen_usr_ldscript -a blkid uuid
+	gen_usr_ldscript -a blkid mount uuid
 	# e2fsprogs-libs didnt install .la files, and .pc work fine
 	rm -f "${ED}"/usr/$(get_libdir)/*.la
+}
+
+pkg_postinst() {
+	elog "The agetty util now clears the terminal by default.  You"
+	elog "might want to add --noclear to your /etc/inittab lines."
 }
