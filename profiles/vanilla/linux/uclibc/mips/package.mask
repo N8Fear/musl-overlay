@@ -1,3 +1,4 @@
 >=app-arch/tar-1.23-r4
 >=sys-apps/coreutils-8.15
 >=sys-process/procps-3.3
+>=sys-fs/e2fsprogs-1.42
