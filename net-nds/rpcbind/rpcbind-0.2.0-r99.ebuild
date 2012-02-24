@@ -7,7 +7,7 @@ EAPI="4"
 inherit autotools
 
 SRC_URI="mirror://sourceforge/${PN}/${P}.tar.bz2"
-KEYWORDS="~amd64 ~x86 ~mips"
+KEYWORDS="amd64 x86 mips"
 
 DESCRIPTION="portmap replacement which supports RPC over various protocols"
 HOMEPAGE="http://sourceforge.net/projects/rpcbind/"
