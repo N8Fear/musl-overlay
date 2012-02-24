@@ -29,10 +29,9 @@ src_unpack() {
 src_prepare() {
 	epatch "${FILESDIR}"/${PN}-0.2.1-fortify.patch
 	epatch "${FILESDIR}"/${PN}-0.2.2-rpc-des-prot.patch
-	epatch "${FILESDIR}"/${PN}-no-des.patch
-	mkdir src/rpcsvc
-	cp "${FILESDIR}"/nis.h src/rpcsvc/
-	elibtoolize
+	epatch "${FILESDIR}"/${PN}-enable-fullfunc.patch
+	> src/des_crypt.c #370713
+	autoreconf
 }
 
 src_configure() {
@@ -42,13 +41,13 @@ src_configure() {
 }
 
 src_install() {
-	emake install DESTDIR="${D}" || die
+	emake install DESTDIR="${D}"
 	dodoc AUTHORS ChangeLog NEWS README THANKS TODO
 	insinto /etc
-	newins doc/etc_netconfig netconfig || die
+	newins doc/etc_netconfig netconfig
 
 	insinto /usr/include/tirpc
-	doins -r "${WORKDIR}"/tirpc/* || die
+	doins -r "${WORKDIR}"/tirpc/*
 
 	# libtirpc replaces rpc support in glibc, so we need it in /
 	gen_usr_ldscript -a tirpc
