@@ -8,7 +8,8 @@ inherit autotools eutils toolchain-funcs
 
 DESCRIPTION="Transport Independent RPC library (SunRPC replacement)"
 HOMEPAGE="http://libtirpc.sourceforge.net/"
-SRC_URI="mirror://sourceforge/${PN}/${P}.tar.bz2"
+SRC_URI="mirror://sourceforge/${PN}/${P}.tar.bz2
+	mirror://gentoo/${PN}-glibc-nfs.tar.xz"
 
 LICENSE="GPL-2"
 SLOT="0"
@@ -20,10 +21,10 @@ DEPEND="${RDEPEND}
 	app-arch/xz-utils
 	dev-util/pkgconfig"
 
-#src_unpack() {
-#	unpack ${A}
-#	cp -r tirpc "${S}"/ || die
-#}
+src_unpack() {
+	unpack ${A}
+	cp -r tirpc "${S}"/ || die
+}
 
 src_prepare() {
 	epatch "${FILESDIR}"/${PN}-0.2.1-fortify.patch
