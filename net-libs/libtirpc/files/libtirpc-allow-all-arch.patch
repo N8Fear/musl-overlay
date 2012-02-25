@@ -1,0 +1,12 @@
+diff -Naur libtirpc-0.2.2.orig/src/key_call.c libtirpc-0.2.2/src/key_call.c
+--- libtirpc-0.2.2.orig/src/key_call.c	2011-05-02 12:10:40.000000000 +0000
++++ libtirpc-0.2.2/src/key_call.c	2012-02-24 04:16:07.000000000 +0000
+@@ -359,7 +359,7 @@
+ #elif defined(sparc)
+ 	if (uname(&u) == -1)
+ #else
+-#error Unknown architecture!
++	if (uname(&u) == -1)
+ #endif
+ #endif
+ 	{

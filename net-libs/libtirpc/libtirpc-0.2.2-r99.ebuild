@@ -29,8 +29,8 @@ src_unpack() {
 src_prepare() {
 	epatch "${FILESDIR}"/${PN}-0.2.1-fortify.patch
 	epatch "${FILESDIR}"/${PN}-0.2.2-rpc-des-prot.patch
-	epatch "${FILESDIR}"/${PN}-enable-fullfunc.patch
-	> src/des_crypt.c #370713
+	epatch "${FILESDIR}"/${PN}-allow-all-arch.patch
+	epatch "${FILESDIR}"/${PN}-no-des.patch
 	autoreconf
 }
 
