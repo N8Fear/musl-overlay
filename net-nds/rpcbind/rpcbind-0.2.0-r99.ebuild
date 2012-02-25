@@ -23,7 +23,7 @@ DEPEND="${RDEPEND}
 
 src_prepare() {
 	epatch "${FILESDIR}"/${P}-pkgconfig.patch
-	epatch "${FILESDIR}"/${P}-uclibc-nss-rpcsvc.patch
+	epatch "${FILESDIR}"/${PN}-uclibc-nss-rpcsvc.patch
 	eautoreconf
 }
 
