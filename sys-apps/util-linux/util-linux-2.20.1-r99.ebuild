@@ -34,7 +34,7 @@ DEPEND="${RDEPEND}
 	virtual/os-headers"
 
 src_prepare() {
-	epatch "${FILESDIR}"/${P}-sscanf-no-ms-as.patch
+	epatch "${FILESDIR}"/${P}-scanf-as.patch
 	use uclibc && sed -i -e s/versionsort/alphasort/g -e s/strverscmp.h/dirent.h/g mount/lomount.c
 	elibtoolize
 }
