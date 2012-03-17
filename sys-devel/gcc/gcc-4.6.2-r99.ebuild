@@ -10,10 +10,10 @@ PIE_VER="0.5.1"
 SPECS_VER="0.2.0"
 SPECS_GCC_VER="4.4.3"
 # arch/libc configurations known to be stable with {PIE,SSP}-by-default
-PIE_GLIBC_STABLE="x86 amd64 mips"
-PIE_UCLIBC_STABLE="x86 amd64 mips"
-SSP_STABLE="amd64 x86 mips"
-SSP_UCLIBC_STABLE="amd64 x86 mips"
+PIE_GLIBC_STABLE="amd64 mips ppc x86"
+PIE_UCLIBC_STABLE="amd64 mips ppc x86"
+SSP_STABLE="amd64 mips ppc x86"
+SSP_UCLIBC_STABLE="amd64 mips ppc x86"
 #end Hardened stuff
 
 inherit toolchain
