@@ -1,4 +1,4 @@
-# Copyright 1999-2011 Gentoo Foundation
+# Copyright 1999-2012 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: /var/cvsroot/gentoo-x86/sys-libs/uclibc/uclibc-0.9.30.1-r1.ebuild,v 1.9 2011/04/20 18:10:38 ulm Exp $
 
@@ -12,7 +12,7 @@ HOMEPAGE="http://www.uclibc.org/"
 SRC_URI="http://uclibc.org/downloads/${MY_P}.tar.bz2"
 
 LICENSE="LGPL-2"
-SLOT="0"
+SLOT="0.9.32.1"
 KEYWORDS="-* amd64 x86 mips ppc"
 IUSE=""
 RESTRICT="strip"
