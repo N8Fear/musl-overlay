@@ -5,6 +5,7 @@
 EAPI="4"
 
 MY_P=uClibc-0.9.33-57f058b
+MY_PN=uClibc-57f058b
 DESCRIPTION="C library for developing embedded Linux systems"
 HOMEPAGE="http://www.uclibc.org/"
 SRC_URI="http://opensource.dyc.edu/pub/misc/${MY_P}.tar.gz"
@@ -18,7 +19,7 @@ RESTRICT="strip"
 RDEPEND=""
 DEPEND=""
 
-S=${WORKDIR}/${MY_P}
+S=${WORKDIR}/${MY_PN}
 
 src_configure() {
 	case ${ARCH} in
