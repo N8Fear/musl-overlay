@@ -4,14 +4,16 @@
 
 EAPI="4"
 
-MY_P=uClibc-0.9.33
+inherit savedconfig
+
+MY_P=uClibc-${PV}
 DESCRIPTION="C library for developing embedded Linux systems"
 HOMEPAGE="http://www.uclibc.org/"
 SRC_URI="http://uclibc.org/downloads/${MY_P}.tar.bz2"
 
 LICENSE="LGPL-2"
 SLOT="0"
-KEYWORDS="-* amd64 x86"
+KEYWORDS="-* amd64 x86 ~mips ~ppc"
 IUSE=""
 RESTRICT="strip"
 
@@ -21,22 +23,11 @@ DEPEND=""
 S=${WORKDIR}/${MY_P}
 
 src_configure() {
-	case ${ARCH} in
-		x86)
-			cp "${FILESDIR}"/uclibc-i686.33.config .config || die "could not copy config file"
-			;;
-		amd64)
-			cp "${FILESDIR}"/uclibc-amd64.33.config .config || die "could not copy config file"
-			;;
-		mips)
-			cp "${FILESDIR}"/uclibc-mips.33.config .config || die "could not copy config file"
-			;;
-		ppc)
-			cp "${FILESDIR}"/uclibc-ppc.33.config .config || die "could not copy config file"
-			;;
-		*)
-			eerror "${ARCH} is not supported"
-	esac
+	if use savedconfig; then
+		restore_config config/.config
+	else
+		cp "${FILESDIR}"/uclibc-${ARCH}.${PV}.config .config || die "${ARCH} is not supported"
+	fi
 	yes "" 2> /dev/null | make -s oldconfig > /dev/null || die "could not make oldconfig"
 }
 
@@ -55,6 +46,10 @@ src_install() {
 	emake DESTDIR="${D}" install_utils
 	dobin extra/scripts/getent
 	dodoc Changelog* README TODO docs/*.txt DEDICATION.mjn3
+
+	if use savedconfig; then
+		save_config config/.config
+	fi
 }
 
 pkg_postinst() {
