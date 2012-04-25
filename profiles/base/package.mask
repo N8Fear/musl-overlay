@@ -9,6 +9,7 @@
 # profiles, as the "dynamic slot generation" is broken. The package is
 # still available on default profiles to be used with crossdev.
 sys-libs/uclibc
+sys-libs/musl
 
 # Diego E. Pettenò <flameeyes@gentoo.org> (25 Apr 2010)
 #  on behalf of QA team <qa@gentoo.org

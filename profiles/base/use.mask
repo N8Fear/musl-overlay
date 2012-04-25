@@ -146,6 +146,7 @@ elibc_NetBSD
 elibc_OpenBSD
 elibc_SunOS
 elibc_uclibc
+elibc_musl
 
 kernel_AIX
 kernel_Darwin
