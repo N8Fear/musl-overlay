@@ -24,7 +24,7 @@ S=${WORKDIR}/${MY_P}
 
 src_configure() {
 	if use savedconfig; then
-		restore_config config/.config
+		restore_config .config
 	else
 		cp "${FILESDIR}"/uclibc-${ARCH}.${PV}.config .config || die "${ARCH} is not supported"
 	fi
