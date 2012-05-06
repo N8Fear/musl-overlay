@@ -1,6 +1,5 @@
 -sys-libs/uclibc
 sys-libs/glibc
-sys-fs/udev
 #
 >sys-libs/pam-1.1.2
 #
