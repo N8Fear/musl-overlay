@@ -1,0 +1,30 @@
+# Copyright 1999-2009 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+# $Header: $
+
+EAPI="4"
+
+inherit eutils
+
+DESCRIPTION="Standalone argp library for use with uclibc"
+HOMEPAGE="http://www.lysator.liu.se/~nisse/misc/"
+SRC_URI="http://www.lysator.liu.se/~nisse/misc/argp-standalone-1.3.tar.gz"
+
+LICENSE="public domain"
+SLOT="0"
+KEYWORDS="~amd64 ~x86 ~mips ~ppc"
+IUSE=""
+
+DEPEND=""
+RDEPEND=""
+
+src_prepare() {
+	epatch "${FILESDIR}/${P}-throw-in-funcdef.patch"
+}
+
+src_install() {
+	dolib.a libargp.a 
+
+	insinto /usr/include
+	doins argp.h
+}
