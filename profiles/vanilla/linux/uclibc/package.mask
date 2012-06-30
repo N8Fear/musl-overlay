@@ -3,7 +3,6 @@ sys-libs/glibc
 #
 >sys-libs/pam-1.1.2
 #
->=app-arch/tar-1.23-r4
 >=sys-fs/e2fsprogs-1.42
 >=sys-libs/e2fsprogs-libs-1.42
 #
