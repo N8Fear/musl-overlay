@@ -1,6 +1,5 @@
 -sys-libs/uclibc
 sys-libs/glibc
-#
->sys-libs/pam-1.1.2
+sys-libs/pam
 #
 >=dev-libs/glib-2.32
