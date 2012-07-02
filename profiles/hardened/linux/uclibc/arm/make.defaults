@@ -1,0 +1,8 @@
+ARCH="arm"
+ACCEPT_KEYWORDS="${ARCH}"
+
+CHOST="arm-unknown-linux-uclibc"
+CFLAGS="-O2"
+CXXFLAGS="${CFLAGS}"
+FFLAGS="${CFLAGS}"
+FCFLAGS="${CFLAGS}"

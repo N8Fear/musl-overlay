@@ -1,0 +1,5 @@
+CHOST="armv6j-unknown-linux-uclibc"
+CFLAGS="-O2 -pipe -march=armv6j -mfpu=vfp -mfloat-abi=softfp"
+CXXFLAGS="${CFLAGS}"
+FFLAGS="${CFLAGS}"
+FCFLAGS="${CFLAGS}"
