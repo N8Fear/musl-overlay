@@ -1,0 +1,2 @@
+# git 1.7.3.4 can find libiconv, but 1.7.8.6 cannot
+dev-vcs/git -iconv
