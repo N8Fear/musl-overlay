@@ -1,3 +1,3 @@
-app-misc/pax-utils
-dev-libs/libiconv
+*app-misc/pax-utils
+*dev-libs/libiconv
 -*sys-apps/man-pages
