@@ -1,2 +1,3 @@
 >=sys-apps/util-linux-2.21
 >=sys-process/procps-3.3
+>dev-lang/perl-5.12.4-r2
