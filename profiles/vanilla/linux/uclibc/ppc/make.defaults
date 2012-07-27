@@ -1,3 +1,0 @@
-ARCH="ppc"
-ACCEPT_KEYWORDS="ppc"
-CHOST="powerpc-unknown-linux-uclibc"

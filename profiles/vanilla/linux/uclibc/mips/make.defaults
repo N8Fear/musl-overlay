@@ -1,3 +1,0 @@
-ARCH="mips"
-ACCEPT_KEYWORDS="mips ~mips"
-CHOST="mips-gentoo-linux-uclibc"

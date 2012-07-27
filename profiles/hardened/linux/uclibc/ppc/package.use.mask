@@ -1,2 +1,0 @@
-dev-libs/libpcre cxx
-sys-libs/ncurses cxx

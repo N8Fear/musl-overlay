@@ -1,5 +1,0 @@
--sys-libs/uclibc
-sys-libs/glibc
-#
-dev-libs/elfutils
-sys-libs/pam

@@ -1,8 +1,0 @@
-nls
-pam
-
-emul-linux-x86
--uclibc
-
--elibc_uclibc
-elibc_glibc

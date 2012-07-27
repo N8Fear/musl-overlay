@@ -1,4 +1,0 @@
->dev-lang/perl-5.12.4-r2
->sys-apps/util-linux-2.20.1-r2
->sys-fs/udev-171-r6
->sys-process/procps-3.2.8_p11
