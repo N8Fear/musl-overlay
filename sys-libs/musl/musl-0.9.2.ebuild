@@ -16,3 +16,27 @@ RESTRICT="strip"
 
 RDEPEND=""
 DEPEND=""
+
+export CBUILD=${CBUILD:-${CHOST}}
+export CTARGET=${CTARGET:-${CHOST}}
+
+do_native_config() {
+	einfo "Installing ${PN} as a native C library"
+	econf --prefix=/usr --disable-gcc-wrapper
+}
+
+do_alternative_config() {
+	einfo "Installing ${PN} as an alternative C library"
+	econf --prefix=/usr/musl
+}
+
+src_configure() {
+	if [ ${CTARGET} == ${CHOST} ] ; then
+		case ${CHOST} in
+			*-musl*) do_native_config ;;
+			*) do_alternative_config ;;
+		esac
+	else
+		die "TODO: set up cross compiling"
+	fi
+}
