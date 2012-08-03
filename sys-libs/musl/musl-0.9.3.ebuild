@@ -19,6 +19,8 @@ DEPEND=""
 
 export CTARGET=${CTARGET:-${CHOST}}
 
+MUSLLIBS="lib/musl"
+
 do_native_config() {
 	einfo "Installing ${PN} as a native C library"
 	econf --prefix=/usr --disable-gcc-wrapper
@@ -26,7 +28,7 @@ do_native_config() {
 
 do_alternative_config() {
 	einfo "Installing ${PN} as an alternative C library"
-	econf --prefix=/usr/musl
+	econf --prefix=/usr/"${MUSLLIBS}"
 }
 
 src_configure() {
@@ -38,4 +40,10 @@ src_configure() {
 	else
 		die "TODO: set up cross compiling"
 	fi
+}
+
+src_install () {
+	emake DESTDIR="${D}" install
+	mkdir "${D}"/usr/bin/
+	ln -s "../${MUSLLIBS}"/bin/musl-gcc "${D}"/usr/bin/
 }
