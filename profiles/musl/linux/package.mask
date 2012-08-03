@@ -1,3 +1,5 @@
 sys-libs/glibc
 sys-libs/uclibc
 -sys-libs/musl
+#
+sys-apps/man-pages
