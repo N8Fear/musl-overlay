@@ -19,6 +19,6 @@ DEPEND=""
 RDEPEND="!prefix? (
 		elibc_glibc? ( sys-libs/glibc:2.2 )
 		elibc_uclibc? ( sys-libs/uclibc )
-		elibc_musl? ( sys-libc/musl )
+		elibc_musl? ( sys-libs/musl )
 		elibc_FreeBSD? ( sys-freebsd/freebsd-lib )
 	)"
