@@ -1,0 +1,6 @@
+CFLAGS="-Os"
+CXXFLAGS="${CFLAGS}"
+PORTAGE_LIBC="musl"
+ELIBC=musl
+FEATURES="sandbox sfperms strict"
+USE="ncurses nptl pic readline uclibc unicode xattr zlib -pam"

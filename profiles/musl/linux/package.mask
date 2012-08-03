@@ -1,0 +1,3 @@
+sys-libs/glibc
+sys-libs/uclibc
+-sys-libs/musl
