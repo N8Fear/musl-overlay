@@ -17,7 +17,6 @@ RESTRICT="strip"
 RDEPEND=""
 DEPEND=""
 
-export CBUILD=${CBUILD:-${CHOST}}
 export CTARGET=${CTARGET:-${CHOST}}
 
 do_native_config() {
