@@ -3,5 +3,3 @@ sys-libs/uclibc
 
 # We'll need this when we mask in base/package.mask
 #-sys-libs/musl
-#
-sys-apps/man-pages
