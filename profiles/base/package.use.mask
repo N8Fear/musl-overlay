@@ -1,13 +1,9 @@
 # Copyright 1999-2012 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/profiles/base/package.use.mask,v 1.382 2012/08/01 11:58:18 blueness Exp $
+# $Header: /var/cvsroot/gentoo-x86/profiles/base/package.use.mask,v 1.383 2012/08/04 11:01:34 jer Exp $
 
 # This file requires >=portage-2.1.1
 # New entries go on top.
-
-# Anthony G. Basile <blueness@gentoo.org> (Aug 1 2012)
-# mask metalink on curl until media-libs/libmetalink-0.1.0, bug #429334
-=net-misc/curl-7.27.0* metalink
 
 # Ben de Groot <yngwin@gentoo.org> (30 Jul 2012)
 # fontconfig-infinality dependency not yet keyworded on most arches
