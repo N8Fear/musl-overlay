@@ -8,9 +8,9 @@ DESCRIPTION="A new standard library of Linux-based devices"
 HOMEPAGE="http://www.etalabs.net/musl/"
 SRC_URI="http://www.etalabs.net/musl/releases/${P}.tar.gz"
 
-LICENSE="LGPL-2"
+LICENSE="MIT"
 SLOT="0"
-KEYWORDS="-* ~amd64 ~arm ~x86"
+KEYWORDS="-* ~amd64 ~arm ~mips ~x86"
 IUSE=""
 RESTRICT="strip"
 
