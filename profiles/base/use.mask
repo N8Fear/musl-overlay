@@ -44,6 +44,7 @@ gluon
 selinux
 uclibc
 multilib
+musl
 
 # amd64/x86 arch specific USE flags
 kqemu
@@ -150,6 +151,7 @@ elibc_FreeBSD
 elibc_HPUX
 elibc_Interix
 elibc_mintlib
+elibc_musl
 elibc_NetBSD
 elibc_OpenBSD
 elibc_SunOS

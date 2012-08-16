@@ -10,6 +10,11 @@
 # still available on default profiles to be used with crossdev.
 sys-libs/uclibc
 
+# Make sure sys-libs/musl is only available on systems on musl profile
+# or on systems where the user explicitly unmasks musl as using it
+# incorrectly can break your system
+sys-libs/musl
+
 # Diego E. Pettenò <flameeyes@gentoo.org> (25 Apr 2010)
 #  on behalf of QA team <qa@gentoo.org
 #
