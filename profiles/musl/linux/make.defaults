@@ -3,4 +3,4 @@ CXXFLAGS="${CFLAGS}"
 PORTAGE_LIBC="musl"
 ELIBC=musl
 FEATURES="sandbox sfperms strict"
-USE="ncurses nptl pic readline unicode xattr zlib -pam"
+USE="-cxx -fortran -mudflap -nls -pam"
