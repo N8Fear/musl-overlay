@@ -1,30 +1,43 @@
-# Copyright 1999-2012 Gentoo Foundation
+# Copyright 1999-2013 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/profiles/base/make.defaults,v 1.83 2012/06/22 10:33:10 chainsaw Exp $
+# $Header: /var/cvsroot/gentoo-x86/profiles/base/make.defaults,v 1.99 2013/05/30 11:20:44 mgorny Exp $
 #
 # System-wide defaults for the Portage system
 # See portage(5) manpage
 
+# Profile IUSE injection (applies only to ebuilds which use EAPI 5 or later)
+IUSE_IMPLICIT="prefix"
+USE_EXPAND_UNPREFIXED="ARCH"
+USE_EXPAND_IMPLICIT="ARCH ELIBC KERNEL USERLAND"
+USE_EXPAND_VALUES_ARCH="alpha amd64 amd64-fbsd amd64-linux arm arm-linux hppa hppa-hpux ia64 ia64-hpux ia64-linux m68k m68k-mint mips ppc ppc64 ppc64-linux ppc-aix ppc-macos ppc-openbsd s390 sh sparc sparc64-freebsd sparc64-solaris sparc-fbsd sparc-solaris x64-freebsd x64-macos x64-openbsd x64-solaris x86 x86-cygwin x86-fbsd x86-freebsd x86-interix x86-linux x86-macos x86-netbsd x86-openbsd x86-solaris x86-winnt"
+USE_EXPAND_VALUES_ELIBC="AIX Cygwin Darwin FreeBSD glibc HPUX Interix mintlib NetBSD OpenBSD SunOS musl uclibc Winnt"
+USE_EXPAND_VALUES_KERNEL="AIX Cygwin Darwin FreeBSD freemint HPUX Interix linux NetBSD OpenBSD SunOS Winnt"
+USE_EXPAND_VALUES_USERLAND="BSD GNU"
+
 # Env vars to expand into USE vars.  Modifying this requires prior
 # discussion on gentoo-dev@gentoo.org.
-USE_EXPAND="APACHE2_MODULES APACHE2_MPMS CALLIGRA_FEATURES FOO2ZJS_DEVICES MISDN_CARDS FRITZCAPI_CARDS FCDSL_CARDS VIDEO_CARDS DVB_CARDS LIRC_DEVICES INPUT_DEVICES LINGUAS USERLAND KERNEL ELIBC CROSSCOMPILE_OPTS ALSA_CARDS ALSA_PCM_PLUGINS LCD_DEVICES CAMERAS NETBEANS_MODULES QEMU_SOFTMMU_TARGETS QEMU_USER_TARGETS SANE_BACKENDS RUBY_TARGETS PHP_TARGETS NGINX_MODULES_HTTP NGINX_MODULES_MAIL XFCE_PLUGINS XTABLES_ADDONS GPSD_PROTOCOLS COLLECTD_PLUGINS DRACUT_MODULES OFED_DRIVERS GRUB_PLATFORMS FFTOOLS PYTHON_TARGETS CURL_SSL OPENMPI_FABRICS OPENMPI_RM OPENMPI_OFED_FEATURES LIBREOFFICE_EXTENSIONS VOICEMAIL_STORAGE"
+USE_EXPAND="ABI_X86 ALSA_CARDS APACHE2_MODULES APACHE2_MPMS CALLIGRA_FEATURES CAMERAS COLLECTD_PLUGINS CROSSCOMPILE_OPTS CURL_SSL DRACUT_MODULES DVB_CARDS ELIBC ENLIGHTENMENT_MODULES FCDSL_CARDS FFTOOLS FOO2ZJS_DEVICES FRITZCAPI_CARDS GPSD_PROTOCOLS GRUB_PLATFORMS INPUT_DEVICES KERNEL LCD_DEVICES LIBREOFFICE_EXTENSIONS LINGUAS LIRC_DEVICES MISDN_CARDS MONKEYD_PLUGINS NETBEANS_MODULES NGINX_MODULES_HTTP NGINX_MODULES_MAIL OFED_DRIVERS OFFICE_IMPLEMENTATION OPENMPI_FABRICS OPENMPI_OFED_FEATURES OPENMPI_RM PHP_TARGETS PYTHON_SINGLE_TARGET PYTHON_TARGETS QEMU_SOFTMMU_TARGETS QEMU_USER_TARGETS RUBY_TARGETS SANE_BACKENDS USERLAND VIDEO_CARDS VOICEMAIL_STORAGE XFCE_PLUGINS XTABLES_ADDONS"
 
 # USE_EXPAND variables whose contents are not shown in package manager
 # output. Changes need discussion on gentoo-dev.
-USE_EXPAND_HIDDEN="USERLAND KERNEL ELIBC CROSSCOMPILE_OPTS"
+USE_EXPAND_HIDDEN="USERLAND KERNEL ELIBC CROSSCOMPILE_OPTS ABI_X86"
 
 CONFIG_PROTECT="/etc"
 CONFIG_PROTECT_MASK="/etc/env.d /etc/gconf"
 
 # Variables that are set exclusively by the profile
 # and not by user configuration files.
-PROFILE_ONLY_VARIABLES="ARCH ELIBC KERNEL USERLAND"
+PROFILE_ONLY_VARIABLES="ARCH ELIBC IUSE_IMPLICIT KERNEL USERLAND USE_EXPAND_IMPLICIT USE_EXPAND_UNPREFIXED USE_EXPAND_VALUES_ARCH USE_EXPAND_VALUES_ELIBC USE_EXPAND_VALUES_KERNEL USE_EXPAND_VALUES_USERLAND"
 
 # 'Sane' defaults
 ELIBC="glibc"
 KERNEL="linux"
 USERLAND="GNU"
 INPUT_DEVICES="keyboard mouse"
+
+# Tomáš Chvátal <scarabeus@gentoo.org> (23 Mar 2013)
+# By default enable libreoffice implementation only.
+OFFICE_IMPLEMENTATION="libreoffice"
 
 # Tomáš Chvátal <scarabeus@gentoo.org> (12 Aug 2011)
 # By default do not build any grub platform and let it guess.
@@ -37,7 +50,7 @@ LIBREOFFICE_EXTENSIONS="presenter-console presenter-minimizer"
 # Tomáš Chvátal <scarabeus@gentoo.org> (15 May 2011)
 # Andreas K. Hüttel <dilfridge@gentoo.org> (19 Aug 2011, 25 Mar 2012)
 # By default build all koffice / calligra features.
-CALLIGRA_FEATURES="kexi words flow plan sheets stage tables krita karbon braindump"
+CALLIGRA_FEATURES="kexi words flow plan sheets stage tables krita karbon braindump author"
 
 # Pacho Ramos <pacho@gentoo.org> (14 Feb 2010)
 # Enable 'ptp2' by default as it is available for most cameras.
@@ -55,13 +68,11 @@ COLLECTD_PLUGINS="df interface irq load memory rrdtool swap syslog"
 # By default enable all protocols for average GPS user
 GPSD_PROTOCOLS="ashtech aivdm earthmate evermore fv18 garmin garmintxt gpsclock itrax mtk3301 nmea ntrip navcom oceanserver oldstyle oncore rtcm104v2 rtcm104v3 sirf superstar2 timing tsip tripmate tnt ubx"
 
-# Diego Pettenò <flameeyes@gentoo.org> (21 Dec 2006)
-# Build everything for the average user
-ALSA_PCM_PLUGINS="adpcm alaw asym copy dmix dshare dsnoop empty extplug file hooks iec958 ioplug ladspa lfloat linear meter mmap_emul mulaw multi null plug rate route share shm softvol"
-
 # Benedikt Böhm <hollow@gentoo.org> (27 Nov 2007)
 # Sane defaults for built-in apache modules
-APACHE2_MODULES="actions alias auth_basic authn_alias authn_anon authn_dbm authn_default authn_file authz_dbm authz_default authz_groupfile authz_host authz_owner authz_user autoindex cache cgi cgid dav dav_fs dav_lock deflate dir disk_cache env expires ext_filter file_cache filter headers include info log_config logio mem_cache mime mime_magic negotiation rewrite setenvif speling status unique_id userdir usertrack vhost_alias"
+# Patrick Lauer <patrick@gentoo.org> (12 Oct 2012)
+# extend for apache 2.4
+APACHE2_MODULES="authn_core authz_core socache_shmcb unixd actions alias auth_basic authn_alias authn_anon authn_dbm authn_default authn_file authz_dbm authz_default authz_groupfile authz_host authz_owner authz_user autoindex cache cgi cgid dav dav_fs dav_lock deflate dir disk_cache env expires ext_filter file_cache filter headers include info log_config logio mem_cache mime mime_magic negotiation rewrite setenvif speling status unique_id userdir usertrack vhost_alias"
 
 # Peter Volkov <pva@gentoo.org> (29 Apr 2010)
 # Set some defaults or package will fail to build (Check mconfig in package sources)
@@ -92,7 +103,7 @@ USE="${USE} modules"
 
 # Alex Legler <a3li@gentoo.org> (30 Nov 2009)
 # Default Ruby build targets
-RUBY_TARGETS="ruby18 ruby19"
+RUBY_TARGETS="ruby19 ruby18"
 
 # Samuli Suominen <ssuominen@gentoo.org> (03 Dec 2009)
 # Enable USE cxx by default so base-system and toolchain pkgs can start using USE cxx
@@ -107,8 +118,11 @@ PYTHONDONTWRITEBYTECODE="1"
 
 # Jorge Manuel B. S. Vicetto <jmbsvicetto@gentoo.org> (16 Nov 2011)
 # Add default USE value for bootstrap and rename it from STAGE1_USE to BOOTSTRAP_USE
-BOOTSTRAP_USE="cxx unicode"
+# Add in expanded PYTHON_TARGETS or stage1 builds break because of USE="-* ${BOOTSTRAP_USE}"
+# This MUST be kept in sync with the PYTHON_TARGETS below
+BOOTSTRAP_USE="cxx unicode python_targets_python3_2 python_targets_python2_7"
 
 # Mike Gilbert <floppym@gentoo.org> (15 May 2012)
-# Default target(s) for python-distutils-ng.eclass
-PYTHON_TARGETS="python2_7"
+# Default target(s) for python-r1.eclass
+PYTHON_TARGETS="python2_7 python3_2"
+PYTHON_SINGLE_TARGET="python2_7"

@@ -1,6 +1,25 @@
-# Copyright 1999-2012 Gentoo Foundation
+# Copyright 1999-2013 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/profiles/base/package.use.force,v 1.22 2012/07/22 13:14:05 graaff Exp $
+# $Header: /var/cvsroot/gentoo-x86/profiles/base/package.use.force,v 1.35 2013/03/08 09:33:09 pesa Exp $
+
+# Michał Gorny <mgorny@gentoo.org> (26 Feb 2013)
+# Meta-packages which use multilib ebuilds always install development
+# headers. The flag is there to satisfy deps only.
+>=app-emulation/emul-linux-x86-xlibs-20130224-r1 development
+
+# Zac Medico <zmedico@gentoo.org> (4 Dec 2012)
+# Force app-shells/bash[readline] in stage1 builds, so that compgen is
+# available for sys-apps/portage (see bug #445576).
+app-shells/bash readline
+
+# Michał Górny <mgorny@gentoo.org> (14 Oct 2012)
+# Force-enable all PYTHON_TARGETS for python-exec to avoid using private
+# API. Please remember to keep it in sync with python_targets.desc.
+dev-python/python-exec python_targets_python2_5 python_targets_python2_6 python_targets_python2_7 python_targets_python3_1 python_targets_python3_2 python_targets_python3_3 python_targets_jython2_5 python_targets_jython2_7 python_targets_pypy1_9 python_targets_pypy2_0
+
+# Davide Pesavento <pesa@gentoo.org> (12 Sep 2012)
+# Unbundling code needs updates, will be fixed in 2.7
+=dev-qt/qt-creator-2.6* botan-bundled
 
 # Samuli Suominen <ssuominen@gentoo.org> (23 Jan 2012)
 # Forcing enabled while waiting for eselect-notify-send wrt #379941

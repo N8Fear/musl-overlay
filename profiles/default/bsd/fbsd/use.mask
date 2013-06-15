@@ -1,6 +1,6 @@
 # Copyright 1999-2012 Gentoo Foundation.
 # Distributed under the terms of the GNU General Public License, v2
-# $Header: /var/cvsroot/gentoo-x86/profiles/default/bsd/fbsd/use.mask,v 1.7 2012/06/02 14:52:22 aballier Exp $
+# $Header: /var/cvsroot/gentoo-x86/profiles/default/bsd/fbsd/use.mask,v 1.8 2012/10/28 22:41:53 naota Exp $
 
 # Espeak does not run on bsd
 espeak
@@ -31,3 +31,6 @@ cdparanoia
 
 # wayland is not targetting BSDs
 wayland
+
+# Recent sys-auth/polkit cannot be built on FreeBSD
+policykit

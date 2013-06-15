@@ -1,6 +1,6 @@
-# Copyright 1999-2012 Gentoo Foundation.
+# Copyright 1999-2013 Gentoo Foundation.
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/profiles/default/bsd/fbsd/packages.build,v 1.5 2012/05/05 13:16:12 aballier Exp $
+# $Header: /var/cvsroot/gentoo-x86/profiles/default/bsd/fbsd/packages.build,v 1.10 2013/05/25 20:32:33 aballier Exp $
 
 # This file describes the packages needed to build a stage 1 based on this
 # profile.  Packages in this file are built in order.
@@ -15,16 +15,18 @@ app-arch/libarchive
 app-shells/bash
 net-misc/rsync
 net-misc/wget
+sys-devel/autoconf
+sys-devel/automake
+sys-devel/libtool
 sys-apps/openrc
 sys-apps/baselayout
 sys-apps/diffutils
 sys-apps/file
+sys-apps/findutils
 sys-apps/gawk
 sys-apps/grep
 sys-apps/less
-sys-apps/portage
 sys-apps/sed
-sys-apps/texinfo
 sys-devel/binutils
 sys-devel/bison
 sys-devel/flex
@@ -34,12 +36,10 @@ sys-devel/gettext
 sys-devel/gnuconfig
 sys-devel/make
 sys-devel/patch
-dev-lang/perl
-dev-lang/python
-app-editors/nano
 virtual/editor
 virtual/libc
 virtual/os-headers
+virtual/package-manager
 sys-freebsd/freebsd-mk-defs
 sys-freebsd/freebsd-lib
 sys-freebsd/freebsd-libexec
@@ -48,4 +48,3 @@ sys-freebsd/freebsd-sbin
 sys-freebsd/freebsd-ubin
 sys-freebsd/freebsd-usbin
 sys-freebsd/freebsd-contrib
-sys-apps/findutils

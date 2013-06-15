@@ -1,6 +1,85 @@
 # ChangeLog for profile directory
-# Copyright 1999-2012 Gentoo Foundation; Distributed under the GPL v2
-# $Header: /var/cvsroot/gentoo-x86/profiles/default/bsd/ChangeLog,v 1.123 2012/08/07 20:52:35 aballier Exp $
+# Copyright 1999-2013 Gentoo Foundation; Distributed under the GPL v2
+# $Header: /var/cvsroot/gentoo-x86/profiles/default/bsd/ChangeLog,v 1.146 2013/05/25 22:04:45 aballier Exp $
+
+  25 May 2013; Alexis Ballier <aballier@gentoo.org>
+  fbsd/amd64/9.1/clang/packages, fbsd/amd64/9.1/clang/packages.build,
+  fbsd/amd64/9.1/clang/profile.bashrc:
+  Make the clang profile use libcxx
+
+  25 May 2013; Alexis Ballier <aballier@gentoo.org>
+  fbsd/amd64/9.1/clang/packages.build, fbsd/packages.build:
+  remove texinfo from packages.build: it is not needed anymore for building
+  stages and causes problems when trying to put it in a stage1. bug #471192
+
+  24 May 2013; Alexis Ballier <aballier@gentoo.org> fbsd/package.use.mask:
+  mask xattr useflag on GNU tar, bug #432410 by Yuta SATOH
+
+  20 May 2013; Alexis Ballier <aballier@gentoo.org> +fbsd/amd64/9.0/deprecated:
+  deprecate 9.0 profile for amd64, bug #464742
+
+  19 May 2013; Alexis Ballier <aballier@gentoo.org> use.mask:
+  mask filecaps useflag, bug #469646
+
+  07 May 2013; Naohiro Aota <naota@gentoo.org> +fbsd/x86/9.0/deprecated,
+  fbsd/x86/7.2/deprecated, fbsd/x86/8.0/deprecated, fbsd/x86/8.2/deprecated:
+  Deprecate x86/9.0. #464742
+
+  18 Feb 2013; Alexis Ballier <aballier@gentoo.org> package.use.mask:
+  mask ffmpeg[iec61883] as its linux only too
+
+  08 Feb 2013; Alexis Ballier <aballier@gentoo.org> fbsd/make.defaults:
+  add python2 to USE too so that it is rebuilt within stage3, bug #448256
+
+  01 Feb 2013; Alexis Ballier <aballier@gentoo.org>
+  fbsd/amd64/9.1/clang/packages.build, fbsd/packages.build:
+  remove nano from packages.build, bug #443810 by Yuta SATOH
+
+  23 Dec 2012; Samuli Suominen <ssuominen@gentoo.org> package.mask:
+  Mask sys-fs/eudev next to sys-fs/udev wrt #447364
+
+  24 Nov 2012; Samuli Suominen <ssuominen@gentoo.org> package.mask:
+  Put virtual/udev masked next to existing sys-fs/udev entry.
+
+  24 Nov 2012; Alexis Ballier <aballier@gentoo.org> fbsd/package.mask:
+  unmask libarchive 3.0.4-r1, works fine here and bug #421191 has no activity
+  since months.
+
+  28 Oct 2012; <naota@gentoo.org> fbsd/use.mask:
+  Mask polkit on FreeBSD. It doesn't work due to FreeBSD API bug.
+
+  15 Oct 2012; Alexis Ballier <aballier@gentoo.org> fbsd/packages.build:
+  remove portage and add virtual/package-manager
+
+  15 Oct 2012; Alexis Ballier <aballier@gentoo.org> fbsd/packages.build:
+  move findutils up as on linux
+
+  15 Oct 2012; Alexis Ballier <aballier@gentoo.org> fbsd/make.defaults:
+  add python2 to BOOTSTRAP_USE so that python2 gets set as default python
+  interpreter
+
+  15 Oct 2012; Alexis Ballier <aballier@gentoo.org> fbsd/packages.build:
+  remove python and perl from packages.build, add autotools, like on linux
+
+  14 Oct 2012; <naota@gentoo.org> fbsd/package.use.mask:
+  Mask numa on sys-apps/hwloc
+
+  09 Oct 2012; <naota@gentoo.org> fbsd/package.use.mask:
+  Mask USE=dmpai on net-fs/samba. #430720
+
+  03 Oct 2012; <naota@gentoo.org> fbsd/package.use.mask:
+  Mask USE=gbm for media-libs/mesa
+
+  19 Sep 2012; Alexis Ballier <aballier@gentoo.org> -fbsd/sparc/8.2/deprecated:
+  revert sparc-fbsd profile deprecation otherwise repoman warns on every
+  package with sparc-fbsd keywords since it has no valid profile
+
+  19 Sep 2012; Alexis Ballier <aballier@gentoo.org> +fbsd/sparc/8.2/deprecated,
+  +fbsd/x86/8.2/deprecated:
+  deprecate fbsd 8.2 profiles, bug #435500
+
+  19 Sep 2012; Alexis Ballier <aballier@gentoo.org> fbsd/package.use.mask:
+  mask patch[xattr] as it requires gnu attr, bug #435474
 
   07 Aug 2012; Alexis Ballier <aballier@gentoo.org>
   +fbsd/amd64/9.1/make.defaults, +fbsd/amd64/9.1/parent,

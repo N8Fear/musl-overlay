@@ -1,6 +1,6 @@
-# Copyright 1999-2012 Gentoo Foundation
+# Copyright 1999-2013 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/profiles/default/bsd/fbsd/package.use.mask,v 1.29 2012/07/04 07:40:40 ssuominen Exp $
+# $Header: /var/cvsroot/gentoo-x86/profiles/default/bsd/fbsd/package.use.mask,v 1.34 2013/05/24 20:20:45 aballier Exp $
 
 # As per UberLord's requests
 sys-apps/openrc pam
@@ -35,6 +35,10 @@ net-wireless/aircrack-ng wifi
 # GNU attr isn't supported
 dev-libs/glib xattr
 gnome-base/gnome-vfs acl
+# https://bugs.gentoo.org/show_bug.cgi?id=435474
+sys-devel/patch xattr
+# https://bugs.gentoo.org/show_bug.cgi?id=432410
+app-arch/tar xattr
 
 # Joe Peterson <lavajoe@gentoo.org> (21 Nov 2007)
 # The following new swig USE flags are not supported (yet):
@@ -83,3 +87,19 @@ dev-java/proguard j2me
 # Naohiro Aota <naota@gentoo.org> (20 Feb 2012)
 # Upstream does not support FreeBSD wifi nor crashreporter
 www-client/firefox wifi crashreporter
+
+# Naohiro Aota <naota@gentoo.org> (03 Oct 2012)
+# Mask gbm, udev is not supported on FreeBSD.
+media-libs/mesa gbm
+
+# Naohiro Aota <naota@gentoo.org> (06 Oct 2012)
+# Mask rpm, app-arch/rpm needs elfutils
+net-analyzer/net-snmp rpm
+
+# Naohiro Aota <naota@gentoo.org> (09 Oct 2012)
+# Mask dmpai, sys-apps/dmapi cannot build on BSD
+net-fs/samba dmapi
+
+# Naohiro Aota <naota@gentoo.org> (15 Oct 2012)
+# Mask numa on sys-apps/hwloc. numactl not available on FreeBSD
+sys-apps/hwloc numa

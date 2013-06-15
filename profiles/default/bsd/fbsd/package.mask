@@ -1,6 +1,6 @@
 # Copyright 1999-2012 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/profiles/default/bsd/fbsd/package.mask,v 1.17 2012/06/15 03:10:35 ryao Exp $
+# $Header: /var/cvsroot/gentoo-x86/profiles/default/bsd/fbsd/package.mask,v 1.18 2012/11/24 12:56:01 aballier Exp $
 
 # Diego Pettenò <flameeyes@gentoo.org> (27 May 2005)
 # SGI's FAM is dead upstream, and requires mayor changes.
@@ -20,7 +20,3 @@ dev-util/strace
 # Don't use them, use the one in base system
 dev-util/yacc
 dev-util/byacc
-
-# Richard Yao <ryao@gentoo.org> (14 June 2012)
-# libarchive-3.0.4-r1 breaks elibtoolize on FreeBSD. Bug #421191
-=app-arch/libarchive-3.0.4-r1
