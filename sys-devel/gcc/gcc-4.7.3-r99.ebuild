@@ -18,7 +18,7 @@ SSP_STABLE="amd64 x86 ppc ppc64 arm"
 SSP_UCLIBC_STABLE="x86 amd64 ppc ppc64 arm"
 #end Hardened stuff
 
-inherit toolchain
+inherit toolchain eutils
 
 DESCRIPTION="The GNU Compiler Collection"
 
@@ -28,26 +28,20 @@ KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~spar
 
 RDEPEND=""
 DEPEND="${RDEPEND}
-	elibc_glibc? ( >=sys-libs/glibc-2.8 )
 	>=${CATEGORY}/binutils-2.18"
 
-if [[ ${CATEGORY} != cross-* ]] ; then
-	PDEPEND="${PDEPEND} elibc_glibc? ( >=sys-libs/glibc-2.8 )"
-fi
-
 src_unpack() {
-	if has_version '<sys-libs/glibc-2.12' ; then
-		ewarn "Your host glibc is too old; disabling automatic fortify."
-		ewarn "Please rebuild gcc after upgrading to >=glibc-2.12 #362315"
-		EPATCH_EXCLUDE+=" 10_all_default-fortify-source.patch"
-	fi
-
-	# drop the x32 stuff once 4.7 goes stable
-	if [[ ${CTARGET} != x86_64* ]] || ! has x32 $(get_all_abis TARGET) ; then
-		EPATCH_EXCLUDE+=" 90_all_gcc-4.7-x32.patch"
-	fi
-
 	toolchain_src_unpack
+
+	if use elibc_musl; then
+		cd "${S}"
+		sed -i 's@\./fixinc\.sh@-c true@' gcc/Makefile.in
+		mv libstdc\+\+-v3/config/os/gnu-linux libstdc\+\+-v3/config/os/gnu-linux.org
+		cp -r libstdc\+\+-v3/config/os/generic libstdc\+\+-v3/config/os/gnu-linux
+		cp libstdc++-v3/config/os/gnu-linux.org/arm-eabi-extra.ver libstdc++-v3/config/os/gnu-linux/
+		mv libitm/config/linux/x86 libitm/config/linux/x86_glibc
+		cp -r libitm/config/generic libitm/config/linux/x86
+	fi
 
 	use vanilla && return 0
 
@@ -56,11 +50,4 @@ src_unpack() {
 
 pkg_setup() {
 	toolchain_pkg_setup
-
-	if use lto ; then
-		ewarn
-		ewarn "LTO support is still experimental and unstable."
-		ewarn "Any bugs resulting from the use of LTO will not be fixed."
-		ewarn
-	fi
 }
