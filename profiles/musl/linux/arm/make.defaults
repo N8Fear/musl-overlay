@@ -1,8 +1,0 @@
-ARCH="arm"
-ACCEPT_KEYWORDS="${ARCH}"
-
-CHOST="arm-unknown-linux-musl"
-CFLAGS="-O2"
-CXXFLAGS="${CFLAGS}"
-FFLAGS="${CFLAGS}"
-FCFLAGS="${CFLAGS}"

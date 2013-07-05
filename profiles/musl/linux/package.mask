@@ -1,2 +1,0 @@
-sys-libs/glibc
--sys-libs/musl

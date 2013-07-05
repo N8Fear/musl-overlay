@@ -1,4 +1,0 @@
-emul-linux-x86
-
-elibc_uclibc
-elibc_glibc
