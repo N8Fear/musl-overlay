@@ -1,0 +1,30 @@
+diff -Naur gzip-1.5.orig/lib/freadahead.c gzip-1.5/lib/freadahead.c
+--- gzip-1.5.orig/lib/freadahead.c	2012-03-03 12:51:02.000000000 +0000
++++ gzip-1.5/lib/freadahead.c	2013-07-06 02:54:02.293243836 +0000
+@@ -25,6 +25,7 @@
+ size_t
+ freadahead (FILE *fp)
+ {
++#if 0
+ #if defined _IO_ftrylockfile || __GNU_LIBRARY__ == 1 /* GNU libc, BeOS, Haiku, Linux libc5 */
+   if (fp->_IO_write_ptr > fp->_IO_write_base)
+     return 0;
+@@ -90,4 +91,6 @@
+ #else
+  #error "Please port gnulib freadahead.c to your platform! Look at the definition of fflush, fread, ungetc on your system, then report this to bug-gnulib."
+ #endif
++#endif
++  return 0;
+ }
+diff -Naur gzip-1.5.orig/lib/fseterr.c gzip-1.5/lib/fseterr.c
+--- gzip-1.5.orig/lib/fseterr.c	2012-03-03 12:51:02.000000000 +0000
++++ gzip-1.5/lib/fseterr.c	2013-07-06 02:54:45.035246226 +0000
+@@ -48,7 +48,7 @@
+ #elif defined EPLAN9                /* Plan9 */
+   if (fp->state != 0 /* CLOSED */)
+     fp->state = 5 /* ERR */;
+-#elif 0                             /* unknown  */
++#elif 1                             /* unknown  */
+   /* Portable fallback, based on an idea by Rich Felker.
+      Wow! 6 system calls for something that is just a bit operation!
+      Not activated on any system, because there is no way to repair FP when
