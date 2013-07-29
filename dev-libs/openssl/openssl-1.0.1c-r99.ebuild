@@ -203,8 +203,8 @@ src_install() {
 	dodir /etc/sandbox.d #254521
 	echo 'SANDBOX_PREDICT="/dev/crypto"' > "${D}"/etc/sandbox.d/10openssl
 
-	diropts -m0700
-	keepdir ${SSL_CNF_DIR}/private
+	#diropts -m0700
+	#keepdir ${SSL_CNF_DIR}/private
 }
 
 pkg_preinst() {
