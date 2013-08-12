@@ -25,7 +25,6 @@ index 68a06b9..595456d 100644
  #include <sys/types.h>
  #include <sys/stat.h>
 diff --git a/src/libudev/path-util.c b/src/libudev/path-util.c
-index fd67310..87f47a5 100644
 --- a/src/libudev/path-util.c
 +++ b/src/libudev/path-util.c
 @@ -152,7 +152,7 @@ char **path_strv_canonicalize(char **l) {
@@ -54,12 +53,17 @@ diff --git a/src/udev/mkdir.c b/src/udev/mkdir.c
 index 420a9eb..5576fbc 100644
 --- a/src/udev/mkdir.c
 +++ b/src/udev/mkdir.c
-@@ -90,7 +90,7 @@ static int mkdir_parents_internal(const char *prefix, const char *path, mode_t m
+@@ -90,7 +90,12 @@ static int mkdir_parents_internal(const char *prefix, const char *path, mode_t m
          if (e == path)
                  return 0;
 
 -        p = strndupa(path, e - path);
-+        p = strndup(path, e - path);
++        char buf[PATH_MAX];
++        p = buf;
++        assert(e-path < sizeof(p));
++        memcpy(buf, path, e-path);
++        buf[e-path] = 0;
++
          r = is_dir(p);
          if (r > 0)
                  return 0;
@@ -67,7 +71,7 @@ diff --git a/src/udev/udevadm-hwdb.c b/src/udev/udevadm-hwdb.c
 index 8f5b1cb..d68dce9 100644
 --- a/src/udev/udevadm-hwdb.c
 +++ b/src/udev/udevadm-hwdb.c
-@@ -123,10 +123,12 @@ static void trie_node_cleanup(struct trie_node *node) {
+@@ -123,10 +128,12 @@ static void trie_node_cleanup(struct trie_node *node) {
          free(node);
  }
 
@@ -93,7 +97,6 @@ index 8f5b1cb..d68dce9 100644
  }
 
 diff --git a/src/udev/udevd.c b/src/udev/udevd.c
-index a923ce7..7dc9f03 100644
 --- a/src/udev/udevd.c
 +++ b/src/udev/udevd.c
 @@ -1214,15 +1214,8 @@ int main(int argc, char *argv[])

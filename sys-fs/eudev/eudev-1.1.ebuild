@@ -132,6 +132,7 @@ src_configure()
 		--with-rootlibdir=/$(get_libdir)
 		--enable-split-usr
 		--exec-prefix=/
+		--disable-manpages
 		$(use_enable doc gtk-doc)
 		$(use_enable gudev)
 		$(use_enable introspection)
