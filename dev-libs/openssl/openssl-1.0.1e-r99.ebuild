@@ -1,6 +1,6 @@
 # Copyright 1999-2013 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/dev-libs/openssl/openssl-1.0.1e-r1.ebuild,v 1.16 2013/10/15 01:53:27 vapier Exp $
+# $Header: /var/cvsroot/gentoo-x86/dev-libs/openssl/openssl-1.0.1e-r3.ebuild,v 1.1 2013/12/20 19:26:59 vapier Exp $
 
 EAPI="4"
 
@@ -14,7 +14,7 @@ SRC_URI="mirror://openssl/source/${P}.tar.gz
 
 LICENSE="openssl"
 SLOT="0"
-KEYWORDS="amd64"
+KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~amd64-fbsd ~sparc-fbsd ~x86-fbsd ~arm-linux ~x86-linux"
 IUSE="bindist gmp kerberos rfc3779 sse2 static-libs test +tls-heartbeat vanilla zlib"
 
 # Have the sub-libs in RDEPEND with [static-libs] since, logically,
@@ -59,6 +59,9 @@ src_prepare() {
 		epatch "${FILESDIR}"/${PN}-1.0.1e-ipv6.patch
 		epatch "${FILESDIR}"/${P}-bad-mac-aes-ni.patch #463444
 		epatch "${FILESDIR}"/${PN}-1.0.1e-perl-5.18.patch #483820
+		epatch "${FILESDIR}"/${PN}-1.0.1e-s_client-verify.patch #472584
+		epatch "${FILESDIR}"/${P}-tls-ver-crash.patch #494816
+		epatch "${FILESDIR}"/${P}-rdrand-explicit.patch
 		epatch "${FILESDIR}"/${PN}-1.0.1c-force-termios.patch
 		epatch_user #332661
 	fi
@@ -113,12 +116,13 @@ src_configure() {
 	# See if our toolchain supports __uint128_t.  If so, it's 64bit
 	# friendly and can use the nicely optimized code paths. #460790
 	local ec_nistp_64_gcc_128
-	if ! use bindist ; then
-		echo "__uint128_t i;" > "${T}"/128.c
-		if ${CC} ${CFLAGS} -c "${T}"/128.c -o /dev/null >&/dev/null ; then
-			ec_nistp_64_gcc_128="enable-ec_nistp_64_gcc_128"
-		fi
-	fi
+	# Disable it for now though #469976
+	#if ! use bindist ; then
+	#	echo "__uint128_t i;" > "${T}"/128.c
+	#	if ${CC} ${CFLAGS} -c "${T}"/128.c -o /dev/null >&/dev/null ; then
+	#		ec_nistp_64_gcc_128="enable-ec_nistp_64_gcc_128"
+	#	fi
+	#fi
 
 	local sslout=$(./gentoo.config)
 	einfo "Use configuration ${sslout:-(openssl knows best)}"
