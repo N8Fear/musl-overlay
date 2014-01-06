@@ -11,7 +11,7 @@ diff -u -r1.21.2.1 s_apps.h
 @@ -148,7 +148,7 @@
  #define PORT_STR        "4433"
  #define PROTOCOL        "tcp"
-
+ 
 -int do_server(int port, int type, int *ret, int (*cb) (char *hostname, int s, unsigned char *context), unsigned char *context);
 +int do_server(int port, int type, int *ret, int (*cb) (char *hostname, int s, unsigned char *context), unsigned char *context, int use_ipv4, int use_ipv6);
  #ifdef HEADER_X509_H
@@ -34,53 +34,53 @@ diff -u -r1.123.2.6.2.10 s_client.c
 --- apps/s_client.c	14 Dec 2011 22:18:02 -0000	1.123.2.6.2.10
 +++ apps/s_client.c	28 Dec 2011 00:28:14 -0000
 @@ -285,6 +285,10 @@
-	{
-	BIO_printf(bio_err,"usage: s_client args\n");
-	BIO_printf(bio_err,"\n");
+ 	{
+ 	BIO_printf(bio_err,"usage: s_client args\n");
+ 	BIO_printf(bio_err,"\n");
 +	BIO_printf(bio_err," -4             - use IPv4 only\n");
 +#if OPENSSL_USE_IPV6
 +	BIO_printf(bio_err," -6             - use IPv6 only\n");
 +#endif
-	BIO_printf(bio_err," -host host     - use -connect instead\n");
-	BIO_printf(bio_err," -port port     - use -connect instead\n");
-	BIO_printf(bio_err," -connect host:port - who to connect to (default is %s:%s)\n",SSL_HOST_NAME,PORT_STR);
+ 	BIO_printf(bio_err," -host host     - use -connect instead\n");
+ 	BIO_printf(bio_err," -port port     - use -connect instead\n");
+ 	BIO_printf(bio_err," -connect host:port - who to connect to (default is %s:%s)\n",SSL_HOST_NAME,PORT_STR);
 @@ -564,6 +567,7 @@
-	int sbuf_len,sbuf_off;
-	fd_set readfds,writefds;
-	short port=PORT;
+ 	int sbuf_len,sbuf_off;
+ 	fd_set readfds,writefds;
+ 	short port=PORT;
 +	int use_ipv4, use_ipv6;
-	int full_log=1;
-	char *host=SSL_HOST_NAME;
-	char *cert_file=NULL,*key_file=NULL;
+ 	int full_log=1;
+ 	char *host=SSL_HOST_NAME;
+ 	char *cert_file=NULL,*key_file=NULL;
 @@ -609,7 +613,11 @@
  #endif
-	char *sess_in = NULL;
-	char *sess_out = NULL;
+ 	char *sess_in = NULL;
+ 	char *sess_out = NULL;
 -	struct sockaddr peer;
 +#if OPENSSL_USE_IPV6
 +	struct sockaddr_storage peer;
 +#else
 +	struct sockaddr_in peer;
 +#endif
-	int peerlen = sizeof(peer);
-	int enable_timeouts = 0 ;
-	long socket_mtu = 0;
+ 	int peerlen = sizeof(peer);
+ 	int enable_timeouts = 0 ;
+ 	long socket_mtu = 0;
 @@ -630,6 +638,12 @@
-	meth=SSLv2_client_method();
+ 	meth=SSLv2_client_method();
  #endif
-
+ 
 +	use_ipv4 = 1;
 +#if OPENSSL_USE_IPV6
 +	use_ipv6 = 1;
 +#else
 +	use_ipv6 = 0;
 +#endif
-	apps_startup();
-	c_Pause=0;
-	c_quiet=0;
+ 	apps_startup();
+ 	c_Pause=0;
+ 	c_quiet=0;
 @@ -951,6 +961,18 @@
-			jpake_secret = *++argv;
-			}
+ 			jpake_secret = *++argv;
+ 			}
  #endif
 +		else if (strcmp(*argv,"-4") == 0)
 +			{
@@ -95,26 +95,26 @@ diff -u -r1.123.2.6.2.10 s_client.c
 +			}
 +#endif
  #ifndef OPENSSL_NO_SRTP
-		else if (strcmp(*argv,"-use_srtp") == 0)
-			{
+ 		else if (strcmp(*argv,"-use_srtp") == 0)
+ 			{
 @@ -1259,7 +1276,7 @@
-
+ 
  re_start:
-
+ 
 -	if (init_client(&s,host,port,socket_type) == 0)
 +	if (init_client(&s,host,port,socket_type,use_ipv4,use_ipv6) == 0)
-		{
-		BIO_printf(bio_err,"connect:errno=%d\n",get_last_socket_error());
-		SHUTDOWN(s);
+ 		{
+ 		BIO_printf(bio_err,"connect:errno=%d\n",get_last_socket_error());
+ 		SHUTDOWN(s);
 @@ -1285,7 +1302,7 @@
-		{
-
-		sbio=BIO_new_dgram(s,BIO_NOCLOSE);
+ 		{
+ 
+ 		sbio=BIO_new_dgram(s,BIO_NOCLOSE);
 -		if (getsockname(s, &peer, (void *)&peerlen) < 0)
 +		if (getsockname(s, (struct sockaddr *)&peer, (void *)&peerlen) < 0)
-			{
-			BIO_printf(bio_err, "getsockname:errno=%d\n",
-				get_last_socket_error());
+ 			{
+ 			BIO_printf(bio_err, "getsockname:errno=%d\n",
+ 				get_last_socket_error());
 ===================================================================
 RCS file: /v/openssl/cvs/openssl/apps/s_server.c,v
 retrieving revision 1.136.2.15.2.13
@@ -129,33 +129,33 @@ diff -u -r1.136.2.15.2.13 s_server.c
 +#if OPENSSL_USE_IPV6
 +	BIO_printf(bio_err," -6            - use IPv6 only\n");
 +#endif
-	BIO_printf(bio_err," -keymatexport label   - Export keying material using label\n");
-	BIO_printf(bio_err," -keymatexportlen len  - Export len bytes of keying material (default 20)\n");
-	}
+ 	BIO_printf(bio_err," -keymatexport label   - Export keying material using label\n");
+ 	BIO_printf(bio_err," -keymatexportlen len  - Export len bytes of keying material (default 20)\n");
+ 	}
 @@ -943,6 +947,7 @@
-	int state=0;
-	const SSL_METHOD *meth=NULL;
-	int socket_type=SOCK_STREAM;
+ 	int state=0;
+ 	const SSL_METHOD *meth=NULL;
+ 	int socket_type=SOCK_STREAM;
 +	int use_ipv4, use_ipv6;
-	ENGINE *e=NULL;
-	char *inrand=NULL;
-	int s_cert_format = FORMAT_PEM, s_key_format = FORMAT_PEM;
+ 	ENGINE *e=NULL;
+ 	char *inrand=NULL;
+ 	int s_cert_format = FORMAT_PEM, s_key_format = FORMAT_PEM;
 @@ -981,6 +986,12 @@
    /*  #error no SSL version enabled */
  #endif
-
+ 
 +	use_ipv4 = 1;
 +#if OPENSSL_USE_IPV6
 +	use_ipv6 = 1;
 +#else
 +	use_ipv6 = 0;
 +#endif
-	local_argc=argc;
-	local_argv=argv;
-
+ 	local_argc=argc;
+ 	local_argv=argv;
+ 
 @@ -1329,6 +1340,18 @@
-			jpake_secret = *(++argv);
-			}
+ 			jpake_secret = *(++argv);
+ 			}
  #endif
 +		else if (strcmp(*argv,"-4") == 0)
 +			{
@@ -170,19 +170,19 @@ diff -u -r1.136.2.15.2.13 s_server.c
 +			}
 +#endif
  #ifndef OPENSSL_NO_SRTP
-		else if (strcmp(*argv,"-use_srtp") == 0)
-			{
+ 		else if (strcmp(*argv,"-use_srtp") == 0)
+ 			{
 @@ -1884,9 +1907,9 @@
-	BIO_printf(bio_s_out,"ACCEPT\n");
-	(void)BIO_flush(bio_s_out);
-	if (www)
+ 	BIO_printf(bio_s_out,"ACCEPT\n");
+ 	(void)BIO_flush(bio_s_out);
+ 	if (www)
 -		do_server(port,socket_type,&accept_socket,www_body, context);
 +		do_server(port,socket_type,&accept_socket,www_body, context, use_ipv4, use_ipv6);
-	else
+ 	else
 -		do_server(port,socket_type,&accept_socket,sv_body, context);
 +		do_server(port,socket_type,&accept_socket,sv_body, context, use_ipv4, use_ipv6);
-	print_stats(bio_s_out,ctx);
-	ret=0;
+ 	print_stats(bio_s_out,ctx);
+ 	ret=0;
  end:
 Index: apps/s_socket.c
 ===================================================================
@@ -194,7 +194,7 @@ diff -u -r1.43.2.3.2.2 s_socket.c
 @@ -97,16 +97,16 @@
  #include "netdb.h"
  #endif
-
+ 
 -static struct hostent *GetHostByName(char *name);
 +static struct hostent *GetHostByName(char *name, int domain);
  #if defined(OPENSSL_SYS_WINDOWS) || (defined(OPENSSL_SYS_NETWARE) && !defined(NETWARE_BSDSOCK))
@@ -210,22 +210,22 @@ diff -u -r1.43.2.3.2.2 s_socket.c
  static int do_accept(int acc_sock, int *sock, char **host);
 -static int host_ip(char *str, unsigned char ip[4]);
 +static int host_ip(char *str, unsigned char *ip, int domain);
-
+ 
  #ifdef OPENSSL_SYS_WIN16
  #define SOCKET_PROTOCOL	0 /* more microsoft stupidity */
 @@ -234,38 +234,68 @@
-	return(1);
-	}
-
+ 	return(1);
+ 	}
+ 
 -int init_client(int *sock, char *host, int port, int type)
 +int init_client(int *sock, char *host, int port, int type, int use_ipv4, int use_ipv6)
-	{
+ 	{
 +#if OPENSSL_USE_IPV6
 +	unsigned char ip[16];
 +#else
-	unsigned char ip[4];
+ 	unsigned char ip[4];
 +#endif
-
+ 
 -	memset(ip, '\0', sizeof ip);
 -	if (!host_ip(host,&(ip[0])))
 -		return 0;
@@ -253,15 +253,15 @@ diff -u -r1.43.2.3.2.2 s_socket.c
 +	struct sockaddr_in *them_in = (struct sockaddr_in *)&them;
 +	struct sockaddr_in6 *them_in6 = (struct sockaddr_in6 *)&them;
 +#else
-	struct sockaddr_in them;
+ 	struct sockaddr_in them;
 +	struct sockaddr_in *them_in = &them;
 +#endif
 +	socklen_t addr_len;
-	int s,i;
-
-	if (!ssl_sock_init()) return(0);
-
-	memset((char *)&them,0,sizeof(them));
+ 	int s,i;
+ 
+ 	if (!ssl_sock_init()) return(0);
+ 
+ 	memset((char *)&them,0,sizeof(them));
 -	them.sin_family=AF_INET;
 -	them.sin_port=htons((unsigned short)port);
 -	addr=(unsigned long)
@@ -292,71 +292,71 @@ diff -u -r1.43.2.3.2.2 s_socket.c
 +#else
 +		return(0);
 +#endif
-
-	if (type == SOCK_STREAM)
+ 
+ 	if (type == SOCK_STREAM)
 -		s=socket(AF_INET,SOCK_STREAM,SOCKET_PROTOCOL);
 +		s=socket(domain,SOCK_STREAM,SOCKET_PROTOCOL);
-	else /* ( type == SOCK_DGRAM) */
+ 	else /* ( type == SOCK_DGRAM) */
 -		s=socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
 +		s=socket(domain,SOCK_DGRAM,IPPROTO_UDP);
-
-	if (s == INVALID_SOCKET) { perror("socket"); return(0); }
-
+ 			
+ 	if (s == INVALID_SOCKET) { perror("socket"); return(0); }
+ 
 @@ -277,29 +315,27 @@
-		if (i < 0) { perror("keepalive"); return(0); }
-		}
+ 		if (i < 0) { perror("keepalive"); return(0); }
+ 		}
  #endif
 -
 -	if (connect(s,(struct sockaddr *)&them,sizeof(them)) == -1)
 +	if (connect(s,(struct sockaddr *)&them,addr_len) == -1)
-		{ closesocket(s); perror("connect"); return(0); }
-	*sock=s;
-	return(1);
-	}
-
+ 		{ closesocket(s); perror("connect"); return(0); }
+ 	*sock=s;
+ 	return(1);
+ 	}
+ 
 -int do_server(int port, int type, int *ret, int (*cb)(char *hostname, int s, unsigned char *context), unsigned char *context)
 +int do_server(int port, int type, int *ret, int (*cb)(char *hostname, int s, unsigned char *context), unsigned char *context, int use_ipv4, int use_ipv6)
-	{
-	int sock;
-	char *name = NULL;
-	int accept_socket = 0;
-	int i;
-
+ 	{
+ 	int sock;
+ 	char *name = NULL;
+ 	int accept_socket = 0;
+ 	int i;
+ 
 -	if (!init_server(&accept_socket,port,type)) return(0);
 -
 +	if (!init_server(&accept_socket,port,type, use_ipv4, use_ipv6)) return(0);
-	if (ret != NULL)
-		{
-		*ret=accept_socket;
-		/* return(1);*/
-		}
+ 	if (ret != NULL)
+ 		{
+ 		*ret=accept_socket;
+ 		/* return(1);*/
+ 		}
 -  	for (;;)
 -  		{
 +	for (;;)
 +		{
-		if (type==SOCK_STREAM)
-			{
-			if (do_accept(accept_socket,&sock,&name) == 0)
+ 		if (type==SOCK_STREAM)
+ 			{
+ 			if (do_accept(accept_socket,&sock,&name) == 0)
 @@ -322,41 +358,88 @@
-		}
-	}
-
+ 		}
+ 	}
+ 
 -static int init_server_long(int *sock, int port, char *ip, int type)
 +static int init_server_long(int *sock, int port, char *ip, int type, int use_ipv4, int use_ipv6)
-	{
-	int ret=0;
+ 	{
+ 	int ret=0;
 +	int domain;
 +#if OPENSSL_USE_IPV6
 +	struct sockaddr_storage server;
 +	struct sockaddr_in *server_in = (struct sockaddr_in *)&server;
 +	struct sockaddr_in6 *server_in6 = (struct sockaddr_in6 *)&server;
 +#else
-	struct sockaddr_in server;
+ 	struct sockaddr_in server;
 +	struct sockaddr_in *server_in = &server;
 +#endif
 +	socklen_t addr_len;
-	int s= -1;
-
+ 	int s= -1;
+ 
 +	if (!use_ipv4 && !use_ipv6)
 +		goto err;
 +#if OPENSSL_USE_IPV6
@@ -365,8 +365,8 @@ diff -u -r1.43.2.3.2.2 s_socket.c
 +	if (use_ipv6)
 +		goto err;
 +#endif
-	if (!ssl_sock_init()) return(0);
-
+ 	if (!ssl_sock_init()) return(0);
+ 
 -	memset((char *)&server,0,sizeof(server));
 -	server.sin_family=AF_INET;
 -	server.sin_port=htons((unsigned short)port);
@@ -382,7 +382,7 @@ diff -u -r1.43.2.3.2.2 s_socket.c
 -		memcpy(&server.sin_addr,ip,4);
 +	domain = AF_INET;
  #endif
--
+-	
 -		if (type == SOCK_STREAM)
 -			s=socket(AF_INET,SOCK_STREAM,SOCKET_PROTOCOL);
 -		else /* type == SOCK_DGRAM */
@@ -391,8 +391,8 @@ diff -u -r1.43.2.3.2.2 s_socket.c
 +		s=socket(domain,SOCK_STREAM,SOCKET_PROTOCOL);
 +	else /* type == SOCK_DGRAM */
 +		s=socket(domain, SOCK_DGRAM,IPPROTO_UDP);
-
-	if (s == INVALID_SOCKET) goto err;
+ 
+ 	if (s == INVALID_SOCKET) goto err;
  #if defined SOL_SOCKET && defined SO_REUSEADDR
 +	{
 +	int j = 1;
@@ -402,7 +402,7 @@ diff -u -r1.43.2.3.2.2 s_socket.c
 +#endif
 +#if OPENSSL_USE_IPV6
 +	if ((use_ipv4 == 0) && (use_ipv6 == 1))
-		{
+ 		{
 -		int j = 1;
 -		setsockopt(s, SOL_SOCKET, SO_REUSEADDR,
 -			   (void *) &j, sizeof j);
@@ -410,7 +410,7 @@ diff -u -r1.43.2.3.2.2 s_socket.c
 +
 +		setsockopt(s, IPPROTO_IPV6, IPV6_V6ONLY,
 +		           (const void *) &on, sizeof(int));
-		}
+ 		}
  #endif
 -	if (bind(s,(struct sockaddr *)&server,sizeof(server)) == -1)
 +	if (domain == AF_INET)
@@ -443,24 +443,24 @@ diff -u -r1.43.2.3.2.2 s_socket.c
 +		}
 +#endif
 +	if (bind(s, (struct sockaddr *)&server, addr_len) == -1)
-		{
+ 		{
  #ifndef OPENSSL_SYS_WINDOWS
-		perror("bind");
+ 		perror("bind");
 @@ -375,16 +458,23 @@
-	return(ret);
-	}
-
+ 	return(ret);
+ 	}
+ 
 -static int init_server(int *sock, int port, int type)
 +static int init_server(int *sock, int port, int type, int use_ipv4, int use_ipv6)
-	{
+ 	{
 -	return(init_server_long(sock, port, NULL, type));
 +	return(init_server_long(sock, port, NULL, type, use_ipv4, use_ipv6));
-	}
-
+ 	}
+ 
  static int do_accept(int acc_sock, int *sock, char **host)
-	{
-	int ret;
-	struct hostent *h1,*h2;
+ 	{
+ 	int ret;
+ 	struct hostent *h1,*h2;
 -	static struct sockaddr_in from;
 +#if OPENSSL_USE_IPV6
 +	struct sockaddr_storage from;
@@ -470,13 +470,13 @@ diff -u -r1.43.2.3.2.2 s_socket.c
 +	struct sockaddr_in from;
 +	struct sockaddr_in *from_in = &from;
 +#endif
-	int len;
+ 	int len;
  /*	struct linger ling; */
-
+ 
 @@ -431,13 +521,23 @@
  */
-
-	if (host == NULL) goto end;
+ 
+ 	if (host == NULL) goto end;
 +#if OPENSSL_USE_IPV6
 +	if (from.ss_family == AF_INET)
 +#else
@@ -500,76 +500,76 @@ diff -u -r1.43.2.3.2.2 s_socket.c
 +		h1=gethostbyaddr((char *)&from_in6->sin6_addr,
 +		                 sizeof(struct in6_addr), AF_INET6);
  #endif
-	if (h1 == NULL)
-		{
+ 	if (h1 == NULL)
+ 		{
 @@ -454,15 +554,23 @@
-			}
-		BUF_strlcpy(*host,h1->h_name,strlen(h1->h_name)+1);
-
+ 			}
+ 		BUF_strlcpy(*host,h1->h_name,strlen(h1->h_name)+1);
+ 
 -		h2=GetHostByName(*host);
 +#if OPENSSL_USE_IPV6
 +		h2=GetHostByName(*host, from.ss_family);
 +#else
 +		h2=GetHostByName(*host, from.sin_family);
 +#endif
-		if (h2 == NULL)
-			{
-			BIO_printf(bio_err,"gethostbyname failure\n");
-			return(0);
-			}
+ 		if (h2 == NULL)
+ 			{
+ 			BIO_printf(bio_err,"gethostbyname failure\n");
+ 			return(0);
+ 			}
 -		if (h2->h_addrtype != AF_INET)
 +#if OPENSSL_USE_IPV6
 +		if (h2->h_addrtype != from.ss_family)
 +#else
 +		if (h2->h_addrtype != from.sin_family)
 +#endif
-			{
+ 			{
 -			BIO_printf(bio_err,"gethostbyname addr is not AF_INET\n");
 +			BIO_printf(bio_err,"gethostbyname addr address is not correct\n");
-			return(0);
-			}
-		}
+ 			return(0);
+ 			}
+ 		}
 @@ -477,7 +585,7 @@
-	char *h,*p;
-
-	h=str;
+ 	char *h,*p;
+ 
+ 	h=str;
 -	p=strchr(str,':');
 +	p=strrchr(str,':');
-	if (p == NULL)
-		{
-		BIO_printf(bio_err,"no port defined\n");
+ 	if (p == NULL)
+ 		{
+ 		BIO_printf(bio_err,"no port defined\n");
 @@ -485,7 +593,7 @@
-		}
-	*(p++)='\0';
-
+ 		}
+ 	*(p++)='\0';
+ 
 -	if ((ip != NULL) && !host_ip(str,ip))
 +	if ((ip != NULL) && !host_ip(str,ip,AF_INET))
-		goto err;
-	if (host_ptr != NULL) *host_ptr=h;
-
+ 		goto err;
+ 	if (host_ptr != NULL) *host_ptr=h;
+ 
 @@ -496,48 +604,58 @@
-	return(0);
-	}
-
+ 	return(0);
+ 	}
+ 
 -static int host_ip(char *str, unsigned char ip[4])
 +static int host_ip(char *str, unsigned char *ip, int domain)
-	{
--	unsigned int in[4];
+ 	{
+-	unsigned int in[4]; 
 +	unsigned int in[4];
 +	unsigned long l;
-	int i;
-
+ 	int i;
+ 
 -	if (sscanf(str,"%u.%u.%u.%u",&(in[0]),&(in[1]),&(in[2]),&(in[3])) == 4)
 +	if ((domain == AF_INET) &&
 +	    (sscanf(str,"%u.%u.%u.%u",&(in[0]),&(in[1]),&(in[2]),&(in[3])) == 4))
-		{
-+
-		for (i=0; i<4; i++)
-			if (in[i] > 255)
-				{
-				BIO_printf(bio_err,"invalid IP address\n");
-				goto err;
-				}
+ 		{
++		
+ 		for (i=0; i<4; i++)
+ 			if (in[i] > 255)
+ 				{
+ 				BIO_printf(bio_err,"invalid IP address\n");
+ 				goto err;
+ 				}
 -		ip[0]=in[0];
 -		ip[1]=in[1];
 -		ip[2]=in[2];
@@ -584,27 +584,27 @@ diff -u -r1.43.2.3.2.2 s_socket.c
 +	         (inet_pton(AF_INET6, str, ip) == 1))
 +	         return 1;
 +#endif
-	else
-		{ /* do a gethostbyname */
-		struct hostent *he;
-
-		if (!ssl_sock_init()) return(0);
-
+ 	else
+ 		{ /* do a gethostbyname */
+ 		struct hostent *he;
+ 
+ 		if (!ssl_sock_init()) return(0);
+ 
 -		he=GetHostByName(str);
 +		he=GetHostByName(str,domain);
-		if (he == NULL)
-			{
-			BIO_printf(bio_err,"gethostbyname failure\n");
-			goto err;
-			}
-		/* cast to short because of win16 winsock definition */
+ 		if (he == NULL)
+ 			{
+ 			BIO_printf(bio_err,"gethostbyname failure\n");
+ 			goto err;
+ 			}
+ 		/* cast to short because of win16 winsock definition */
 -		if ((short)he->h_addrtype != AF_INET)
 +		if ((short)he->h_addrtype != domain)
-			{
+ 			{
 -			BIO_printf(bio_err,"gethostbyname addr is not AF_INET\n");
 +			BIO_printf(bio_err,"gethostbyname addr family is not correct\n");
-			return(0);
-			}
+ 			return(0);
+ 			}
 -		ip[0]=he->h_addr_list[0][0];
 -		ip[1]=he->h_addr_list[0][1];
 -		ip[2]=he->h_addr_list[0][2];
@@ -617,33 +617,33 @@ diff -u -r1.43.2.3.2.2 s_socket.c
 +#endif
 +		memcpy(ip, he->h_addr_list[0], he->h_length);
 +		return 1;
-		}
+ 		}
 -	return(1);
  err:
-	return(0);
-	}
+ 	return(0);
+ 	}
 @@ -574,7 +692,7 @@
  static unsigned long ghbn_hits=0L;
  static unsigned long ghbn_miss=0L;
-
+ 
 -static struct hostent *GetHostByName(char *name)
 +static struct hostent *GetHostByName(char *name, int domain)
-	{
-	struct hostent *ret;
-	int i,lowi=0;
+ 	{
+ 	struct hostent *ret;
+ 	int i,lowi=0;
 @@ -589,14 +707,20 @@
-			}
-		if (ghbn_cache[i].order > 0)
-			{
+ 			}
+ 		if (ghbn_cache[i].order > 0)
+ 			{
 -			if (strncmp(name,ghbn_cache[i].name,128) == 0)
 +			if ((strncmp(name,ghbn_cache[i].name,128) == 0) &&
 +			    (ghbn_cache[i].ent.h_addrtype == domain))
-				break;
-			}
-		}
-	if (i == GHBN_NUM) /* no hit*/
-		{
-		ghbn_miss++;
+ 				break;
+ 			}
+ 		}
+ 	if (i == GHBN_NUM) /* no hit*/
+ 		{
+ 		ghbn_miss++;
 -		ret=gethostbyname(name);
 +		if (domain == AF_INET)
 +			ret=gethostbyname(name);
@@ -651,6 +651,6 @@ diff -u -r1.43.2.3.2.2 s_socket.c
 +		else
 +			ret=gethostbyname2(name, AF_INET6);
 +#endif
-		if (ret == NULL) return(NULL);
-		/* else add to cache */
-		if(strlen(name) < sizeof ghbn_cache[0].name)
+ 		if (ret == NULL) return(NULL);
+ 		/* else add to cache */
+ 		if(strlen(name) < sizeof ghbn_cache[0].name)
