@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: /var/cvsroot/gentoo-x86/sys-apps/shadow/shadow-4.1.5.1.ebuild,v 1.4 2013/03/12 14:19:37 vapier Exp $
 
-EAPI="2"
+EAPI=4
 
 inherit eutils libtool toolchain-funcs pam multilib
 
@@ -35,6 +35,7 @@ src_prepare() {
 	epatch "${FILESDIR}"/${PN}-4.1.3-dots-in-usernames.patch #22920
 	epatch "${FILESDIR}"/${P}-include-sys-socket.patch
 	epatch "${FILESDIR}"/${P}-fix-RUSEROK.patch
+	epatch "${FILESDIR}"/${P}-fix-struct_in_addr-collision.patch
 	epatch_user
 	elibtoolize
 }
@@ -69,7 +70,7 @@ set_login_opt() {
 }
 
 src_install() {
-	emake DESTDIR="${D}" suidperms=4711 install || die
+	emake DESTDIR="${D}" suidperms=4711 install
 
 	# Remove libshadow and libmisc; see bug 37725 and the following
 	# comment from shadow's README.linux:
@@ -91,7 +92,7 @@ src_install() {
 	case $(tc-arch) in
 		ppc*)  devs="hvc0 hvsi0 ttyPSC0";;
 		hppa)  devs="ttyB0";;
-		arm)   devs="ttyFB0 ttySAC0 ttySAC1 ttySAC2 ttySAC3 ttymxc0 ttymxc1 ttyO0 ttyO1 ttyO2";;
+		arm)   devs="ttyFB0 ttySAC0 ttySAC1 ttySAC2 ttySAC3 ttymxc0 ttymxc1 ttymxc2 ttymxc3 ttyO0 ttyO1 ttyO2";;
 		sh)    devs="ttySC0 ttySC1";;
 	esac
 	[[ -n ${devs} ]] && printf '%s\n' ${devs} >> "${D}"/etc/securetty
@@ -117,15 +118,15 @@ src_install() {
 		set_login_opt LOGIN_RETRIES 3
 		set_login_opt ENCRYPT_METHOD SHA512
 	else
-		dopamd "${FILESDIR}"/pam.d-include/shadow || die
+		dopamd "${FILESDIR}"/pam.d-include/shadow
 
-		for x in chpasswd chgpasswd; do
-			newpamd "${FILESDIR}"/pam.d-include/passwd ${x} || die
+		for x in chpasswd chgpasswd newusers; do
+			newpamd "${FILESDIR}"/pam.d-include/passwd ${x}
 		done
 
-		for x in chage chsh chfn newusers \
+		for x in chage chsh chfn \
 				 user{add,del,mod} group{add,del,mod} ; do
-			newpamd "${FILESDIR}"/pam.d-include/shadow ${x} || die
+			newpamd "${FILESDIR}"/pam.d-include/shadow ${x}
 		done
 
 		# comment out login.defs options that pam hates
@@ -180,8 +181,6 @@ src_install() {
 pkg_preinst() {
 	rm -f "${ROOT}"/etc/pam.d/system-auth.new \
 		"${ROOT}/etc/login.defs.new"
-
-	use pam && pam_epam_expand "${D}"/etc/pam.d/login
 }
 
 pkg_postinst() {
