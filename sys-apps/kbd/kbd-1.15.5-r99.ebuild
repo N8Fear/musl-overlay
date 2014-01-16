@@ -1,6 +1,8 @@
-# Copyright 1999-2013 Gentoo Foundation
+# Copyright 1999-2014 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/sys-apps/kbd/kbd-1.15.3.ebuild,v 1.7 2011/10/11 16:44:58 jer Exp $
+# $Header: /var/cvsroot/gentoo-x86/sys-apps/kbd/kbd-1.15.5-r1.ebuild,v 1.6 2014/01/09 13:37:41 polynomial-c Exp $
+
+EAPI="4"
 
 inherit eutils
 
@@ -10,17 +12,15 @@ SRC_URI="ftp://ftp.altlinux.org/pub/people/legion/kbd/${P}.tar.gz"
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="alpha amd64 arm hppa ia64 m68k ~mips ppc ppc64 s390 sh sparc x86"
-IUSE="nls"
+KEYWORDS="alpha amd64 arm hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc x86"
+IUSE="nls pam"
 
-RDEPEND=""
-DEPEND="${RDEPEND}
-	nls? ( sys-devel/gettext )"
+RDEPEND="pam? ( virtual/pam )"
+DEPEND="${RDEPEND}"
 
 src_unpack() {
-	unpack ${A}
+	default
 	cd "${S}"
-	epatch "${FILESDIR}"/${P}-musl-headers-error.patch
 
 	# broken file ... upstream git punted it
 	rm po/es.po
@@ -32,19 +32,21 @@ src_unpack() {
 	mv olpc/es.map olpc/es-olpc.map
 	mv olpc/pt.map olpc/pt-olpc.map
 	mv qwerty/cz.map qwerty/cz-qwerty.map
-
-
-	# bundled timestamps are broken
-	find "${S}" -type f -exec touch -r "${S}"/configure {} +
 }
 
-src_compile() {
-	econf $(use_enable nls) || die
-	emake || die
+src_prepare() {
+	epatch "${FILESDIR}"/${P}-loadkeys-parse.patch #447440
+	epatch "${FILESDIR}"/${P}-musl-headers-error.patch
+	epatch "${FILESDIR}"/${P}-fix-struct_winsize-collision.patch
+}
+
+src_configure() {
+	econf \
+		$(use_enable nls) \
+		$(use_enable pam vlock)
 }
 
 src_install() {
-	emake DESTDIR="${D}" install || die
-	dodoc AUTHORS ChangeLog INSTALL NEWS README
+	default
 	dohtml doc/*.html
 }
