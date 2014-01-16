@@ -1,0 +1,12 @@
+diff -Naur kmod-15.orig/libkmod/libkmod-util.c kmod-15/libkmod/libkmod-util.c
+--- kmod-15.orig/libkmod/libkmod-util.c	2014-01-16 14:11:37.002012850 +0000
++++ kmod-15/libkmod/libkmod-util.c	2014-01-16 14:10:36.709009479 +0000
+@@ -324,7 +324,7 @@
+ {
+ 	char *start, *end;
+ 
+-	start = strndupa(path, len);
++	start = strndup(path, len);
+ 	end = start + len;
+ 
+ 	/*
