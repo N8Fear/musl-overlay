@@ -1,0 +1,11 @@
+diff -Naur eudev-1.3.orig/man/Makefile.am eudev-1.3/man/Makefile.am
+--- eudev-1.3.orig/man/Makefile.am	2013-08-26 22:36:38.000000000 +0000
++++ eudev-1.3/man/Makefile.am	2014-01-16 14:30:24.157075876 +0000
+@@ -23,7 +23,6 @@
+ 	$(MANPAGES)
+ 
+ XSLTPROC_FLAGS = \
+-	--nonet \
+ 	--stringparam man.output.quietly 1 \
+ 	--stringparam funcsynopsis.style ansi \
+ 	--stringparam man.th.extra1.suppress 1 \

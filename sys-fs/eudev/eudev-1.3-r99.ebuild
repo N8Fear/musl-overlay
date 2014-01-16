@@ -1,12 +1,12 @@
-# Copyright 1999-2013 Gentoo Foundation
+# Copyright 1999-2014 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/sys-fs/eudev/eudev-1.1.ebuild,v 1.5 2013/07/25 15:31:49 axs Exp $
+# $Header: /var/cvsroot/gentoo-x86/sys-fs/eudev/eudev-1.3.ebuild,v 1.11 2014/01/06 20:12:32 axs Exp $
 
 EAPI="5"
 
 KV_min=2.6.31
 
-inherit autotools eutils linux-info
+inherit autotools eutils multilib linux-info multilib-minimal
 
 if [[ ${PV} = 9999* ]]
 then
@@ -14,7 +14,7 @@ then
 	inherit git-2
 else
 	SRC_URI="http://dev.gentoo.org/~blueness/${PN}/${P}.tar.gz"
-	KEYWORDS="~amd64 ~arm ~hppa ~mips ~ppc ~ppc64 ~x86"
+	KEYWORDS="amd64 arm hppa ~mips ~ppc ~ppc64 x86"
 fi
 
 DESCRIPTION="Linux dynamic and persistent device naming support (aka userspace devfs)"
@@ -22,14 +22,18 @@ HOMEPAGE="https://github.com/gentoo/eudev"
 
 LICENSE="LGPL-2.1 MIT GPL-2"
 SLOT="0"
-IUSE="doc elibc_musl gudev hwdb kmod introspection keymap +modutils +openrc +rule-generator selinux static-libs test"
+IUSE="doc gudev hwdb kmod introspection keymap +modutils +openrc +rule-generator selinux static-libs test"
 
 COMMON_DEPEND="gudev? ( dev-libs/glib:2 )
 	kmod? ( sys-apps/kmod )
 	introspection? ( >=dev-libs/gobject-introspection-1.31.1 )
 	selinux? ( sys-libs/libselinux )
 	>=sys-apps/util-linux-2.20
-	!<sys-libs/glibc-2.11"
+	!<sys-libs/glibc-2.11
+	abi_x86_32? (
+		!<=app-emulation/emul-linux-x86-baselibs-20130224-r7
+		!app-emulation/emul-linux-x86-baselibs[-abi_x86_32(-)]
+	)"
 
 DEPEND="${COMMON_DEPEND}
 	keymap? ( dev-util/gperf )
@@ -43,7 +47,6 @@ DEPEND="${COMMON_DEPEND}
 	test? ( app-text/tree dev-lang/perl )"
 
 RDEPEND="${COMMON_DEPEND}
-	hwdb? ( >=sys-apps/hwids-20121202.2[udev] )
 	!sys-fs/udev
 	!sys-apps/coldplug
 	!sys-apps/systemd
@@ -51,9 +54,12 @@ RDEPEND="${COMMON_DEPEND}
 	!sys-fs/device-mapper
 	!<sys-fs/udev-init-scripts-18"
 
-PDEPEND=">=virtual/udev-180
-	<virtual/udev-206
+PDEPEND="hwdb? ( >=sys-apps/hwids-20130717-r1[udev] )
+	keymap? ( >=sys-apps/hwids-20130717-r1[udev] )
+	>=virtual/udev-206-r2
 	openrc? ( >=sys-fs/udev-init-scripts-18 )"
+
+REQUIRED_USE="keymap? ( hwdb )"
 
 pkg_pretend()
 {
@@ -97,7 +103,8 @@ src_prepare()
 	sed -e 's/GROUP="dialout"/GROUP="uucp"/' -i rules/*.rules \
 	|| die "failed to change group dialout to uucp"
 
-	use elibc_musl && epatch "${FILESDIR}/${P}-musl.patch"
+	epatch "${FILESDIR}"/${PN}-selinux-timespan.patch
+	epatch "${FILESDIR}"/${PN}-man-no_nonet.patch
 
 	epatch_user
 
@@ -115,7 +122,7 @@ src_prepare()
 	fi
 }
 
-src_configure()
+multilib_src_configure()
 {
 	local econf_args
 
@@ -129,38 +136,70 @@ src_configure()
 		--libdir=/usr/$(get_libdir)
 		--with-firmware-path="${EPREFIX}usr/lib/firmware/updates:${EPREFIX}usr/lib/firmware:${EPREFIX}lib/firmware/updates:${EPREFIX}lib/firmware"
 		--with-html-dir="/usr/share/doc/${PF}/html"
-		--with-rootlibdir=/$(get_libdir)
 		--enable-split-usr
 		--exec-prefix=/
-		--disable-manpages
+	)
+
+	# Only build libudev for non-native_abi, and only install it to libdir,
+	# that means all options only apply to native_abi
+	if multilib_build_binaries; then econf_args+=(
+		--with-rootlibdir=/$(get_libdir)
 		$(use_enable doc gtk-doc)
 		$(use_enable gudev)
 		$(use_enable introspection)
 		$(use_enable keymap)
 		$(use_enable kmod libkmod)
-		$(use_enable modutils modules)
-		$(use_enable selinux)
+		$(usex kmod --enable-modules $(use_enable modutils modules))
 		$(use_enable static-libs static)
+		$(use_enable selinux)
 		$(use_enable rule-generator)
-	)
-	econf "${econf_args[@]}"
+		)
+	else econf_args+=(
+		$(echo --disable-{gtk-doc,gudev,introspection,keymap,libkmod,modules,static,selinux,rule-generator})
+		)
+	fi
+	ECONF_SOURCE="${S}" econf "${econf_args[@]}"
 }
 
-src_test() {
+multilib_src_compile()
+{
+	if ! multilib_build_binaries; then
+		cd src/libudev || die "Could not change directory"
+	fi
+	emake
+}
+
+multilib_src_install()
+{
+	if ! multilib_build_binaries; then
+		cd src/libudev || die "Could not change directory"
+	fi
+	emake DESTDIR="${D}" install
+}
+
+multilib_src_test()
+{
 	# make sandbox get out of the way
 	# these are safe because there is a fake root filesystem put in place,
 	# but sandbox seems to evaluate the paths of the test i/o instead of the
 	# paths of the actual i/o that results.
-	addread /sys
-	addwrite /dev
-	addwrite /run
-	default_src_test
+	# also only test for native abi
+	if multilib_build_binaries; then
+		addread /sys
+		addwrite /dev
+		addwrite /run
+		default_src_test
+	fi
 }
 
-src_install()
+# disable header checks because we only install libudev headers for non-native abi
+multilib_check_headers()
 {
-	emake DESTDIR="${D}" install
+	:
+}
 
+multilib_src_install_all()
+{
 	prune_libtool_files --all
 	rm -rf "${ED}"/usr/share/doc/${PF}/LICENSE.*
 
@@ -210,6 +249,14 @@ pkg_postinst()
 
 	if use hwdb && has_version 'sys-apps/hwids[udev]'; then
 		udevadm hwdb --update --root="${ROOT%/}"
+
+		# http://cgit.freedesktop.org/systemd/systemd/commit/?id=1fab57c209035f7e66198343074e9cee06718bda
+		# reload database after it has be rebuilt, but only if we are not upgrading
+		# also pass if we are -9999 since who knows what hwdb related changes there might be
+		if [[ ${REPLACING_VERSIONS%-r*} == ${PV} || -z ${REPLACING_VERSIONS} ]] && \
+		[[ ${ROOT%/} == "" ]] && [[ ${PV} != "9999" ]]; then
+			udevadm control --reload
+		fi
 	fi
 
 	ewarn
