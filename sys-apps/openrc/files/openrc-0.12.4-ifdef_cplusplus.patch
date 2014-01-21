@@ -1,0 +1,42 @@
+diff -Naur openrc-0.12.4.orig/src/libeinfo/einfo.h openrc-0.12.4/src/libeinfo/einfo.h
+--- openrc-0.12.4.orig/src/libeinfo/einfo.h	2013-10-30 20:00:40.000000000 +0000
++++ openrc-0.12.4/src/libeinfo/einfo.h	2014-01-21 22:38:00.356867564 +0000
+@@ -48,7 +48,9 @@
+ # endif
+ #endif
+ 
++#ifdef __cplusplus
+ __BEGIN_DECLS
++#endif
+ 
+ /*! @brief Color types to use */
+ typedef enum
+@@ -140,5 +142,7 @@
+ /*! @brief Prefix each einfo line with something */
+ void eprefix(const char * EINFO_RESTRICT);
+ 
++#ifdef __cplusplus
+ __END_DECLS
+ #endif
++#endif
+diff -Naur openrc-0.12.4.orig/src/librc/rc.h.in openrc-0.12.4/src/librc/rc.h.in
+--- openrc-0.12.4.orig/src/librc/rc.h.in	2013-10-30 20:00:40.000000000 +0000
++++ openrc-0.12.4/src/librc/rc.h.in	2014-01-21 22:37:32.890866029 +0000
+@@ -31,7 +31,9 @@
+ #include <stdbool.h>
+ #include <stdio.h>
+ 
++#ifdef __cplusplus
+ __BEGIN_DECLS
++#endif
+ 
+ #define RC_PREFIX "@PREFIX@"
+ #define RC_SYSCONFDIR		"@SYSCONFDIR@"
+@@ -563,5 +565,7 @@
+  * we have our own */
+ ssize_t rc_getline(char **, size_t *, FILE *);
+ 
++#ifdef __cplusplus
+ __END_DECLS
+ #endif
++#endif

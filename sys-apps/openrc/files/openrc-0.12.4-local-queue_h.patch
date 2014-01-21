@@ -1,0 +1,12 @@
+diff -Naur openrc-0.12.4.orig/src/librc/rc.h.in openrc-0.12.4/src/librc/rc.h.in
+--- openrc-0.12.4.orig/src/librc/rc.h.in	2013-10-30 20:00:40.000000000 +0000
++++ openrc-0.12.4/src/librc/rc.h.in	2014-01-21 22:57:11.283931920 +0000
+@@ -27,7 +27,7 @@
+ #define __RC_H__
+ 
+ #include <sys/types.h>
+-#include <sys/queue.h>
++#include "queue.h"
+ #include <stdbool.h>
+ #include <stdio.h>
+ 
