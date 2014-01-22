@@ -131,6 +131,10 @@ src_prepare() {
 	)
 	sed -i "${sed_args[@]}" configure{,.ac} || die
 
+	epatch "${FILESDIR}"/${PN}-6.4p1-avoid-exit.patch
+	epatch "${FILESDIR}"/${PN}-6.4p1-missing-sys_param_h.patch
+	epatch "${FILESDIR}"/${PN}-6.4p1-fix-typo-construct_utmpx.patch
+
 	epatch_user #473004
 
 	# Now we can build a sane merged version.h
