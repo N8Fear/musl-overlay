@@ -13,7 +13,7 @@ if [[ ${PV} == "9999" ]] ; then
 	MY_P=${PN}
 else
 	SRC_URI="http://dev.gentoo.org/~blueness/${PN}/${P}"
-	KEYWORDS="~amd64 ~arm ~m68k ~mips ~ppc ~sh ~sparc ~x86"
+	KEYWORDS="amd64 ~arm ~m68k ~mips ~ppc ~sh ~sparc ~x86"
 	MY_P=${P}
 fi
 
