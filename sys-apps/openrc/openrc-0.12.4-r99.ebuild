@@ -56,7 +56,7 @@ src_prepare() {
 	epatch "${FILESDIR}"/${PN}-0.12.4-ifdef_cplusplus.patch
 	epatch "${FILESDIR}"/${PN}-0.12.4-local-queue_h.patch
 
-	cp "${FILESDIR}"/queue.h $S/src/librc
+	cp "${FILESDIR}"/queue.h "$S"/src/librc
 
 	# Allow user patches to be applied without modifying the ebuild
 	epatch_user
