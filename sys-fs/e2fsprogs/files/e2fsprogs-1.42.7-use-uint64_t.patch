@@ -1,0 +1,17 @@
+diff -Naur e2fsprogs-1.42.7.orig/lib/ext2fs/unix_io.c e2fsprogs-1.42.7/lib/ext2fs/unix_io.c
+--- e2fsprogs-1.42.7.orig/lib/ext2fs/unix_io.c	2013-01-02 00:47:20.000000000 +0000
++++ e2fsprogs-1.42.7/lib/ext2fs/unix_io.c	2014-01-23 19:33:52.851912147 +0000
+@@ -931,10 +931,10 @@
+ 
+ 	if (channel->flags & CHANNEL_FLAGS_BLOCK_DEVICE) {
+ #ifdef BLKDISCARD
+-		__uint64_t range[2];
++		uint64_t range[2];
+ 
+-		range[0] = (__uint64_t)(block) * channel->block_size;
+-		range[1] = (__uint64_t)(count) * channel->block_size;
++		range[0] = (uint64_t)(block) * channel->block_size;
++		range[1] = (uint64_t)(count) * channel->block_size;
+ 
+ 		ret = ioctl(data->dev, BLKDISCARD, &range);
+ #else
