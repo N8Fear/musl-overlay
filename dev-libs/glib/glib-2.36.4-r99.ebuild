@@ -152,6 +152,7 @@ src_prepare() {
 
 	# Support compilation in clang until upstream solves this, upstream bug #691608
 	append-flags -Wno-format-nonliteral
+	append-cppflags -D_GNU_SOURCE
 
 	epatch_user
 
