@@ -2,6 +2,8 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: /var/cvsroot/gentoo-x86/sys-devel/gcc/gcc-4.7.3.ebuild,v 1.2 2013/05/20 10:56:06 aballier Exp $
 
+EAPI=4
+
 PATCH_VER="1.0"
 UCLIBC_VER="1.0"
 
@@ -41,11 +43,22 @@ src_unpack() {
 		cp libstdc++-v3/config/os/gnu-linux.org/arm-eabi-extra.ver libstdc++-v3/config/os/gnu-linux/
 		mv libitm/config/linux/x86 libitm/config/linux/x86_glibc
 		cp -r libitm/config/generic libitm/config/linux/x86
+
+		epatch "${FILESDIR}"/${P}-musl-linker-path.patch
 	fi
 
 	use vanilla && return 0
 
 	[[ ${CHOST} == ${CTARGET} ]] && epatch "${FILESDIR}"/gcc-spec-env.patch
+}
+
+src_install() {
+	toolchain_src_install
+
+	# Because /usr/lib/gcc/.. is not in musl search path
+	# cp-ing libgcc_s.so.1 is the safest way but it does
+	# mess up gcc-config which will need patching for this.
+	cp "${D}"/usr/lib/gcc/${CHOST}/${PV}/libgcc_s.so.1 "${D}"/usr/lib
 }
 
 pkg_setup() {
