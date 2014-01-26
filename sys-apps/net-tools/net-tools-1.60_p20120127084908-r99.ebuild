@@ -80,6 +80,7 @@ src_configure() {
 	set_opt HAVE_HWIB has_version '>=sys-kernel/linux-headers-2.6'
 	set_opt HAVE_HWTR has_version '<sys-kernel/linux-headers-3.5'
 	set_opt HAVE_HWSTRIP has_version '<sys-kernel/linux-headers-3.6'
+	set_opt HAVE_AFECONET 0
 	if use static ; then
 		append-flags -static
 		append-ldflags -static
