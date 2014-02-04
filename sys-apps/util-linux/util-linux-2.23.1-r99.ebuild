@@ -12,7 +12,7 @@ if [[ ${PV} == "9999" ]] ; then
 	inherit git-2 autotools
 	#KEYWORDS=""
 else
-	KEYWORDS="~alpha amd64 ~arm ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~amd64-linux ~arm-linux ~x86-linux"
+	KEYWORDS="amd64 x86"
 fi
 
 MY_PV=${PV/_/-}
@@ -112,7 +112,6 @@ src_install() {
 	dodoc AUTHORS NEWS README* Documentation/{TODO,*.txt,releases/*}
 
 	# need the libs in /
-	gen_usr_ldscript -a blkid mount uuid
 	# e2fsprogs-libs didnt install .la files, and .pc work fine
 	find "${ED}" -name '*.la' -delete
 }
