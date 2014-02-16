@@ -1,0 +1,13 @@
+--- a/gc-7.2/os_dep.c
++++ b/gc-7.2/os_dep.c
+@@ -38,10 +38,6 @@
+         /* has the right declaration for glibc 2.1.                     */
+ #       include <sigcontext.h>
+ #     endif /* 0 == __GLIBC_MINOR__ */
+-#   else /* not 2 <= __GLIBC__ */
+-      /* libc5 doesn't have <sigcontext.h>: go directly with the kernel   */
+-      /* one.  Check LINUX_VERSION_CODE to see which we should reference. */
+-#     include <asm/sigcontext.h>
+ #   endif /* 2 <= __GLIBC__ */
+ # endif
+ #endif
