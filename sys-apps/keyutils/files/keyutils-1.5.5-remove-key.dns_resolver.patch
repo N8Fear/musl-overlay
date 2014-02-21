@@ -1,0 +1,47 @@
+diff -Naur keyutils-1.5.5.orig/Makefile keyutils-1.5.5/Makefile
+--- keyutils-1.5.5.orig/Makefile	2011-11-30 15:27:43.000000000 +0000
++++ keyutils-1.5.5/Makefile	2014-02-21 22:31:47.224588695 +0000
+@@ -86,7 +86,7 @@
+ # Normal build rule
+ #
+ ###############################################################################
+-all: $(DEVELLIB) keyctl request-key key.dns_resolver
++all: $(DEVELLIB) keyctl request-key
+ 
+ ###############################################################################
+ #
+@@ -137,9 +137,6 @@
+ request-key: request-key.o $(DEVELLIB)
+ 	$(CC) -L. $(CFLAGS) $(LDFLAGS) $(RPATH) -o $@ $< -lkeyutils
+ 
+-key.dns_resolver: key.dns_resolver.o $(DEVELLIB)
+-	$(CC) -L. $(CFLAGS) $(LDFLAGS) $(RPATH) -o $@ $< -lkeyutils -lresolv
+-
+ ###############################################################################
+ #
+ # Install everything
+@@ -156,7 +153,6 @@
+ 	$(INSTALL) -D keyctl $(DESTDIR)$(BINDIR)/keyctl
+ 	$(INSTALL) -D request-key $(DESTDIR)$(SBINDIR)/request-key
+ 	$(INSTALL) -D request-key-debug.sh $(DESTDIR)$(SHAREDIR)/request-key-debug.sh
+-	$(INSTALL) -D key.dns_resolver $(DESTDIR)$(SBINDIR)/key.dns_resolver
+ 	$(INSTALL) -D -m 0644 request-key.conf $(DESTDIR)$(ETCDIR)/request-key.conf
+ 	mkdir -p $(DESTDIR)$(ETCDIR)/request-key.d
+ 	$(INSTALL) -D -m 0644 keyctl.1 $(DESTDIR)$(MAN1)/keyctl.1
+@@ -187,7 +183,6 @@
+ 	$(LNS) recursive_key_scan.3 $(DESTDIR)$(MAN3)/recursive_session_key_scan.3
+ 	$(INSTALL) -D -m 0644 request-key.conf.5 $(DESTDIR)$(MAN5)/request-key.conf.5
+ 	$(INSTALL) -D -m 0644 request-key.8 $(DESTDIR)$(MAN8)/request-key.8
+-	$(INSTALL) -D -m 0644 key.dns_resolver.8 $(DESTDIR)$(MAN8)/key.dns_resolver.8
+ 	$(INSTALL) -D -m 0644 keyutils.h $(DESTDIR)$(INCLUDEDIR)/keyutils.h
+ 
+ ###############################################################################
+@@ -206,7 +201,7 @@
+ clean:
+ 	$(MAKE) -C tests clean
+ 	$(RM) libkeyutils*
+-	$(RM) keyctl request-key key.dns_resolver
++	$(RM) keyctl request-key
+ 	$(RM) *.o *.os *~
+ 	$(RM) debugfiles.list debugsources.list
+ 
