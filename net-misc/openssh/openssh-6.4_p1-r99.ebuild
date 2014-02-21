@@ -23,7 +23,7 @@ SRC_URI="mirror://openbsd/OpenSSH/portable/${PARCH}.tar.gz
 
 LICENSE="BSD GPL-2"
 SLOT="0"
-KEYWORDS="amd64 x86"
+KEYWORDS="amd64 arm x86"
 IUSE="bindist ${HPN_PATCH:++}hpn kerberos ldap ldns libedit pam selinux skey static tcpd X X509"
 
 LIB_DEPEND="selinux? ( >=sys-libs/libselinux-1.28[static-libs(+)] )

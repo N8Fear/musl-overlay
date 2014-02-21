@@ -11,7 +11,7 @@ SRC_URI="http://encfs.googlecode.com/files/${P}.tgz"
 
 LICENSE="GPL-3"
 SLOT="0"
-KEYWORDS="amd64 ~sparc x86"
+KEYWORDS="amd64 arm x86"
 IUSE="xattr"
 
 RDEPEND=">=dev-libs/boost-1.34

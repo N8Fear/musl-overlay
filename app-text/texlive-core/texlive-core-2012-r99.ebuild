@@ -64,7 +64,7 @@ for i in ${TL_CORE_EXTRA_SRC_MODULES}; do
 done
 SRC_URI="${SRC_URI} )"
 
-KEYWORDS="alpha amd64 arm hppa ia64 ~mips ppc ppc64 s390 sh sparc x86 ~amd64-fbsd ~x86-fbsd"
+KEYWORDS="amd64 arm x86"
 IUSE="cjk X doc source tk xetex"
 
 MODULAR_X_DEPEND="X? (

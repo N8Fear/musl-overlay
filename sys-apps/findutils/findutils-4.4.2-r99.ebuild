@@ -13,7 +13,7 @@ SRC_URI="mirror://gnu-alpha/${PN}/${P}.tar.gz
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="amd64 x86"
+KEYWORDS="amd64 arm x86"
 IUSE="nls selinux static"
 
 RDEPEND="selinux? ( sys-libs/libselinux )

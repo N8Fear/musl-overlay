@@ -10,7 +10,7 @@ if [[ ${PV} == 9999 ]]; then
 	inherit git-2
 else
 	SRC_URI="mirror://kernel/linux/utils/kernel/kmod/${P}.tar.xz"
-	KEYWORDS="amd64 x86"
+	KEYWORDS="amd64 arm x86"
 fi
 
 DESCRIPTION="library and tools for managing linux kernel modules"

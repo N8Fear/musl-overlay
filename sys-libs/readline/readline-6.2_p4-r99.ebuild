@@ -32,7 +32,7 @@ SRC_URI="mirror://gnu/${PN}/${MY_P}.tar.gz $(patches)"
 
 LICENSE="GPL-3"
 SLOT="0"
-KEYWORDS="amd64 x86"
+KEYWORDS="amd64 arm x86"
 IUSE="static-libs"
 
 RDEPEND=">=sys-libs/ncurses-5.2-r2"
