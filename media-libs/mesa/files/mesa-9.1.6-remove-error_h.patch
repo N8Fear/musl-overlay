@@ -1,0 +1,33 @@
+diff -Naur Mesa-9.1.6.orig/src/gallium/state_trackers/xvmc/tests/xvmc_bench.c Mesa-9.1.6/src/gallium/state_trackers/xvmc/tests/xvmc_bench.c
+--- Mesa-9.1.6.orig/src/gallium/state_trackers/xvmc/tests/xvmc_bench.c	2013-07-31 22:56:45.000000000 +0000
++++ Mesa-9.1.6/src/gallium/state_trackers/xvmc/tests/xvmc_bench.c	2014-02-21 20:20:43.470217630 +0000
+@@ -28,7 +28,7 @@
+ #include <assert.h>
+ #include <stdio.h>
+ #include <string.h>
+-#include <error.h>
++#include <err.h>
+ #include <sys/time.h>
+ #include "testlib.h"
+ 
+@@ -144,9 +144,9 @@
+ 	}
+ 
+ 	if (fail)
+-		error
++		err
+ 		(
+-			1, 0,
++			1,
+ 			"Bad argument.\n"
+ 			"\n"
+ 			"Usage: %s [options]\n"
+@@ -214,7 +214,7 @@
+ 	))
+ 	{
+ 		XCloseDisplay(display);
+-		error(1, 0, "Error, unable to find a good port.\n");
++		err(1, "Error, unable to find a good port.\n");
+ 	}
+ 
+ 	if (is_overlay)

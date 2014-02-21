@@ -161,6 +161,9 @@ src_prepare() {
 		epatch
 	fi
 
+	# musl doesn have error, so we fall back on err.
+	epatch "${FILESDIR}"/${PN}-9.1.6-remove-error_h.patch
+
 	# relax the requirement that r300 must have llvm, bug 380303
 	epatch "${FILESDIR}"/${PN}-8.1-dont-require-llvm-for-r300.patch
 
