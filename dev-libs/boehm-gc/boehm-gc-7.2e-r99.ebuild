@@ -4,7 +4,7 @@
 
 EAPI=5
 
-inherit autotools eutils
+inherit autotools eutils flag-o-matic
 
 MY_P="gc-${PV/_/}"
 
@@ -24,6 +24,8 @@ S="${WORKDIR}/${MY_P/e}"
 
 src_prepare() {
 	rm -r libatomic_ops || die
+
+	append-cppflags -DNO_GETCONTEXT
 
 	epatch "${FILESDIR}"/${P}-automake-1.13.patch
 	epatch "${FILESDIR}"/${PN}-7.2e-os_dep.patch
