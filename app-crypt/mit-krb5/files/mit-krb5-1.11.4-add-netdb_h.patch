@@ -1,0 +1,11 @@
+diff -Naur krb5-1.11.4.orig/src/lib/rpc/bindresvport.c krb5-1.11.4/src/lib/rpc/bindresvport.c
+--- krb5-1.11.4.orig/src/lib/rpc/bindresvport.c	2013-11-05 00:55:08.000000000 +0000
++++ krb5-1.11.4/src/lib/rpc/bindresvport.c	2014-02-23 13:02:01.036502508 +0000
+@@ -38,6 +38,7 @@
+ #include <sys/errno.h>
+ #include <sys/socket.h>
+ #include <netinet/in.h>
++#include <netdb.h>
+ #include <gssrpc/rpc.h>
+ #include <errno.h>
+ 
