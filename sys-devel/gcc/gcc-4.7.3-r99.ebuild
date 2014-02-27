@@ -44,6 +44,8 @@ src_prepare() {
 		EPATCH_EXCLUDE+=" 10_all_default-fortify-source.patch"
 	fi
 
+	toolchain_src_prepare
+
 	if use elibc_musl; then
 		cd "${S}"
 		sed -i 's@\./fixinc\.sh@-c true@' gcc/Makefile.in
@@ -54,13 +56,6 @@ src_prepare() {
 		cp -r libitm/config/generic libitm/config/linux/x86
 		epatch "${FILESDIR}"/${P}-musl-linker-path.patch
 	fi
-
-	# drop the x32 stuff once 4.7 goes stable
-	if [[ ${CTARGET} != x86_64* ]] || ! has x32 $(get_all_abis TARGET) ; then
-		EPATCH_EXCLUDE+=" 90_all_gcc-4.7-x32.patch"
-	fi
-
-	toolchain_src_prepare
 
 	use vanilla && return 0
 
