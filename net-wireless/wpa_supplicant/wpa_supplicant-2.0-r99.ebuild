@@ -12,7 +12,7 @@ SRC_URI="http://hostap.epitest.fi/releases/${P}.tar.gz"
 LICENSE="|| ( GPL-2 BSD )"
 
 SLOT="0"
-KEYWORDS="amd64 arm x86"
+KEYWORDS="amd64 arm ~mips x86"
 IUSE="ap dbus gnutls eap-sim fasteap p2p ps3 qt4 readline selinux smartcard ssl wimax wps kernel_linux kernel_FreeBSD"
 REQUIRED_USE="fasteap? ( !gnutls !ssl ) smartcard? ( ssl )"
 

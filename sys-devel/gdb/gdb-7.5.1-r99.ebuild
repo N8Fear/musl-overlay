@@ -50,7 +50,7 @@ SRC_URI="${SRC_URI} ${PATCH_VER:+mirror://gentoo/${P}-patches-${PATCH_VER}.tar.x
 LICENSE="GPL-2 LGPL-2"
 SLOT="0"
 if [[ ${PV} != 9999* ]] ; then
-	KEYWORDS="amd64 arm x86"
+	KEYWORDS="amd64 arm ~mips x86"
 fi
 IUSE="+client expat multitarget nls +python +server test vanilla zlib"
 

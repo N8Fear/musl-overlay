@@ -18,7 +18,7 @@ SRC_URI="http://www.python.org/ftp/python/${PV}/${MY_P}.tar.xz
 
 LICENSE="PSF-2"
 SLOT="2.7"
-KEYWORDS="amd64 arm x86"
+KEYWORDS="amd64 arm ~mips x86"
 IUSE="-berkdb build doc elibc_uclibc examples gdbm hardened ipv6 +ncurses +readline sqlite +ssl +threads tk +wide-unicode wininst +xml"
 
 # Do not add a dependency on dev-lang/python to this ebuild.

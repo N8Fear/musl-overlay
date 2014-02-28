@@ -15,7 +15,7 @@ HOMEPAGE="http://www.cmake.org/"
 SRC_URI="http://www.cmake.org/files/v$(get_version_component_range 1-2)/${MY_P}.tar.gz"
 
 LICENSE="CMake"
-KEYWORDS="amd64 arm x86"
+KEYWORDS="amd64 arm ~mips x86"
 SLOT="0"
 IUSE="emacs ncurses qt4 qt5 vim-syntax"
 

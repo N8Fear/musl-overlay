@@ -11,7 +11,7 @@ if [[ ${PV} == "9999" ]] ; then
 	inherit git-2 autotools
 else
 	SRC_URI="mirror://sourceforge/${PN}/${P}.tar.xz"
-	KEYWORDS="~alpha ~amd64 ~arm arm64 hppa ~ia64 ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~amd64-linux ~arm-linux ~ia64-linux ~x86-linux"
+	KEYWORDS="amd64 arm ~mips x86"
 fi
 
 DESCRIPTION="A useful diagnostic, instructional, and debugging tool"

@@ -16,7 +16,7 @@ if [[ ${PV} == "99999999" ]] ; then
 else
 	SRC_URI="http://www.skbuff.net/iputils/iputils-s${PV}.tar.bz2
 		mirror://gentoo/iputils-s${PV}-manpages.tar.bz2"
-	KEYWORDS="amd64 arm x86"
+	KEYWORDS="amd64 arm ~mips x86"
 fi
 
 DESCRIPTION="Network monitoring tools including ping and ping6"

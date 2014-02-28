@@ -12,7 +12,7 @@ SRC_URI="http://pkg-shadow.alioth.debian.org/releases/${P}.tar.bz2"
 
 LICENSE="BSD GPL-2"
 SLOT="0"
-KEYWORDS="amd64 arm x86"
+KEYWORDS="amd64 arm ~mips x86"
 IUSE="acl audit cracklib nls pam selinux skey xattr"
 
 RDEPEND="acl? ( sys-apps/acl )

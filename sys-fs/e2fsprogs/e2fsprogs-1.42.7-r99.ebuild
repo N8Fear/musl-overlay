@@ -17,7 +17,7 @@ SRC_URI="mirror://sourceforge/e2fsprogs/${PN}-${UP_PV}.tar.gz"
 
 LICENSE="GPL-2 BSD"
 SLOT="0"
-KEYWORDS="amd64 arm x86"
+KEYWORDS="amd64 arm ~mips x86"
 IUSE="nls static-libs elibc_FreeBSD"
 
 RDEPEND="~sys-libs/${PN}-libs-${PV}

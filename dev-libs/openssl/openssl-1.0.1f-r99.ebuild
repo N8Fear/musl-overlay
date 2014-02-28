@@ -14,7 +14,7 @@ SRC_URI="mirror://openssl/source/${P}.tar.gz
 
 LICENSE="openssl"
 SLOT="0"
-KEYWORDS="amd64 arm x86"
+KEYWORDS="amd64 arm ~mips x86"
 IUSE="bindist gmp kerberos rfc3779 sse2 static-libs test +tls-heartbeat vanilla zlib"
 
 # Have the sub-libs in RDEPEND with [static-libs] since, logically,

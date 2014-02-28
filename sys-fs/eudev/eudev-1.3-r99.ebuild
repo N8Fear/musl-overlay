@@ -14,7 +14,7 @@ then
 	inherit git-2
 else
 	SRC_URI="http://dev.gentoo.org/~blueness/${PN}/${P}.tar.gz"
-	KEYWORDS="amd64 arm x86"
+	KEYWORDS="amd64 arm ~mips x86"
 fi
 
 DESCRIPTION="Linux dynamic and persistent device naming support (aka userspace devfs)"

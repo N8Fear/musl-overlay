@@ -15,7 +15,7 @@ SRC_URI="mirror://alsaproject/lib/${P}.tar.bz2"
 
 LICENSE="LGPL-2.1"
 SLOT="0"
-KEYWORDS="amd64 arm x86"
+KEYWORDS="amd64 arm ~mips x86"
 IUSE="doc debug alisp python"
 
 RDEPEND="python? ( ${PYTHON_DEPS} )"

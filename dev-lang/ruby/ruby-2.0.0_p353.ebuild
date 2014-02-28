@@ -33,7 +33,7 @@ SRC_URI="mirror://ruby/2.0/${MY_P}.tar.bz2
 		 http://dev.gentoo.org/~flameeyes/ruby-team/${PN}-patches-${PATCHSET}.tar.bz2"
 
 LICENSE="|| ( Ruby-BSD BSD-2 )"
-KEYWORDS="amd64 arm x86"
+KEYWORDS="amd64 arm ~mips x86"
 IUSE="berkdb debug doc examples gdbm ipv6 +rdoc rubytests socks5 ssl tk xemacs ncurses +readline"
 
 RDEPEND="

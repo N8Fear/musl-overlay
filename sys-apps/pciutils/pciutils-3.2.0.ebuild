@@ -12,7 +12,7 @@ SRC_URI="ftp://atrey.karlin.mff.cuni.cz/pub/linux/pci/${P}.tar.gz"
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="amd64 arm x86"
+KEYWORDS="amd64 arm ~mips x86"
 IUSE="+kmod static-libs zlib"
 
 # Have the sub-libs in RDEPEND with [static-libs] since, logically,

@@ -13,7 +13,7 @@ SRC_URI="mirror://gentoo/${P}.tar.xz
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="amd64 arm x86"
+KEYWORDS="amd64 arm ~mips x86"
 IUSE="jbig jpeg jpeg2k png rle svga tiff X xml zlib"
 
 RDEPEND="jbig? ( media-libs/jbigkit )

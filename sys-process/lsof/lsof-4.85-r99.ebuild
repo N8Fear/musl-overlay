@@ -15,7 +15,7 @@ SRC_URI="ftp://lsof.itap.purdue.edu/pub/tools/unix/lsof/${MY_P}.tar.bz2
 
 LICENSE="lsof"
 SLOT="0"
-KEYWORDS="amd64 arm x86"
+KEYWORDS="amd64 arm ~mips x86"
 IUSE="examples ipv6 rpc selinux static"
 
 RDEPEND="rpc? ( net-libs/libtirpc )
