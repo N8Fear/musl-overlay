@@ -169,6 +169,7 @@ src_prepare() {
 
 	# Make it compile with musl
 	epatch "${FILESDIR}"/${PN}-9.1.6-fpclassify.patch
+	epatch "${FILESDIR}"/${PN}-9.1.6-endian.patch
 
 	# fix for hardened pax_kernel, bug 240956
 	[[ ${PV} != 9999* ]] && epatch "${FILESDIR}"/glx_ro_text_segm.patch

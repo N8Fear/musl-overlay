@@ -1,0 +1,11 @@
+--- a/Mesa-9.1.6/src/gallium/include/pipe/p_config.h
++++ b/Mesa-9.1.6/src/gallium/include/pipe/p_config.h
+@@ -115,7 +115,7 @@
+  * Endian detection.
+  */
+ 
+-#ifdef __GLIBC__
++#if 1
+ #include <endian.h>
+ 
+ #if __BYTE_ORDER == __LITTLE_ENDIAN
