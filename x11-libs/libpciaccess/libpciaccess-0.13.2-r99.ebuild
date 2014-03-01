@@ -18,6 +18,7 @@ RDEPEND="${DEPEND}
 
 PATCHES=(
 	"${FILESDIR}"/${PN}-0.13.2-limits.patch
+	"${FILESDIR}"/${PN}-0.13.2-arm.patch
 )
 
 pkg_setup() {
