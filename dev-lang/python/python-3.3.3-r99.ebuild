@@ -73,6 +73,7 @@ src_prepare() {
 
 	epatch "${FILESDIR}/python-3.3-fix-posix-close-clash.patch"
 	epatch "${FILESDIR}/python-3.3-xattr.patch"
+	epatch "${FILESDIR}/python-3.3-lchmod.patch"
 
 	sed -i -e "s:@@GENTOO_LIBDIR@@:$(get_libdir):g" \
 		Lib/distutils/command/install.py \
