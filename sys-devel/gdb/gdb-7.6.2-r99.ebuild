@@ -1,6 +1,6 @@
-# Copyright 1999-2013 Gentoo Foundation
+# Copyright 1999-2014 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/sys-devel/gdb/gdb-7.5.1.ebuild,v 1.16 2013/11/20 08:15:35 vapier Exp $
+# $Header: /var/cvsroot/gentoo-x86/sys-devel/gdb/gdb-7.6.2.ebuild,v 1.8 2014/03/05 15:53:52 ago Exp $
 
 EAPI="3"
 
@@ -42,7 +42,7 @@ case ${PV} in
 	;;
 esac
 
-PATCH_VER="2"
+PATCH_VER="1"
 DESCRIPTION="GNU debugger"
 HOMEPAGE="http://sourceware.org/gdb/"
 SRC_URI="${SRC_URI} ${PATCH_VER:+mirror://gentoo/${P}-patches-${PATCH_VER}.tar.xz}"
@@ -50,7 +50,7 @@ SRC_URI="${SRC_URI} ${PATCH_VER:+mirror://gentoo/${P}-patches-${PATCH_VER}.tar.x
 LICENSE="GPL-2 LGPL-2"
 SLOT="0"
 if [[ ${PV} != 9999* ]] ; then
-	KEYWORDS="amd64 arm ~mips x86"
+ 	KEYWORDS="amd64 arm ~mips x86"
 fi
 IUSE="+client expat multitarget nls +python +server test vanilla zlib"
 
@@ -69,16 +69,26 @@ DEPEND="${RDEPEND}
 S=${WORKDIR}/${PN}-${MY_PV}
 
 src_prepare() {
-
-	epatch ${FILESDIR}/${PN}-7.4-linux-nat.patch
-	epatch ${FILESDIR}/${PN}-7.4-threaddb.patch
-	epatch ${FILESDIR}/${PN}-7.5.1-amd64-linux-nat.patch
-	epatch ${FILESDIR}/${PN}-7.6-linux-low-threaddb.patch
-	epatch ${FILESDIR}/${PN}-7.6-pid_t.patch
+ 	epatch ${FILESDIR}/${PN}-7.4-linux-nat.patch
+ 	epatch ${FILESDIR}/${PN}-7.4-threaddb.patch
+ 	epatch ${FILESDIR}/${PN}-7.5.1-amd64-linux-nat.patch
+ 	epatch ${FILESDIR}/${PN}-7.6-linux-low-threaddb.patch
+ 	epatch ${FILESDIR}/${PN}-7.6-pid_t.patch
 
 	[[ -n ${RPM} ]] && rpm_spec_epatch "${WORKDIR}"/gdb.spec
 	use vanilla || [[ -n ${PATCH_VER} ]] && EPATCH_SUFFIX="patch" epatch "${WORKDIR}"/patch
 	strip-linguas -u bfd/po opcodes/po
+	if [[ ${CHOST} == *-darwin* ]] ; then
+		# make sure we have a python-config that matches our install,
+		# such that the python check doesn't fail just because the
+		# gdb-provided copy isn't quite what our python installed
+		# version is
+		rm -f "${S}"/gdb/python/python-config.py || die
+		pushd "${S}"/gdb/python > /dev/null || die
+		ln -s "${EROOT}"/usr/bin/$(eselect python show --python2)-config \
+			python-config.py || die
+		popd > /dev/null || die
+	fi
 }
 
 gdb_branding() {
