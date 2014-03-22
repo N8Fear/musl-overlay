@@ -138,7 +138,7 @@ src_prepare() {
 
 	epatch "${FILESDIR}"/${PN}-6.4p1-avoid-exit.patch
 	epatch "${FILESDIR}"/${PN}-6.4p1-missing-sys_param_h.patch
-	epatch "${FILESDIR}"/${PN}-6.4p1-fix-typo-construct_utmpx.patch                
+	epatch "${FILESDIR}"/${PN}-6.4p1-fix-typo-construct_utmpx.patch
 
 	epatch_user #473004
 
