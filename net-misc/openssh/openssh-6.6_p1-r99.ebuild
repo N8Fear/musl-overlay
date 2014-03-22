@@ -180,6 +180,8 @@ src_configure() {
 		append-ldflags -lutil
 	fi
 
+	use x86 && myconf="${myconf} --without-stackprotect"
+
 	econf \
 		--with-ldflags="${LDFLAGS}" \
 		--disable-strip \
