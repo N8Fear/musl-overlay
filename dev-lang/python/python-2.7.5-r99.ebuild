@@ -119,6 +119,7 @@ src_prepare() {
 		setup.py || die "sed failed to replace @@GENTOO_LIBDIR@@"
 
 	epatch_user
+	epatch "${FILESDIR}/Python-2.7.5-remove-ptmx-ptc-checks.patch"
 
 	eautoconf
 	eautoheader
