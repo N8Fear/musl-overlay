@@ -1,0 +1,68 @@
+diff -Naur po4a-0.45.orig/Po4aBuilder.pm po4a-0.45/Po4aBuilder.pm
+--- po4a-0.45.orig/Po4aBuilder.pm	2013-08-21 20:11:04.000000000 +0000
++++ po4a-0.45/Po4aBuilder.pm	2014-04-03 11:09:20.000000000 +0000
+@@ -264,7 +264,7 @@
+     foreach $file (@{$self->rscan_dir($manpath, qr{\.xml$})}) {
+         if ($file =~ m,(.*/man(.))/([^/]*)\.xml$,) {
+             my ($outdir, $section, $outfile) = ($1, $2, $3);
+-            system("xsltproc -o $outdir/$outfile.$section --nonet http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl $file") and die;
++            system("xsltproc -o $outdir/$outfile.$section http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl $file") and die;
+             system ("gzip -9 -f $outdir/$outfile.$section") and die;
+         }
+         unlink "$file" || die;
+diff -Naur po4a-0.45.orig/share/po4a-build po4a-0.45/share/po4a-build
+--- po4a-0.45.orig/share/po4a-build	2013-08-21 20:11:04.000000000 +0000
++++ po4a-0.45/share/po4a-build	2014-04-03 11:09:43.000000000 +0000
+@@ -258,14 +258,14 @@
+ 				eval_gettext "Processing untranslated files for \$X (1). . ."; echo
+ 				MANDIR=$BASEDIR/$P/man/man1/
+ 				XML_CATALOG_FILES="/etc/xml/catalog" \
+-				xsltproc -o $MANDIR --nonet $XSLFILE $XMLDIR/$X
++				xsltproc -o $MANDIR $XSLFILE $XMLDIR/$X
+ 			done
+ 			for X3 in $XMLMAN3; do
+ 				# TRANSLATORS: $X3 contains the name of the manual page
+ 				eval_gettext "Processing untranslated files for \$X3 (3). . ."; echo
+ 				MANDIR=$BASEDIR/$P/man/man3/
+ 				XML_CATALOG_FILES="/etc/xml/catalog" \
+-				xsltproc -o $MANDIR --nonet $XSLFILE $XMLDIR/$X3
++				xsltproc -o $MANDIR $XSLFILE $XMLDIR/$X3
+ 			done
+ 		fi
+ 	done
+@@ -317,7 +317,7 @@
+ 		fi
+ 	done
+ 	if [ -n "$HTMLDIR" ]; then
+-		xsltproc -o $BASEDIR/$d/$HTMLDIR/ --nonet $HTMLXSL $XMLDIR/$HTMLFILE
++		xsltproc -o $BASEDIR/$d/$HTMLDIR/ $HTMLXSL $XMLDIR/$HTMLFILE
+ 	fi
+ 	for l in $LANGS; do
+ 		for P in $XMLPACKAGES; do
+@@ -328,7 +328,7 @@
+ 						eval_gettext "Processing \$l translations for \$X (1). . ."; echo
+ 						MANDIR=$BASEDIR/$P/man/$l/man1/
+ 						XML_CATALOG_FILES="/etc/xml/catalog" \
+-						xsltproc -o $MANDIR --nonet $XSLFILE $XMLDIR/$l/$X
++						xsltproc -o $MANDIR $XSLFILE $XMLDIR/$l/$X
+ 					fi
+ 				done
+ 				for X3 in $XMLMAN3; do
+@@ -337,7 +337,7 @@
+ 						eval_gettext "Processing \$l translations for \$X3 (3). . ."; echo
+ 						MANDIR=$BASEDIR/$P/man/$l/man3/
+ 						XML_CATALOG_FILES="/etc/xml/catalog" \
+-						xsltproc -o $MANDIR --nonet $XSLFILE $XMLDIR/$l/$X3
++						xsltproc -o $MANDIR $XSLFILE $XMLDIR/$l/$X3
+ 					fi
+ 				done
+ 			fi
+@@ -399,7 +399,7 @@
+ 		done
+ 		if [ -n "$HTMLDIR" ]; then
+ 			mkdir -p $BASEDIR/$d/$HTMLDIR/$l/
+-			xsltproc -o $BASEDIR/$d/$HTMLDIR/$l/ --nonet $HTMLXSL $XMLDIR/$l/$HTMLFILE
++			xsltproc -o $BASEDIR/$d/$HTMLDIR/$l/ $HTMLXSL $XMLDIR/$l/$HTMLFILE
+ 		fi
+ 		done
+ 		if [ -n "$HTMLDIR" ]; then
