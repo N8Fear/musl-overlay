@@ -1,6 +1,6 @@
 diff -Naur gcc-4.7.3.orig/gcc/config/arm/linux-eabi.h gcc-4.7.3/gcc/config/arm/linux-eabi.h
---- gcc-4.7.3.orig/gcc/config/arm/linux-eabi.h	2014-02-26 11:35:12.955061913 +0000
-+++ gcc-4.7.3/gcc/config/arm/linux-eabi.h	2014-02-26 11:40:46.800062073 +0000
+--- gcc-4.7.3.orig/gcc/config/arm/linux-eabi.h	2014-04-06 14:15:03.000000000 +0000
++++ gcc-4.7.3/gcc/config/arm/linux-eabi.h	2014-04-06 12:12:42.000000000 +0000
 @@ -69,8 +69,8 @@
     GLIBC_DYNAMIC_LINKER_DEFAULT and TARGET_DEFAULT_FLOAT_ABI.  */
  
@@ -13,8 +13,8 @@ diff -Naur gcc-4.7.3.orig/gcc/config/arm/linux-eabi.h gcc-4.7.3/gcc/config/arm/l
  
  #define GLIBC_DYNAMIC_LINKER \
 diff -Naur gcc-4.7.3.orig/gcc/config/i386/linux64.h gcc-4.7.3/gcc/config/i386/linux64.h
---- gcc-4.7.3.orig/gcc/config/i386/linux64.h	2011-07-07 15:38:34.000000000 +0000
-+++ gcc-4.7.3/gcc/config/i386/linux64.h	2014-02-26 11:40:00.240062051 +0000
+--- gcc-4.7.3.orig/gcc/config/i386/linux64.h	2014-04-06 14:15:03.000000000 +0000
++++ gcc-4.7.3/gcc/config/i386/linux64.h	2014-04-06 12:12:42.000000000 +0000
 @@ -28,6 +28,6 @@
  #define GNU_USER_LINK_EMULATION64 "elf_x86_64"
  #define GNU_USER_LINK_EMULATIONX32 "elf32_x86_64"
@@ -24,3 +24,12 @@ diff -Naur gcc-4.7.3.orig/gcc/config/i386/linux64.h gcc-4.7.3/gcc/config/i386/li
 +#define GLIBC_DYNAMIC_LINKER32 "/usr/lib/libc.so"
 +#define GLIBC_DYNAMIC_LINKER64 "/usr/lib/libc.so"
  #define GLIBC_DYNAMIC_LINKERX32 "/libx32/ld-linux-x32.so.2"
+diff -Naur gcc-4.7.3.orig/gcc/config/mips/linux.h gcc-4.7.3/gcc/config/mips/linux.h
+--- gcc-4.7.3.orig/gcc/config/mips/linux.h	2011-07-19 18:00:27.000000000 +0000
++++ gcc-4.7.3/gcc/config/mips/linux.h	2014-04-06 14:12:48.000000000 +0000
+@@ -18,4 +18,4 @@
+ along with GCC; see the file COPYING3.  If not see
+ <http://www.gnu.org/licenses/>.  */
+ 
+-#define GLIBC_DYNAMIC_LINKER "/lib/ld.so.1"
++#define GLIBC_DYNAMIC_LINKER "/usr/lib/libc.so"
