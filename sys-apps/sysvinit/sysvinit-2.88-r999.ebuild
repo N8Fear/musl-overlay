@@ -30,10 +30,16 @@ src_prepare() {
 	epatch "${FILESDIR}"/${P}-musl.patch
 	sed -i '/^CPPFLAGS =$/d' src/Makefile || die
 
-	# mesg/mountpoint/sulogin/utmpdump/wall have moved to util-linux
+	# last/lastb/mesg/mountpoint/sulogin/utmpdump/wall have moved to util-linux
 	sed -i -r \
-		-e '/^(USR)?S?BIN/s:\<(mesg|mountpoint|sulogin|utmpdump|wall)\>::g' \
-		-e '/^MAN[18]/s:\<(mesg|mountpoint|sulogin|utmpdump|wall)[.][18]\>::g' \
+		-e '/^(USR)?S?BIN/s:\<(last|lastb|mesg|mountpoint|sulogin|utmpdump|wall)\>::g' \
+		-e '/^MAN[18]/s:\<(last|lastb|mesg|mountpoint|sulogin|utmpdump|wall)[.][18]\>::g' \
+		src/Makefile || die
+
+	# pidof has moved to >=procps-3.3.9
+	sed -i -r \
+		-e '/\/bin\/pidof/d' \
+		-e '/^MAN8/s:\<pidof.8\>::g' \
 		src/Makefile || die
 
 	# Mung inittab for specific architectures
@@ -42,8 +48,9 @@ src_prepare() {
 	local insert=()
 	use ppc && insert=( '#psc0:12345:respawn:/sbin/agetty 115200 ttyPSC0 linux' )
 	use arm && insert=( '#f0:12345:respawn:/sbin/agetty 9600 ttyFB0 vt100' )
+	use arm64 && insert=( 'f0:12345:respawn:/sbin/agetty 9600 ttyAMA0 vt100' )
 	use hppa && insert=( 'b0:12345:respawn:/sbin/agetty 9600 ttyB0 vt100' )
-	use s390 && insert=( 's0:12345:respawn:/sbin/agetty 38400 console' )
+	use s390 && insert=( 's0:12345:respawn:/sbin/agetty 38400 console dumb' )
 	if use ibm ; then
 		insert+=(
 			'#hvc0:2345:respawn:/sbin/agetty -L 9600 hvc0'
@@ -86,6 +93,9 @@ src_install() {
 	insinto /etc
 	doins "${WORKDIR}"/inittab
 
+	# dead symlink
+	rm -f "${D}"/usr/bin/lastb
+
 	doinitd "${FILESDIR}"/{reboot,shutdown}.sh
 }
 
@@ -98,5 +108,6 @@ pkg_postinst() {
 		/sbin/telinit U &>/dev/null
 	fi
 
-	elog "The mesg/mountpoint/sulogin/utmpdump/wall tools have been moved to sys-apps/util-linux."
+	elog "The last/lastb/mesg/mountpoint/sulogin/utmpdump/wall tools have been moved to"
+	elog "sys-apps/util-linux. The pidof tool has been moved to sys-process/procps."
 }
