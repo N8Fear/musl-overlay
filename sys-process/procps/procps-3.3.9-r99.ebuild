@@ -4,7 +4,7 @@
 
 EAPI="4"
 
-inherit eutils toolchain-funcs
+inherit eutils toolchain-funcs flag-o-matic
 
 DESCRIPTION="standard informational utilities and process-handling tools"
 # http://packages.debian.org/sid/procps
@@ -28,11 +28,14 @@ S=${WORKDIR}/${PN}-ng-${PV}
 
 src_prepare() {
 	epatch "${FILESDIR}"/${PN}-3.3.8-kill-neg-pid.patch
-	epatch "${FILESDIR}"/${P}-no-error_h.patch
 	epatch "${FILESDIR}"/${PN}-3.3.8-no-GLOB_TILDE.patch
+	epatch "${FILESDIR}"/${P}-no-error_h.patch
+	epatch "${FILESDIR}"/${P}-configure.patch
+	autoreconf
 }
 
 src_configure() {
+	use elibc_musl && append-cppflags -D_XOPEN_SOURCE_EXTENDED
 	econf \
 		--exec-prefix="${EPREFIX}" \
 		--docdir='$(datarootdir)'/doc/${PF} \
@@ -45,8 +48,6 @@ src_configure() {
 src_install() {
 	default
 #	dodoc sysctl.conf
-
-	mv "${ED}"/usr/bin/pidof "${ED}"/bin/ || die
 
 	# The configure script is completely whacked in the head
 	mv "${ED}"/lib* "${ED}"/usr/ || die
