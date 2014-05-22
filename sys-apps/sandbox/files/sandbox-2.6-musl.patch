@@ -1,6 +1,21 @@
-diff -ur a/sandbox-2.6/libsandbox/trace.c b/sandbox-2.6/libsandbox/trace.c
---- a/sandbox-2.6/libsandbox/trace.c
-+++ b/sandbox-2.6/libsandbox/trace.c
+diff -Naur sandbox-2.6.orig/headers.h sandbox-2.6/headers.h
+--- sandbox-2.6.orig/headers.h	2012-07-03 18:27:44.000000000 +0000
++++ sandbox-2.6/headers.h	2014-05-22 13:57:55.225002786 +0000
+@@ -133,9 +133,11 @@
+ #ifdef HAVE_ASM_PTRACE_H
+ # include <asm/ptrace.h>
+ #endif
++/*
+ #ifdef HAVE_LINUX_PTRACE_H
+ # include <linux/ptrace.h>
+ #endif
++*/
+ #undef FU_ia64_fpreg
+ #undef FU_pt_all_user_regs
+ 
+diff -Naur sandbox-2.6.orig/libsandbox/trace.c sandbox-2.6/libsandbox/trace.c
+--- sandbox-2.6.orig/libsandbox/trace.c	2014-05-22 13:58:25.215002800 +0000
++++ sandbox-2.6/libsandbox/trace.c	2014-05-22 13:57:26.515002772 +0000
 @@ -9,7 +9,7 @@
  #include "wrappers.h"
  #include "sb_nr.h"
@@ -19,9 +34,9 @@ diff -ur a/sandbox-2.6/libsandbox/trace.c b/sandbox-2.6/libsandbox/trace.c
  {
  	long ret;
   try_again:
-diff -ur a/sandbox-2.6/scripts/gen_symbol_header.awk b/sandbox-2.6/scripts/gen_symbol_header.awk
---- a/sandbox-2.6/scripts/gen_symbol_header.awk
-+++ b/sandbox-2.6/scripts/gen_symbol_header.awk
+diff -Naur sandbox-2.6.orig/scripts/gen_symbol_header.awk sandbox-2.6/scripts/gen_symbol_header.awk
+--- sandbox-2.6.orig/scripts/gen_symbol_header.awk	2014-05-22 13:58:25.235002800 +0000
++++ sandbox-2.6/scripts/gen_symbol_header.awk	2014-05-22 13:57:26.520002772 +0000
 @@ -161,7 +161,7 @@
  				else
  					printf("symbol_version(%s, %s, %s);\n",
