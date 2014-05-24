@@ -1,29 +1,31 @@
 # Copyright 1999-2014 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/net-misc/openssh/openssh-6.4_p1-r1.ebuild,v 1.6 2014/01/02 12:06:49 polynomial-c Exp $
+# $Header: /var/cvsroot/gentoo-x86/net-misc/openssh/openssh-6.6.1_p1-r99.ebuild,v 1.2 2014/03/20 20:58:31 vapier Exp $
 
 EAPI="4"
 inherit eutils user flag-o-matic multilib autotools pam systemd versionator
 
 # Make it more portable between straight releases
 # and _p? releases.
-PARCH=${P/_}
+PARCH=${P/.1_}
 
-HPN_PATCH="${PN}-6.3p1-hpnssh14v2.diff.gz"
-LDAP_PATCH="${PN}-lpk-6.3p1-0.3.14.patch.gz"
-X509_VER="7.7" X509_PATCH="${PARCH}+x509-${X509_VER}.diff.gz"
+#HPN_PATCH="${PN}-6.6p1-hpnssh14v4.diff.gz"
+HPN_PATCH="${PN}-6.6.1p1-hpnssh14v4.diff.xz"
+LDAP_PATCH="${PN}-lpk-6.5p1-0.3.14.patch.gz"
+X509_VER="7.9" X509_PATCH="${PARCH}+x509-${X509_VER}.diff.gz"
 
 DESCRIPTION="Port of OpenBSD's free SSH release"
 HOMEPAGE="http://www.openssh.org/"
 SRC_URI="mirror://openbsd/OpenSSH/portable/${PARCH}.tar.gz
-	${HPN_PATCH:+hpn? ( mirror://gentoo/${HPN_PATCH} )}
+	${HPN_PATCH:+hpn? ( http://dev.gentoo.org/~polynomial-c/${HPN_PATCH} )}
 	${LDAP_PATCH:+ldap? ( mirror://gentoo/${LDAP_PATCH} )}
 	${X509_PATCH:+X509? ( http://roumenpetrov.info/openssh/x509-${X509_VER}/${X509_PATCH} )}
 	"
+	#${HPN_PATCH:+hpn? ( mirror://sourceforge/hpnssh/${HPN_PATCH} )}
 
 LICENSE="BSD GPL-2"
 SLOT="0"
-KEYWORDS="amd64 arm ~mips x86"
+KEYWORDS="~amd64 ~arm ~mips ~x86"
 IUSE="bindist ${HPN_PATCH:++}hpn kerberos ldap ldns libedit pam selinux skey static tcpd X X509"
 
 LIB_DEPEND="selinux? ( >=sys-libs/libselinux-1.28[static-libs(+)] )
@@ -98,10 +100,13 @@ src_prepare() {
 	# don't break .ssh/authorized_keys2 for fun
 	sed -i '/^AuthorizedKeysFile/s:^:#:' sshd_config || die
 
+	epatch "${FILESDIR}"/${P}.patch #508604
+
 	epatch "${FILESDIR}"/${PN}-5.9_p1-sshd-gssapi-multihomed.patch #378361
 	if use X509 ; then
 		pushd .. >/dev/null
-		epatch "${FILESDIR}"/${PN}-6.4_p1-x509-glue.patch
+		epatch "${FILESDIR}"/${PN}-6.6_p1-x509-glue.patch
+		use hpn && epatch "${FILESDIR}"/${PN}-6.6.1_p1-x509-hpn14v4-glue-p2.patch
 		popd >/dev/null
 		epatch "${WORKDIR}"/${X509_PATCH%.*}
 		epatch "${FILESDIR}"/${PN}-6.3_p1-x509-hpn14v2-glue.patch
@@ -116,8 +121,10 @@ src_prepare() {
 		use ldap && ewarn "Sorry, X509 and LDAP conflict internally, disabling LDAP"
 	fi
 	epatch "${FILESDIR}"/${PN}-4.7_p1-GSSAPI-dns.patch #165444 integrated into gsskex
+	epatch "${FILESDIR}"/${PN}-6.6_p1-openssl-ignore-status.patch
 	if [[ -n ${HPN_PATCH} ]] && use hpn; then
 		epatch "${WORKDIR}"/${HPN_PATCH%.*}
+		epatch "${FILESDIR}"/${PN}-6.5_p1-hpn-cipher-align.patch #498632
 		save_version HPN
 	fi
 
@@ -129,7 +136,12 @@ src_prepare() {
 		# Disable fortify flags ... our gcc does this for us
 		-e 's:-D_FORTIFY_SOURCE=2::'
 	)
-	sed -i "${sed_args[@]}" configure{,.ac} || die
+	# The -ftrapv flag ICEs on hppa #505182
+	use hppa && sed_args+=(
+		-e '/CFLAGS/s:-ftrapv:-fdisable-this-test:'
+		-e '/OSSH_CHECK_CFLAG_LINK.*-ftrapv/d'
+	)
+	sed -i "${sed_args[@]}" configure{.ac,} || die
 
 	epatch "${FILESDIR}"/${PN}-6.4p1-avoid-exit.patch
 	epatch "${FILESDIR}"/${PN}-6.4p1-missing-sys_param_h.patch
