@@ -236,7 +236,7 @@ src_install() {
 
 	cd "${BUILD_DIR}" || die
 
-	emake DESTDIR="${D}" altinstall
+	emake -j1 DESTDIR="${D}" altinstall
 
 	sed \
 		-e "s/\(CONFIGURE_LDFLAGS=\).*/\1/" \
