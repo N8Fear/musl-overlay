@@ -128,4 +128,7 @@ pkg_preinst() {
 
 pkg_postinst() {
 	chmod 0755 "${ROOT}"/etc/sandbox.d #265376
+
+	# Sandbox builds on mips-musl but fails to run
+	use mips && chmod -x "${ROOT}"/usr/bin/sandbox
 }
