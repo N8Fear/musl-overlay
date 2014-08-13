@@ -5,7 +5,7 @@ diff -Naur util-linux-2.25.orig/sys-utils/switch_root.c util-linux-2.25/sys-util
  #include <sys/stat.h>
  #include <sys/statfs.h>
  #include <sys/param.h>
-+#include <sys/user.h>
++#include <sys/reg.h>
  #include <fcntl.h>
  #include <stdio.h>
  #include <stdlib.h>
