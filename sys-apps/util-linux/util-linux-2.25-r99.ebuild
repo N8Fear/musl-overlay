@@ -66,7 +66,7 @@ src_prepare() {
 		eautoreconf
 	fi
 	epatch "${FILESDIR}"/${P}-lscpu-pic.patch #518936
-	epatch "${FILESDIR}"/${PN}-2.25-missing__SWORD_TYPE.patch
+	epatch "${FILESDIR}"/${PN}-2.25-remove__SWORD_TYPE.patch
 	elibtoolize
 }
 
