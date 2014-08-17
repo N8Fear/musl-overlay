@@ -43,7 +43,7 @@ src_configure() {
 	econf \
 		INIT_D_PATH="${EPREFIX}/etc/init.d" \
 		MOUNT_FUSE_PATH="${EPREFIX}/sbin" \
-		UDEV_RULES_PATH="${EPREFIX}/$(udev_get_udevdir)/rules.d" \
+		UDEV_RULES_PATH="${EPREFIX}/$(get_udevdir)/rules.d" \
 		$(use_enable static-libs static) \
 		--disable-example
 }
