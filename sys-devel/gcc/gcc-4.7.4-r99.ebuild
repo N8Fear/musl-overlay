@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: /var/cvsroot/gentoo-x86/sys-devel/gcc/gcc-4.7.3.ebuild,v 1.2 2013/05/20 10:56:06 aballier Exp $
 
-EAPI="4"
+EAPI="2"
 
 PATCH_VER="1.1"
 UCLIBC_VER="1.0"
