@@ -1,23 +1,25 @@
 # Copyright 1999-2014 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/sys-devel/gcc/gcc-4.7.3.ebuild,v 1.2 2013/05/20 10:56:06 aballier Exp $
+# $Header: /var/cvsroot/gentoo-x86/sys-devel/gcc/gcc-4.8.2.ebuild,v 1.9 2014/01/19 01:51:34 dirtyepic Exp $
 
-EAPI="2"
+EAPI="4"
 
-PATCH_VER="1.4"
+PATCH_VER="1.1"
 UCLIBC_VER="1.0"
 
 # Hardened gcc 4 stuff
-PIE_VER="0.5.5"
+PIE_VER="0.5.9"
 SPECS_VER="0.2.0"
 SPECS_GCC_VER="4.4.3"
 # arch/libc configurations known to be stable with {PIE,SSP}-by-default
-PIE_GLIBC_STABLE="x86 amd64 ppc ppc64 arm ia64"
-PIE_UCLIBC_STABLE="x86 arm amd64 ppc ppc64"
-SSP_STABLE="amd64 x86 ppc ppc64 arm"
+PIE_GLIBC_STABLE="x86 amd64 mips ppc ppc64 arm ia64"
+PIE_UCLIBC_STABLE="x86 arm amd64 mips ppc ppc64"
+SSP_STABLE="amd64 x86 mips ppc ppc64 arm"
 # uclibc need tls and nptl support for SSP support
 # uclibc need to be >= 0.9.33
-SSP_UCLIBC_STABLE="x86 amd64 ppc ppc64 arm"
+SSP_UCLIBC_STABLE="x86 amd64 mips ppc ppc64 arm"
+PIE_MUSL_STABLE="amd64 arm ppc mips x86"
+SSP_MUSL_STABLE="amd64 arm ppc mips x86"
 #end Hardened stuff
 
 inherit eutils toolchain
@@ -31,7 +33,7 @@ KEYWORDS="amd64 arm ~mips x86"
 RDEPEND=""
 DEPEND="${RDEPEND}
 	elibc_glibc? ( >=sys-libs/glibc-2.8 )
-	>=${CATEGORY}/binutils-2.18"
+	>=${CATEGORY}/binutils-2.20"
 
 if [[ ${CATEGORY} != cross-* ]] ; then
 	PDEPEND="${PDEPEND} elibc_glibc? ( >=sys-libs/glibc-2.8 )"
@@ -54,10 +56,9 @@ src_prepare() {
 		cp libstdc++-v3/config/os/gnu-linux.org/arm-eabi-extra.ver libstdc++-v3/config/os/gnu-linux/
 		mv libitm/config/linux/x86 libitm/config/linux/x86_glibc
 		cp -r libitm/config/generic libitm/config/linux/x86
-		epatch "${FILESDIR}"/${P}-musl-linker-path.patch
 	fi
 
 	use vanilla && return 0
-
-	[[ ${CHOST} == ${CTARGET} ]] && epatch "${FILESDIR}"/gcc-spec-env.patch
+	#Use -r1 for newer piepatchet that use DRIVER_SELF_SPECS for the hardened specs.
+	[[ ${CHOST} == ${CTARGET} ]] && epatch "${FILESDIR}"/gcc-spec-env-r1.patch
 }
