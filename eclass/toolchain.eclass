@@ -2157,9 +2157,9 @@ hardened_gcc_is_stable() {
 	if [[ $1 == "pie" ]] ; then
 		if [[ ${CTARGET} == *-uclibc* ]] ; then
 			tocheck=${PIE_UCLIBC_STABLE}
-		elif
+		elif [[ ${CTARGET} == *-musl* ]] ; then
 			tocheck=${PIE_MUSL_STABLE}
-		else
+		elif [[ ${CTARGET} == *-gnu* ]] ; then
 			tocheck=${PIE_GLIBC_STABLE}
 		fi
 	elif [[ $1 == "ssp" ]] ; then
