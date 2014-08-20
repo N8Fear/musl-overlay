@@ -7,8 +7,8 @@ diff -Naur gcc-4.7.3.orig/gcc/config/arm/linux-eabi.h gcc-4.7.3/gcc/config/arm/l
  #undef  GLIBC_DYNAMIC_LINKER
 -#define GLIBC_DYNAMIC_LINKER_SOFT_FLOAT "/lib/ld-linux.so.3"
 -#define GLIBC_DYNAMIC_LINKER_HARD_FLOAT "/lib/ld-linux-armhf.so.3"
-+#define GLIBC_DYNAMIC_LINKER_SOFT_FLOAT "/usr/lib/libc.so"
-+#define GLIBC_DYNAMIC_LINKER_HARD_FLOAT "/usr/lib/libc.so"
++#define GLIBC_DYNAMIC_LINKER_SOFT_FLOAT "/lib/ld-musl-arm.so.1"
++#define GLIBC_DYNAMIC_LINKER_HARD_FLOAT "/lib/ld-musl-armhf.so.1"
  #define GLIBC_DYNAMIC_LINKER_DEFAULT GLIBC_DYNAMIC_LINKER_SOFT_FLOAT
  
  #define GLIBC_DYNAMIC_LINKER \
@@ -21,8 +21,8 @@ diff -Naur gcc-4.7.3.orig/gcc/config/i386/linux64.h gcc-4.7.3/gcc/config/i386/li
  
 -#define GLIBC_DYNAMIC_LINKER32 "/lib/ld-linux.so.2"
 -#define GLIBC_DYNAMIC_LINKER64 "/lib64/ld-linux-x86-64.so.2"
-+#define GLIBC_DYNAMIC_LINKER32 "/usr/lib/libc.so"
-+#define GLIBC_DYNAMIC_LINKER64 "/usr/lib/libc.so"
++#define GLIBC_DYNAMIC_LINKER32 "/lib/ld-musl-i386.so.1"
++#define GLIBC_DYNAMIC_LINKER64 "/lib/ld-musl-x86_64.so.1"
  #define GLIBC_DYNAMIC_LINKERX32 "/libx32/ld-linux-x32.so.2"
 diff -Naur gcc-4.7.3.orig/gcc/config/mips/linux.h gcc-4.7.3/gcc/config/mips/linux.h
 --- gcc-4.7.3.orig/gcc/config/mips/linux.h	2011-07-19 18:00:27.000000000 +0000
