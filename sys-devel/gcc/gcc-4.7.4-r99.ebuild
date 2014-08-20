@@ -56,7 +56,7 @@ src_prepare() {
 		cp libstdc++-v3/config/os/gnu-linux.org/arm-eabi-extra.ver libstdc++-v3/config/os/gnu-linux/
 		mv libitm/config/linux/x86 libitm/config/linux/x86_glibc
 		cp -r libitm/config/generic libitm/config/linux/x86
-		epatch "${FILESDIR}"/${P}-musl-linker-path.patch
+		epatch "${FILESDIR}"/${PN}-4.7.3-musl-linker-path.patch
 	fi
 
 	use vanilla && return 0

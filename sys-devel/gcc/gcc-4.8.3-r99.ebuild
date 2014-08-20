@@ -28,7 +28,7 @@ DESCRIPTION="The GNU Compiler Collection"
 
 LICENSE="GPL-3+ LGPL-3+ || ( GPL-3+ libgcc libstdc++ gcc-runtime-library-exception-3.1 ) FDL-1.3+"
 
-KEYWORDS="amd64 arm ~mips x86"
+KEYWORDS="~amd64 ~arm ~mips ~x86"
 
 RDEPEND=""
 DEPEND="${RDEPEND}
@@ -56,6 +56,7 @@ src_prepare() {
 		cp libstdc++-v3/config/os/gnu-linux.org/arm-eabi-extra.ver libstdc++-v3/config/os/gnu-linux/
 		mv libitm/config/linux/x86 libitm/config/linux/x86_glibc
 		cp -r libitm/config/generic libitm/config/linux/x86
+		epatch "${FILESDIR}"/${PN}-4.7.3-musl-linker-path.patch
 	fi
 
 	use vanilla && return 0
