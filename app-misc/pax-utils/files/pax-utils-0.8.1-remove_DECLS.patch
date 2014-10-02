@@ -1,0 +1,25 @@
+diff --git a/elf.h b/elf.h
+index d131b9b..e625240 100644
+--- a/elf.h
++++ b/elf.h
+@@ -21,7 +21,9 @@
+ 
+ #include <features.h>
+ 
+-__BEGIN_DECLS
++#ifdef __cplusplus
++extern "C" {
++#endif
+ 
+ /* Standard ELF types.  */
+ 
+@@ -3375,6 +3377,8 @@ typedef Elf32_Addr Elf32_Conflict;
+ #define R_TILEGX_NUM		130
+ 
+ 
+-__END_DECLS
++#ifdef __cplusplus
++}
++#endif
+ 
+ #endif	/* elf.h */
