@@ -1,0 +1,12 @@
+diff -Naur build-docbook-catalog-1.20.orig/build-docbook-catalog build-docbook-catalog-1.20/build-docbook-catalog
+--- build-docbook-catalog-1.20.orig/build-docbook-catalog	2014-10-02 20:34:17.215360013 -0400
++++ build-docbook-catalog-1.20/build-docbook-catalog	2014-10-02 20:34:51.161361558 -0400
+@@ -43,7 +43,7 @@
+ main() {
+ 	local d v opts
+ 
+-	opts=$(${GETOPT} -o hr:v --long help,root:,verbose -n "${ZERO}" -- "$@") || exit 1
++	opts=$(${GETOPT} -o hr:v -n "${ZERO}" -- "$@") || exit 1
+ 	eval set -- "${opts}"
+ 	while true; do
+ 		case $1 in
