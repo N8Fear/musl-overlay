@@ -16,7 +16,7 @@ SRC_URI="${SRC_URI}
 LICENSE="LGPL-2+"
 SLOT="2"
 IUSE="debug fam kernel_linux +mime selinux static-libs systemtap test utils xattr"
-KEYWORDS="~alpha amd64 ~arm ~arm64 hppa ~ia64 ~m68k ~mips ppc ~ppc64 ~s390 ~sh ~sparc x86 ~amd64-fbsd ~sparc-fbsd ~x86-fbsd ~amd64-linux ~arm-linux ~x86-linux"
+KEYWORDS="~amd64 ~arm ~mips ~x86"
 
 # FIXME: want >=libselinux-2.2.2-r4[${MULTILIB_USEDEP}] - bug #480960
 RDEPEND="
