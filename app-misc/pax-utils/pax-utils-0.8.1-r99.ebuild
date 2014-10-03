@@ -14,7 +14,7 @@ SRC_URI="mirror://gentoo/pax-utils-${PV}.tar.xz
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~amd64-fbsd ~sparc-fbsd ~x86-fbsd"
+KEYWORDS="~amd64 ~arm ~mips ~x86"
 IUSE="caps python"
 #RESTRICT="mirror"
 
