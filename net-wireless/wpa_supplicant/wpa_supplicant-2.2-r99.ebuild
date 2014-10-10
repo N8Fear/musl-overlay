@@ -1,6 +1,6 @@
-# Copyright 1999-2013 Gentoo Foundation
+# Copyright 1999-2014 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/net-wireless/wpa_supplicant/wpa_supplicant-2.0-r2.ebuild,v 1.6 2013/12/22 12:03:58 ago Exp $
+# $Header: /var/cvsroot/gentoo-x86/net-wireless/wpa_supplicant/wpa_supplicant-2.2-r1.ebuild,v 1.4 2014/10/05 19:07:17 zerochaos Exp $
 
 EAPI=4
 
@@ -24,6 +24,7 @@ RDEPEND="dbus? ( sys-apps/dbus )
 	)
 	!kernel_linux? ( net-libs/libpcap )
 	qt4? (
+		dev-qt/qtcore:4
 		dev-qt/qtgui:4
 		dev-qt/qtsvg:4
 	)
@@ -88,7 +89,8 @@ src_prepare() {
 	# bug (320097)
 	epatch "${FILESDIR}/${P}-do-not-call-dbus-functions-with-NULL-path.patch"
 
-	epatch "${FILESDIR}/${P}-linux_wext.patch"
+	# for musl
+	epatch "${FILESDIR}/${PN}-2.0-linux_wext.patch"
 
 	# TODO - NEED TESTING TO SEE IF STILL NEEDED, NOT COMPATIBLE WITH 1.0 OUT OF THE BOX,
 	# SO WOULD BE NICE TO JUST DROP IT, IF IT IS NOT NEEDED.
@@ -103,6 +105,7 @@ src_configure() {
 	# Basic setup
 	echo "CONFIG_CTRL_IFACE=y" >> .config
 	echo "CONFIG_BACKEND=file" >> .config
+	echo "CONFIG_IBSS_RSN=y"   >> .config
 
 	# Basic authentication methods
 	# NOTE: we don't set GPSK or SAKE as they conflict
@@ -113,6 +116,7 @@ src_configure() {
 	echo "CONFIG_EAP_PAX=y"         >> .config
 	echo "CONFIG_EAP_PSK=y"         >> .config
 	echo "CONFIG_EAP_TLV=y"         >> .config
+	echo "CONFIG_EAP_EXE=y"         >> .config
 	echo "CONFIG_IEEE8021X_EAPOL=y" >> .config
 	echo "CONFIG_PKCS12=y"          >> .config
 	echo "CONFIG_PEERKEY=y"         >> .config
@@ -121,6 +125,10 @@ src_configure() {
 	echo "CONFIG_EAP_PEAP=y"        >> .config
 	echo "CONFIG_EAP_TLS=y"         >> .config
 	echo "CONFIG_EAP_TTLS=y"        >> .config
+
+	# Enabling background scanning.
+	echo "CONFIG_BGSCAN_SIMPLE=y"	>> .config
+	echo "CONFIG_BGSCAN_LEARN=y"	>> .config
 
 	if use dbus ; then
 		echo "CONFIG_CTRL_IFACE_DBUS=y" >> .config
@@ -165,13 +173,9 @@ src_configure() {
 	if use kernel_linux ; then
 		# Linux specific drivers
 		echo "CONFIG_DRIVER_ATMEL=y"       >> .config
-		#echo "CONFIG_DRIVER_BROADCOM=y"   >> .config
-		#echo "CONFIG_DRIVER_HERMES=y"	   >> .config
 		echo "CONFIG_DRIVER_HOSTAP=y"      >> .config
 		echo "CONFIG_DRIVER_IPW=y"         >> .config
-		echo "CONFIG_DRIVER_NDISWRAPPER=y" >> .config
 		echo "CONFIG_DRIVER_NL80211=y"     >> .config
-		#echo "CONFIG_DRIVER_PRISM54=y"    >> .config
 		echo "CONFIG_DRIVER_RALINK=y"      >> .config
 		echo "CONFIG_DRIVER_WEXT=y"        >> .config
 		echo "CONFIG_DRIVER_WIRED=y"       >> .config
@@ -284,7 +288,6 @@ src_install() {
 		newins dbus-wpa_supplicant.conf wpa_supplicant.conf
 		insinto /usr/share/dbus-1/system-services
 		doins fi.epitest.hostap.WPASupplicant.service fi.w1.wpa_supplicant1.service
-		keepdir /var/run/wpa_supplicant
 		popd > /dev/null
 	fi
 
