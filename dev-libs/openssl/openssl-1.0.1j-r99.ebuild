@@ -1,10 +1,10 @@
 # Copyright 1999-2014 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/dev-libs/openssl/openssl-1.0.1g.ebuild,v 1.10 2014/04/08 09:36:44 ago Exp $
+# $Header: /var/cvsroot/gentoo-x86/dev-libs/openssl/openssl-1.0.1i.ebuild,v 1.5 2014/08/09 16:03:46 jer Exp $
 
 EAPI="4"
 
-inherit eutils flag-o-matic toolchain-funcs multilib
+inherit eutils flag-o-matic toolchain-funcs multilib multilib-minimal
 
 REV="1.7"
 DESCRIPTION="full-strength general purpose cryptography library (including SSL and TLS)"
@@ -17,16 +17,16 @@ SLOT="0"
 KEYWORDS="amd64 arm ~mips x86"
 IUSE="bindist gmp kerberos rfc3779 sse2 static-libs test +tls-heartbeat vanilla zlib"
 
-# Have the sub-libs in RDEPEND with [static-libs] since, logically,
-# our libssl.a depends on libz.a/etc... at runtime.
-LIB_DEPEND="gmp? ( dev-libs/gmp[static-libs(+)] )
-	zlib? ( sys-libs/zlib[static-libs(+)] )
-	kerberos? ( app-crypt/mit-krb5 )"
 # The blocks are temporary just to make sure people upgrade to a
 # version that lack runtime version checking.  We'll drop them in
 # the future.
-RDEPEND="static-libs? ( ${LIB_DEPEND} )
-	!static-libs? ( ${LIB_DEPEND//\[static-libs(+)]} )
+RDEPEND="gmp? ( >=dev-libs/gmp-5.1.3-r1[static-libs(+)?,${MULTILIB_USEDEP}] )
+	zlib? ( >=sys-libs/zlib-1.2.8-r1[static-libs(+)?,${MULTILIB_USEDEP}] )
+	kerberos? ( >=app-crypt/mit-krb5-1.11.4[${MULTILIB_USEDEP}] )
+	abi_x86_32? (
+		!<=app-emulation/emul-linux-x86-baselibs-20140406-r3
+		!app-emulation/emul-linux-x86-baselibs[-abi_x86_32(-)]
+	)
 	!<net-misc/openssh-5.9_p1-r4
 	!<net-libs/neon-0.29.6-r1"
 DEPEND="${RDEPEND}
@@ -45,6 +45,10 @@ src_unpack() {
 		> "${WORKDIR}"/c_rehash || die #416717
 }
 
+MULTILIB_WRAPPED_HEADERS=(
+	usr/include/openssl/opensslconf.h
+)
+
 src_prepare() {
 	# Make sure we only ever touch Makefile.org and avoid patching a file
 	# that gets blown away anyways by the Configure script in src_configure
@@ -56,8 +60,7 @@ src_prepare() {
 		epatch "${FILESDIR}"/${PN}-1.0.0h-pkg-config.patch
 		epatch "${FILESDIR}"/${PN}-1.0.1-parallel-build.patch
 		epatch "${FILESDIR}"/${PN}-1.0.1-x32.patch
-		epatch "${FILESDIR}"/${PN}-1.0.1e-ipv6.patch
-		epatch "${FILESDIR}"/${PN}-1.0.1f-perl-5.18.patch #497286
+		epatch "${FILESDIR}"/${PN}-1.0.1h-ipv6.patch
 		epatch "${FILESDIR}"/${PN}-1.0.1e-s_client-verify.patch #472584
 		epatch "${FILESDIR}"/${PN}-1.0.1f-revert-alpha-perl-generation.patch #499086
 		epatch "${FILESDIR}"/${PN}-1.0.1c-force-termios.patch
@@ -79,6 +82,16 @@ src_prepare() {
 	# show the actual commands in the log
 	sed -i '/^SET_X/s:=.*:=set -x:' Makefile.shared
 
+	# since we're forcing $(CC) as makedep anyway, just fix
+	# the conditional as always-on
+	# helps clang (#417795), and versioned gcc (#499818)
+	sed -i 's/expr.*MAKEDEPEND.*;/true;/' util/domd || die
+
+	# quiet out unknown driver argument warnings since openssl
+	# doesn't have well-split CFLAGS and we're making it even worse
+	# and 'make depend' uses -Werror for added fun (#417795 again)
+	[[ ${CC} == *clang* ]] && append-flags -Qunused-arguments
+
 	# allow openssl to be cross-compiled
 	cp "${FILESDIR}"/gentoo.config-1.0.1 gentoo.config || die
 	chmod a+rx gentoo.config
@@ -90,9 +103,11 @@ src_prepare() {
 	# The config script does stupid stuff to prompt the user.  Kill it.
 	sed -i '/stty -icanon min 0 time 50; read waste/d' config || die
 	./config --test-sanity || die "I AM NOT SANE"
+
+	multilib_copy_sources
 }
 
-src_configure() {
+multilib_src_configure() {
 	unset APPS #197996
 	unset SCRIPTS #312551
 	unset CROSS_COMPILE #311473
@@ -126,6 +141,7 @@ src_configure() {
 	einfo "Use configuration ${sslout:-(openssl knows best)}"
 	local config="Configure"
 	[[ -z ${sslout} ]] && config="config"
+
 	echoit \
 	./${config} \
 		${sslout} \
@@ -163,7 +179,7 @@ src_configure() {
 		Makefile || die
 }
 
-src_compile() {
+multilib_src_compile() {
 	# depend is needed to use $confopts; it also doesn't matter
 	# that it's -j1 as the code itself serializes subdirs
 	emake -j1 depend
@@ -173,12 +189,15 @@ src_compile() {
 	emake rehash
 }
 
-src_test() {
+multilib_src_test() {
 	emake -j1 test
 }
 
-src_install() {
+multilib_src_install() {
 	emake INSTALL_PREFIX="${D}" install
+}
+
+multilib_src_install_all() {
 	dobin "${WORKDIR}"/c_rehash #333117
 	dodoc CHANGES* FAQ NEWS README doc/*.txt doc/c-indentation.el
 	dohtml -r doc/*
