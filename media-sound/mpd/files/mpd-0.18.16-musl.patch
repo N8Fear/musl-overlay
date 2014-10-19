@@ -1,0 +1,13 @@
+diff --git a/src/thread/Id.hxx b/src/thread/Id.hxx
+index fa1cf2c..e7774b8 100644
+--- a/src/thread/Id.hxx
++++ b/src/thread/Id.hxx
+@@ -84,7 +84,7 @@ public:
+ #ifdef WIN32
+ 		return id == other.id;
+ #else
+-		return ::pthread_equal(id, other.id);
++		return pthread_equal(id, other.id);
+ #endif
+ 	}
+ 
