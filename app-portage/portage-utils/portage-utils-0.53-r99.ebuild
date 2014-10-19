@@ -20,7 +20,7 @@ DEPEND="app-arch/xz-utils"
 RDEPEND=""
 
 src_prepare() {
-	epatch "${FILESDIR}/${P}-fallback-S_BLKSIZE.patch"
+	epatch "${FILESDIR}"/${P}-S_BLKSIZE.patch
 	epatch_user
 }
 

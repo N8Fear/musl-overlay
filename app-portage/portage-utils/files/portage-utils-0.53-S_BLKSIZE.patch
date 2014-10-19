@@ -1,0 +1,12 @@
+diff --git a/include_applets.h b/include_applets.h
+index bed18e6..a56c25d 100644
+--- a/include_applets.h
++++ b/include_applets.h
+@@ -1,3 +1,7 @@
++#ifndef S_BLKSIZE
++#	define S_BLKSIZE 	512
++#endif
++
+ #include "q.c"
+ #include "qcheck.c"
+ #include "qdepends.c"
