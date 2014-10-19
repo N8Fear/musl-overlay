@@ -1,0 +1,13 @@
+diff --git a/libmailutils/sockaddr/str.c b/libmailutils/sockaddr/str.c
+index d51f525..b56895e 100644
+--- a/libmailutils/sockaddr/str.c
++++ b/libmailutils/sockaddr/str.c
+@@ -15,6 +15,8 @@
+    Public License along with this library.  If not, see 
+    <http://www.gnu.org/licenses/>. */
+ 
++#define NULL 0L
++
+ #ifdef HAVE_CONFIG_H
+ # include <config.h>
+ #endif
