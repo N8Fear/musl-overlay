@@ -1,0 +1,137 @@
+diff --git a/daemons/lvmetad/lvmetad-core.c b/daemons/lvmetad/lvmetad-core.c
+index 5b23a56..f37a47c 100644
+--- a/daemons/lvmetad/lvmetad-core.c
++++ b/daemons/lvmetad/lvmetad-core.c
+@@ -31,6 +31,10 @@
+ 
+ #define LVMETAD_SOCKET DEFAULT_RUN_DIR "/lvmetad.socket"
+ 
++#if !defined(PTHREAD_MUTEX_RECURSIVE_NP)
++# define PTHREAD_MUTEX_RECURSIVE_NP PTHREAD_MUTEX_RECURSIVE
++#endif
++
+ typedef struct {
+ 	log_state *log; /* convenience */
+ 	const char *log_config;
+diff --git a/lib/commands/toolcontext.c b/lib/commands/toolcontext.c
+index fe79a81..da16058 100644
+--- a/lib/commands/toolcontext.c
++++ b/lib/commands/toolcontext.c
+@@ -1353,6 +1353,8 @@ struct cmd_context *create_toolcontext(unsigned is_long_lived,
+ {
+ 	struct cmd_context *cmd;
+ 	FILE *new_stream;
++	FILE *stdin_stream = stdin;
++	FILE *stdout_stream = stdout;
+ 	int flags;
+ 
+ #ifdef M_MMAP_MAX
+@@ -1402,10 +1404,10 @@ struct cmd_context *create_toolcontext(unsigned is_long_lived,
+ 		if (is_valid_fd(STDIN_FILENO) &&
+ 		    ((flags = fcntl(STDIN_FILENO, F_GETFL)) > 0) &&
+ 		    (flags & O_ACCMODE) != O_WRONLY) {
+-			if (!_reopen_stream(stdin, STDIN_FILENO, "r", "stdin", &new_stream))
++			if (!_reopen_stream(stdin_stream, STDIN_FILENO, "r", "stdin", &new_stream))
+ 				goto_out;
+-			stdin = new_stream;
+-			if (setvbuf(stdin, cmd->linebuffer, _IOLBF, linebuffer_size)) {
++			stdin_stream = new_stream;
++			if (setvbuf(stdin_stream, cmd->linebuffer, _IOLBF, linebuffer_size)) {
+ 				log_sys_error("setvbuf", "");
+ 				goto out;
+ 			}
+@@ -1414,9 +1416,9 @@ struct cmd_context *create_toolcontext(unsigned is_long_lived,
+ 		if (is_valid_fd(STDOUT_FILENO) &&
+ 		    ((flags = fcntl(STDOUT_FILENO, F_GETFL)) > 0) &&
+ 		    (flags & O_ACCMODE) != O_RDONLY) {
+-			if (!_reopen_stream(stdout, STDOUT_FILENO, "w", "stdout", &new_stream))
++			if (!_reopen_stream(stdout_stream, STDOUT_FILENO, "w", "stdout", &new_stream))
+ 				goto_out;
+-			stdout = new_stream;
++			stdout_stream = new_stream;
+ 			if (setvbuf(stdout, cmd->linebuffer + linebuffer_size,
+ 				     _IOLBF, linebuffer_size)) {
+ 				log_sys_error("setvbuf", "");
+@@ -1725,6 +1727,8 @@ void destroy_toolcontext(struct cmd_context *cmd)
+ {
+ 	struct dm_config_tree *cft_cmdline;
+ 	FILE *new_stream;
++	FILE *stdin_stream = stdin;
++	FILE *stdout_stream = stdout;
+ 	int flags;
+ 
+ 	if (cmd->dump_filter && cmd->filter && cmd->filter->dump &&
+@@ -1761,9 +1765,9 @@ void destroy_toolcontext(struct cmd_context *cmd)
+ 		if (is_valid_fd(STDIN_FILENO) &&
+ 		    ((flags = fcntl(STDIN_FILENO, F_GETFL)) > 0) &&
+ 		    (flags & O_ACCMODE) != O_WRONLY) {
+-			if (_reopen_stream(stdin, STDIN_FILENO, "r", "stdin", &new_stream)) {
+-				stdin = new_stream;
+-				setlinebuf(stdin);
++			if (_reopen_stream(stdin_stream, STDIN_FILENO, "r", "stdin", &new_stream)) {
++				stdin_stream = new_stream;
++				setlinebuf(stdin_stream);
+ 			} else
+ 				cmd->linebuffer = NULL;	/* Leave buffer in place (deliberate leak) */
+ 		}
+@@ -1771,9 +1775,9 @@ void destroy_toolcontext(struct cmd_context *cmd)
+ 		if (is_valid_fd(STDOUT_FILENO) &&
+ 		    ((flags = fcntl(STDOUT_FILENO, F_GETFL)) > 0) &&
+ 		    (flags & O_ACCMODE) != O_RDONLY) {
+-			if (_reopen_stream(stdout, STDOUT_FILENO, "w", "stdout", &new_stream)) {
+-				stdout = new_stream;
+-				setlinebuf(stdout);
++			if (_reopen_stream(stdout_stream, STDOUT_FILENO, "w", "stdout", &new_stream)) {
++				stdout_stream = new_stream;
++				setlinebuf(stdout_stream);
+ 			} else
+ 				cmd->linebuffer = NULL;	/* Leave buffer in place (deliberate leak) */
+ 		}
+diff --git a/libdaemon/server/daemon-server.c b/libdaemon/server/daemon-server.c
+index a8afcc1..e59e4ef 100644
+--- a/libdaemon/server/daemon-server.c
++++ b/libdaemon/server/daemon-server.c
+@@ -26,6 +26,7 @@
+ #include <sys/un.h>
+ #include <unistd.h>
+ #include <signal.h>
++#include <fcntl.h>
+ 
+ #include <syslog.h> /* FIXME. For the global closelog(). */
+ 
+diff --git a/tools/lvmcmdline.c b/tools/lvmcmdline.c
+index 10dac8f..e921928 100644
+--- a/tools/lvmcmdline.c
++++ b/tools/lvmcmdline.c
+@@ -1464,9 +1464,12 @@ int lvm_split(char *str, int *argc, char **argv, int max)
+ static int _check_standard_fds(void)
+ {
+ 	int err = is_valid_fd(STDERR_FILENO);
++	FILE *stdin_stream = stdin;
++	FILE *stdout_stream = stdout;
++	FILE *stderr_stream = stderr;
+ 
+ 	if (!is_valid_fd(STDIN_FILENO) &&
+-	    !(stdin = fopen(_PATH_DEVNULL, "r"))) {
++	    !(stdin_stream = fopen(_PATH_DEVNULL, "r"))) {
+ 		if (err)
+ 			perror("stdin stream open");
+ 		else
+@@ -1476,7 +1479,7 @@ static int _check_standard_fds(void)
+ 	}
+ 
+ 	if (!is_valid_fd(STDOUT_FILENO) &&
+-	    !(stdout = fopen(_PATH_DEVNULL, "w"))) {
++	    !(stdout_stream = fopen(_PATH_DEVNULL, "w"))) {
+ 		if (err)
+ 			perror("stdout stream open");
+ 		/* else no stdout */
+@@ -1484,7 +1487,7 @@ static int _check_standard_fds(void)
+ 	}
+ 
+ 	if (!is_valid_fd(STDERR_FILENO) &&
+-	    !(stderr = fopen(_PATH_DEVNULL, "w"))) {
++	    !(stderr_stream = fopen(_PATH_DEVNULL, "w"))) {
+ 		printf("stderr stream open: %s\n",
+ 		       strerror(errno));
+ 		return 0;
