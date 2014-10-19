@@ -1,0 +1,13 @@
+diff --git a/include/c11/threads_posix.h b/include/c11/threads_posix.h
+index f9c165d..dbd7a06 100644
+--- a/include/c11/threads_posix.h
++++ b/include/c11/threads_posix.h
+@@ -178,7 +178,7 @@ mtx_init(mtx_t *mtx, int type)
+         return thrd_error;
+     pthread_mutexattr_init(&attr);
+     if ((type & mtx_recursive) != 0) {
+-#if defined(__linux__) || defined(__linux)
++#if defined(PTHREAD_MUTEX_RECURSIVE_NP)
+         pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE_NP);
+ #else
+         pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
