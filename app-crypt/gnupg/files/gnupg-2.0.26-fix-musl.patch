@@ -1,0 +1,41 @@
+diff --git a/tools/symcryptrun.c b/tools/symcryptrun.c
+index 067da29..5d504d4 100644
+--- a/tools/symcryptrun.c
++++ b/tools/symcryptrun.c
+@@ -101,6 +101,21 @@
+ /* We assume to have `unsigned long int' value with at least 32 bits.  */
+ #define HASHWORDBITS 32
+ 
++/* login_tty function from musl commit:
++ * [PATCH] split off login_tty() from forkpty() and clean up the latter
++ * Can be removed once upstreamed
++ */
++int login_tty(int fd)
++{
++	setsid();
++        if (ioctl(fd, TIOCSCTTY, (char *)0)) return -1;
++	dup2(fd, 0);
++	dup2(fd, 1);
++	dup2(fd, 2);
++	if (fd>2) close(fd);
++	return 0;
++}
++
+ /* The so called `hashpjw' function by P.J. Weinberger
+    [see Aho/Sethi/Ullman, COMPILERS: Principles, Techniques and Tools,
+    1986, 1987 Bell Telephone Laboratories, Inc.]  */
+diff --git a/tools/symcryptrun.o b/tools/symcryptrun.o
+index fe1e0b5..b08d3bd 100644
+Binary files a/tools/symcryptrun.o and b/tools/symcryptrun.o differ
+diff --git a/tools/watchgnupg.c b/tools/watchgnupg.c
+index 4bbf212..cf30036 100644
+--- a/tools/watchgnupg.c
++++ b/tools/watchgnupg.c
+@@ -29,6 +29,7 @@
+ #include <assert.h>
+ #include <unistd.h>
+ #include <sys/socket.h>
++#include <sys/select.h>
+ #include <sys/un.h>
+ #include <fcntl.h>
+ #include <time.h>
