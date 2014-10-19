@@ -1,0 +1,93 @@
+diff --git a/src/network/socket/qnativesocketengine_unix.cpp b/src/network/socket/qnativesocketengine_unix.cpp
+index 1cab58b..5fe35d5 100644
+--- a/src/network/socket/qnativesocketengine_unix.cpp
++++ b/src/network/socket/qnativesocketengine_unix.cpp
+@@ -248,7 +248,7 @@ int QNativeSocketEnginePrivate::option(QNativeSocketEngine::SocketOption opt) co
+ 
+     int v = -1;
+     QT_SOCKOPTLEN_T len = sizeof(v);
+-    if (::getsockopt(socketDescriptor, level, n, (char *) &v, &len) != -1)
++    if (::getsockopt(socketDescriptor, level, n, (char *) &v, (socklen_t *) &len) != -1)
+         return v;
+ 
+     return -1;
+@@ -691,7 +691,7 @@ QNetworkInterface QNativeSocketEnginePrivate::nativeMulticastInterface() const
+     if (socketProtocol == QAbstractSocket::IPv6Protocol) {
+         uint v;
+         QT_SOCKOPTLEN_T sizeofv = sizeof(v);
+-        if (::getsockopt(socketDescriptor, IPPROTO_IPV6, IPV6_MULTICAST_IF, &v, &sizeofv) == -1)
++        if (::getsockopt(socketDescriptor, IPPROTO_IPV6, IPV6_MULTICAST_IF, &v, (socklen_t *) &sizeofv) == -1)
+             return QNetworkInterface();
+         return QNetworkInterface::interfaceFromIndex(v);
+     }
+@@ -699,7 +699,7 @@ QNetworkInterface QNativeSocketEnginePrivate::nativeMulticastInterface() const
+ 
+     struct in_addr v = { 0 };
+     QT_SOCKOPTLEN_T sizeofv = sizeof(v);
+-    if (::getsockopt(socketDescriptor, IPPROTO_IP, IP_MULTICAST_IF, &v, &sizeofv) == -1)
++    if (::getsockopt(socketDescriptor, IPPROTO_IP, IP_MULTICAST_IF, &v, (socklen_t *) &sizeofv) == -1)
+         return QNetworkInterface();
+     if (v.s_addr != 0 && sizeofv >= sizeof(v)) {
+         QHostAddress ipv4(ntohl(v.s_addr));
+@@ -774,7 +774,7 @@ bool QNativeSocketEnginePrivate::nativeHasPendingDatagrams() const
+     ssize_t readBytes;
+     do {
+         char c;
+-        readBytes = ::recvfrom(socketDescriptor, &c, 1, MSG_PEEK, &storage.a, &storageSize);
++        readBytes = ::recvfrom(socketDescriptor, &c, 1, MSG_PEEK, &storage.a, (socklen_t *) &storageSize);
+     } while (readBytes == -1 && errno == EINTR);
+ 
+     // If there's no error, or if our buffer was too small, there must be a
+@@ -827,7 +827,7 @@ qint64 QNativeSocketEnginePrivate::nativeReceiveDatagram(char *data, qint64 maxS
+     do {
+         char c;
+         recvFromResult = ::recvfrom(socketDescriptor, maxSize ? data : &c, maxSize ? maxSize : 1,
+-                                    0, &aa.a, &sz);
++                                    0, &aa.a, (socklen_t *) &sz);
+     } while (recvFromResult == -1 && errno == EINTR);
+ 
+     if (recvFromResult == -1) {
+@@ -919,7 +919,7 @@ bool QNativeSocketEnginePrivate::fetchConnectionParameters()
+ 
+     // Determine local address
+     memset(&sa, 0, sizeof(sa));
+-    if (::getsockname(socketDescriptor, &sa.a, &sockAddrSize) == 0) {
++    if (::getsockname(socketDescriptor, &sa.a, (socklen_t *) &sockAddrSize) == 0) {
+         qt_socket_getPortAndAddress(&sa, &localPort, &localAddress);
+ 
+         // Determine protocol family
+@@ -943,13 +943,13 @@ bool QNativeSocketEnginePrivate::fetchConnectionParameters()
+     }
+ 
+     // Determine the remote address
+-    if (!::getpeername(socketDescriptor, &sa.a, &sockAddrSize))
++    if (!::getpeername(socketDescriptor, &sa.a, (socklen_t *) &sockAddrSize))
+         qt_socket_getPortAndAddress(&sa, &peerPort, &peerAddress);
+ 
+     // Determine the socket type (UDP/TCP)
+     int value = 0;
+     QT_SOCKOPTLEN_T valueSize = sizeof(int);
+-    if (::getsockopt(socketDescriptor, SOL_SOCKET, SO_TYPE, &value, &valueSize) == 0) {
++    if (::getsockopt(socketDescriptor, SOL_SOCKET, SO_TYPE, &value, (socklen_t *) &valueSize) == 0) {
+         if (value == SOCK_STREAM)
+             socketType = QAbstractSocket::TcpSocket;
+         else if (value == SOCK_DGRAM)
+diff --git a/src/network/socket/qnet_unix_p.h b/src/network/socket/qnet_unix_p.h
+index 5e6a1ca..66b7fd6 100644
+--- a/src/network/socket/qnet_unix_p.h
++++ b/src/network/socket/qnet_unix_p.h
+@@ -118,12 +118,12 @@ static inline int qt_safe_accept(int s, struct sockaddr *addr, QT_SOCKLEN_T *add
+     int sockflags = SOCK_CLOEXEC;
+     if (flags & O_NONBLOCK)
+         sockflags |= SOCK_NONBLOCK;
+-    fd = ::accept4(s, addr, static_cast<QT_SOCKLEN_T *>(addrlen), sockflags);
++    fd = accept4(s, addr, static_cast<QT_SOCKLEN_T *>(addrlen), sockflags);
+     if (fd != -1 || !(errno == ENOSYS || errno == EINVAL))
+         return fd;
+ #endif
+ 
+-    fd = ::accept(s, addr, static_cast<QT_SOCKLEN_T *>(addrlen));
++    fd = accept(s, addr, (socklen_t *) addrlen);
+     if (fd == -1)
+         return -1;
+ 
