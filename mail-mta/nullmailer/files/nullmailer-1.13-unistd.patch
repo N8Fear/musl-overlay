@@ -1,0 +1,12 @@
+diff --git a/lib/fdbuf/fdbuf.h b/lib/fdbuf/fdbuf.h
+index 4b0e9cb..0054b01 100644
+--- a/lib/fdbuf/fdbuf.h
++++ b/lib/fdbuf/fdbuf.h
+@@ -20,6 +20,7 @@
+ #include "config.h"
+ #include <string.h>
+ #include <fcntl.h>
++#include <unistd.h>
+ 
+ #ifdef _REENTRANT
+ #include <pthread.h>
