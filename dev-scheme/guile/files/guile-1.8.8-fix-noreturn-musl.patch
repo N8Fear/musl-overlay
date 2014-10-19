@@ -1,0 +1,13 @@
+diff --git a/libguile/__scm.h b/libguile/__scm.h
+index e75f1a9..486825e 100644
+--- a/libguile/__scm.h
++++ b/libguile/__scm.h
+@@ -66,7 +66,7 @@
+  *   1) int foo (char arg) SCM_NORETURN;
+  */
+ #ifdef __GNUC__
+-#define SCM_NORETURN __attribute__ ((noreturn))
++#define SCM_NORETURN __attribute__ ((__noreturn__))
+ #else
+ #define SCM_NORETURN
+ #endif

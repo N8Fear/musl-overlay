@@ -31,7 +31,8 @@ src_prepare() {
 	epatch "${FILESDIR}/${P}-fix_guile-config.patch" \
 		"${FILESDIR}/${P}-gcc46.patch" \
 		"${FILESDIR}/${P}-os_dep.patch" \
-		"${FILESDIR}/${P}-makeinfo-5.patch"
+		"${FILESDIR}/${P}-makeinfo-5.patch" \
+		"${FILESDIR}/${P}-fix-noreturn-musl.patch"
 	sed \
 		-e "s/AM_CONFIG_HEADER/AC_CONFIG_HEADERS/g" \
 		-e "/AM_PROG_CC_STDC/d" \
