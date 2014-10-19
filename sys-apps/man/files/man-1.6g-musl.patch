@@ -1,0 +1,14 @@
+diff --git a/gencat/gencat.c b/gencat/gencat.c
+index d1a7c31..d68bf2c 100644
+--- a/gencat/gencat.c
++++ b/gencat/gencat.c
+@@ -52,6 +52,9 @@ up-to-date.  Many thanks.
+ #ifdef __linux__
+ #include <string.h>
+ #include <unistd.h>
++#if !defined(__GLIBC__)
++#include <sys/fcntl.h>
++#endif
+ #endif
+ #include <sys/file.h>
+ #include <sys/stat.h>
