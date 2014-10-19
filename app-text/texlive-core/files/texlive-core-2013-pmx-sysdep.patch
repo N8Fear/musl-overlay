@@ -1,0 +1,13 @@
+diff --git a/utils/pmx/pmx-2.7.0/libf2c/sysdep1.h b/utils/pmx/pmx-2.7.0/libf2c/sysdep1.h
+index 4c026a2..9e3c977 100644
+--- a/utils/pmx/pmx-2.7.0/libf2c/sysdep1.h
++++ b/utils/pmx/pmx-2.7.0/libf2c/sysdep1.h
+@@ -10,7 +10,7 @@
+ 
+ #ifdef __linux__
+ #define USE_LARGEFILE
+-#define OFF_T __off64_t
++#define OFF_T off64_t
+ #endif
+ 
+ #ifdef _AIX43
