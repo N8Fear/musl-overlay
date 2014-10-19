@@ -1,0 +1,63 @@
+diff --git a/base/application.cc b/base/application.cc
+index 6012e06..2977b6d 100644
+--- a/base/application.cc
++++ b/base/application.cc
+@@ -56,7 +56,7 @@ application::basename(std::string const &path) const
+ 	memset(buffer, 0, sizeof(buffer));
+ 	strncpy(buffer, path.c_str(), PATH_MAX);
+ 
+-	return ::basename(buffer);
++	return basename(buffer);
+ }
+ 
+ //----------------------------------------------------------------
+diff --git a/caching/cache_check.cc b/caching/cache_check.cc
+index 400b214..5d20bd5 100644
+--- a/caching/cache_check.cc
++++ b/caching/cache_check.cc
+@@ -202,10 +202,9 @@ namespace {
+ 		int r = ::stat(path.c_str(), &info);
+ 		if (r) {
+ 			ostringstream msg;
+-			char buffer[128], *ptr;
+-
+-			ptr = ::strerror_r(errno, buffer, sizeof(buffer));
+-			msg << path << ": " << ptr;
++			char buffer[128];
++			int out = strerror_r(errno, buffer, sizeof(buffer));
++			msg << path << ": " << out;
+ 			throw runtime_error(msg.str());
+ 		}
+ 
+diff --git a/era/era_check.cc b/era/era_check.cc
+index fed199e..7c49435 100644
+--- a/era/era_check.cc
++++ b/era/era_check.cc
+@@ -186,10 +186,11 @@ namespace {
+ 		int r = ::stat(path.c_str(), &info);
+ 		if (r) {
+ 			ostringstream msg;
+-			char buffer[128], *ptr;
++			char buffer[128];
++			int out;
+ 
+-			ptr = ::strerror_r(errno, buffer, sizeof(buffer));
+-			msg << path << ": " << ptr;
++			out = strerror_r(errno, buffer, sizeof(buffer));
++			msg << path << ": " << out;
+ 			throw runtime_error(msg.str());
+ 		}
+ 
+diff --git a/persistent-data/block.tcc b/persistent-data/block.tcc
+index f2f3a7a..169bd3d 100644
+--- a/persistent-data/block.tcc
++++ b/persistent-data/block.tcc
+@@ -45,7 +45,7 @@ namespace {
+ 	// to exception.h
+ 	void syscall_failed(char const *call) {
+ 		char buffer[128];
+-		char *msg = strerror_r(errno, buffer, sizeof(buffer));
++		int msg = strerror_r(errno, buffer, sizeof(buffer));
+ 
+ 		ostringstream out;
+ 		out << "syscall '" << call << "' failed: " << msg;
