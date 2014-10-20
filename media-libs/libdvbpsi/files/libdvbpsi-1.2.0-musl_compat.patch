@@ -1,0 +1,12 @@
+diff --git a/src/descriptor.h b/src/descriptor.h
+index f344a73..358866a 100644
+--- a/src/descriptor.h
++++ b/src/descriptor.h
+@@ -39,6 +39,7 @@
+ extern "C" {
+ #endif
+ 
++typedef long ssize_t;
+ /*****************************************************************************
+  * common definitions
+  *****************************************************************************/
