@@ -1,0 +1,26 @@
+diff --git a/src/dial.c b/src/dial.c
+index a90c1d2..ea8807c 100644
+--- a/src/dial.c
++++ b/src/dial.c
+@@ -43,6 +43,9 @@
+ #    include <sys/ioctl.h>
+ #    include <sys/kd.h>
+ #    include <sys/time.h>
++#  elif defined(linux)
++#    include <linux/kd.h>
++#    include <linux/ioctl.h>
+ #  endif
+ #endif
+ 
+diff --git a/src/getsdir.h b/src/getsdir.h
+index c5679d6..ea0b7fa 100644
+--- a/src/getsdir.h
++++ b/src/getsdir.h
+@@ -23,6 +23,7 @@
+  */
+ 
+ #include <dirent.h>
++#include <sys/param.h>
+ 
+ typedef struct dirEntry {		/* structure of data item */
+   char fname[MAXNAMLEN + 1];		/* filename + terminating null */
