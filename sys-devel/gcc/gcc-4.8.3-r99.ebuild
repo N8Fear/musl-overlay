@@ -58,6 +58,7 @@ src_prepare() {
 		cp -r libitm/config/generic libitm/config/linux/x86
 		epatch "${FILESDIR}"/${PN}-4.7.3-musl-linker-path.patch
 		epatch "${FILESDIR}"/${PN}-4.8.3-musl-res_state.patch
+		epatch "${FILESDIR}"/${PN}-4.8.3-musl-fix-libc5-assumption.patch
 	fi
 
 	use vanilla && return 0
