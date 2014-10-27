@@ -89,7 +89,6 @@ src_prepare() {
 
 	# Use pkgconfig to find icu to properly support multilib, upstream bug #738751
 	epatch "${FILESDIR}/${PN}-2.9.2-icu-pkgconfig.patch"
-
 	epatch "${FILESDIR}/${PN}-2.9.0-remove-redundant-pthread-defs.patch"
 	eautoreconf
 }
