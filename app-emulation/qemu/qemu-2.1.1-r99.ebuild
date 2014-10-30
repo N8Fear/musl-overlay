@@ -1,6 +1,6 @@
 # Copyright 1999-2014 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/app-emulation/qemu/qemu-2.1.0-r1.ebuild,v 1.6 2014/09/13 17:07:04 ago Exp $
+# $Header: /var/cvsroot/gentoo-x86/app-emulation/qemu/qemu-2.1.1.ebuild,v 1.4 2014/10/23 14:53:45 ago Exp $
 
 EAPI=5
 
@@ -52,7 +52,7 @@ IUSE+=" ${use_targets}"
 # Require at least one softmmu or user target.
 # Block USE flag configurations known to not work.
 REQUIRED_USE="|| ( ${use_targets} )
-	python? ( ${PYTHON_REQUIRED_USE} )
+	${PYTHON_REQUIRED_USE}
 	qemu_softmmu_targets_arm? ( fdt )
 	qemu_softmmu_targets_microblaze? ( fdt )
 	qemu_softmmu_targets_ppc? ( fdt )
@@ -255,9 +255,9 @@ src_prepare() {
 	use nls || rm -f po/*.po
 
 	epatch "${FILESDIR}"/qemu-1.7.0-cflags.patch
-	epatch "${FILESDIR}"/${P}-CVE-2014-5388.patch #520688
+	epatch "${FILESDIR}"/${PN}-2.1.1-readlink-self.patch
 	epatch "${FILESDIR}"/${PN}-2.0.0-F_SHLCK-and-F_EXLCK.patch #for musl
-	epatch "${FILESDIR}"/${PN}-2.0.0-linux-user-signal.c-define-__SIGRTMIN-MAX-for-non-GN.patch #for musl
+	epatch "${FILESDIR}"/${PN}-2.0.0-linux-user-signal.c-define-__SIGRTMIN-MAX-for-non-GN.patch #for musl                                                                                                       
 	[[ -n ${BACKPORTS} ]] && \
 		EPATCH_FORCE=yes EPATCH_SUFFIX="patch" EPATCH_SOURCE="${S}/patches" \
 			epatch
