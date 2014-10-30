@@ -1,12 +1,12 @@
-# Copyright 1999-2013 Gentoo Foundation
+# Copyright 1999-2014 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/dev-libs/libxml2/libxml2-2.9.1-r1.ebuild,v 1.11 2013/07/21 17:55:22 ago Exp $
+# $Header: /var/cvsroot/gentoo-x86/dev-libs/libxml2/libxml2-2.9.1-r4.ebuild,v 1.12 2014/06/24 19:59:48 vapier Exp $
 
 EAPI="5"
-PYTHON_COMPAT=( python{2_5,2_6,2_7,3_1,3_2,3_3} )
+PYTHON_COMPAT=( python{2_6,2_7,3_2,3_3,3_4} )
 PYTHON_REQ_USE="xml"
 
-inherit libtool flag-o-matic eutils python-r1 autotools prefix
+inherit libtool flag-o-matic eutils python-r1 autotools prefix multilib-minimal
 
 DESCRIPTION="Version 2 of the library to manipulate XML files"
 HOMEPAGE="http://www.xmlsoft.org/"
@@ -29,15 +29,21 @@ SRC_URI="ftp://xmlsoft.org/${PN}/${PN}-${PV/_rc/-rc}.tar.gz
 		${XSTS_HOME}/${XSTS_NAME_2}/${XSTS_TARBALL_2}
 		http://www.w3.org/XML/Test/${XMLCONF_TARBALL} )"
 
-RDEPEND="sys-libs/zlib:=
-	icu? ( dev-libs/icu:= )
-	lzma? ( app-arch/xz-utils:= )
+COMMON_DEPEND=">=sys-libs/zlib-1.2.8-r1:=[${MULTILIB_USEDEP}]
+	icu? ( >=dev-libs/icu-51.2-r1:=[${MULTILIB_USEDEP}] )
+	lzma? ( >=app-arch/xz-utils-5.0.5-r1:=[${MULTILIB_USEDEP}] )
 	python? ( ${PYTHON_DEPS} )
-	readline? ( sys-libs/readline:= )"
-
-DEPEND="${RDEPEND}
+	readline? ( sys-libs/readline:= )
+"
+RDEPEND="${COMMON_DEPEND}
+	abi_x86_32? ( !<=app-emulation/emul-linux-x86-baselibs-20131008-r6
+		!app-emulation/emul-linux-x86-baselibs[-abi_x86_32(-)] )
+"
+DEPEND="${COMMON_DEPEND}
 	dev-util/gtk-doc-am
-	hppa? ( >=sys-devel/binutils-2.15.92.0.2 )"
+	virtual/pkgconfig
+	hppa? ( >=sys-devel/binutils-2.15.92.0.2 )
+"
 
 S="${WORKDIR}/${PN}-${PV%_rc*}"
 
@@ -57,6 +63,8 @@ src_unpack() {
 }
 
 src_prepare() {
+	DOCS=( AUTHORS ChangeLog NEWS README* TODO* )
+
 	# Patches needed for prefix support
 	epatch "${FILESDIR}"/${PN}-2.7.1-catalog_path.patch
 	epatch "${FILESDIR}"/${PN}-2.8.0_rc1-winnt.patch
@@ -73,19 +81,25 @@ src_prepare() {
 		"${FILESDIR}/${PN}-2.9.1-python3.patch" \
 		"${FILESDIR}/${PN}-2.9.1-python3a.patch"
 
+	# Security fixes from 2.9.2
+	epatch "${FILESDIR}/${P}-external-param-entities.patch"
+
+	# https://bugzilla.gnome.org/show_bug.cgi?id=730290
+	epatch "${FILESDIR}/${PN}-2.9.1-xmllint-postvalid.patch"
+
 	# Please do not remove, as else we get references to PORTAGE_TMPDIR
 	# in /usr/lib/python?.?/site-packages/libxml2mod.la among things.
 	# We now need to run eautoreconf at the end to prevent maintainer mode.
 #	elibtoolize
 
-	# Python bindings are built/tested/installed manually.
-	epatch "${FILESDIR}/${PN}-2.9.0-manual-python.patch"
+	# Use pkgconfig to find icu to properly support multilib
+	epatch "${FILESDIR}/${PN}-2.9.1-icu-pkgconfig.patch"
 
 	epatch "${FILESDIR}/${PN}-2.9.0-remove-redundant-pthread-defs.patch"
 	eautoreconf
 }
 
-src_configure() {
+multilib_src_configure() {
 	# filter seemingly problematic CFLAGS (#26320)
 	filter-flags -fprefetch-loop-arrays -funroll-loops
 
@@ -97,36 +111,57 @@ src_configure() {
 	# switch (enabling the libxml2 debug module). See bug #100898.
 
 	# --with-mem-debug causes unusual segmentation faults (bug #105120).
-	econf \
-		-with-html-subdir=${PF}/html \
-		--docdir="${EPREFIX}/usr/share/doc/${PF}" \
-		$(use_with debug run-debug) \
-		$(use_with icu) \
-		$(use_with lzma) \
-		$(use_with python) \
-		$(use_with readline) \
-		$(use_with readline history) \
-		$(use_enable ipv6) \
-		$(use_enable static-libs static)
-}
 
-src_compile() {
-	default
-	if use python; then
-		python_copy_sources
-		python_foreach_impl libxml2_py_emake
+	libxml2_configure() {
+		ECONF_SOURCE="${S}" econf \
+			--with-html-subdir=${PF}/html \
+			--docdir="${EPREFIX}/usr/share/doc/${PF}" \
+			$(use_with debug run-debug) \
+			$(use_with icu) \
+			$(use_with lzma) \
+			$(use_enable ipv6) \
+			$(use_enable static-libs static) \
+			$(multilib_native_use_with readline) \
+			$(multilib_native_use_with readline history) \
+			"$@"
+	}
+
+	libxml2_py_configure() {
+		mkdir -p "${BUILD_DIR}" || die # ensure python build dirs exist
+		run_in_build_dir libxml2_configure "--with-python=${PYTHON}" # odd build system
+	}
+
+	libxml2_configure --without-python # build python bindings separately
+
+	if multilib_is_native_abi && use python; then
+		python_parallel_foreach_impl libxml2_py_configure
 	fi
 }
 
-src_test() {
+multilib_src_compile() {
 	default
-	use python && python_foreach_impl libxml2_py_emake test
+	if multilib_is_native_abi && use python; then
+		local native_builddir=${BUILD_DIR}
+		python_foreach_impl libxml2_py_emake top_builddir="${native_builddir}" all
+	fi
 }
 
-src_install() {
+multilib_src_test() {
+	default
+	multilib_is_native_abi && use python && python_foreach_impl libxml2_py_emake test
+}
+
+multilib_src_install() {
 	emake DESTDIR="${D}" \
 		EXAMPLES_DIR="${EPREFIX}"/usr/share/doc/${PF}/examples install
 
+	if multilib_is_native_abi && use python; then
+		python_foreach_impl libxml2_py_emake DESTDIR="${D}" install
+		python_foreach_impl python_optimize
+	fi
+}
+
+multilib_src_install_all() {
 	# on windows, xmllint is installed by interix libxml2 in parent prefix.
 	# this is the version to use. the native winnt version does not support
 	# symlinks, which makes repoman fail if the portage tree is linked in
@@ -136,16 +171,8 @@ src_install() {
 		rm -rf "${ED}"/usr/bin/xmlcatalog
 	fi
 
-	if use python; then
-		python_foreach_impl libxml2_py_emake DESTDIR="${D}" \
-			docsdir="${EPREFIX}"/usr/share/doc/${PF}/python \
-			exampledir="${EPREFIX}"/usr/share/doc/${PF}/python/examples \
-			install
-		python_foreach_impl python_optimize
-	fi
-
 	rm -rf "${ED}"/usr/share/doc/${P}
-	dodoc AUTHORS ChangeLog Copyright NEWS README* TODO*
+	einstalldocs
 
 	if ! use python; then
 		rm -rf "${ED}"/usr/share/doc/${PF}/python
@@ -182,11 +209,6 @@ pkg_postinst() {
 
 libxml2_py_emake() {
 	pushd "${BUILD_DIR}/python" > /dev/null || die
-	emake \
-		PYTHON="${PYTHON}" \
-		PYTHON_INCLUDES="${EPREFIX}/usr/include/${EPYTHON}" \
-		PYTHON_LIBS="$(python-config --ldflags)" \
-		PYTHON_SITE_PACKAGES="$(python_get_sitedir)" \
-		pythondir="$(python_get_sitedir)" "$@"
+	emake "$@"
 	popd > /dev/null
 }
