@@ -63,6 +63,9 @@ sb_configure() {
 
 	use multilib && multilib_toolchain_setup ${ABI}
 
+	# hack for conflict between powerpc bits/user.h and asm/ptrace.h
+	use elibc_musl && append-cppflags -D_ASM_POWERPC_PTRACE_H
+
 	einfo "Configuring sandbox for ABI=${ABI}..."
 	ECONF_SOURCE="../${P}/" \
 	econf ${myconf} || die
