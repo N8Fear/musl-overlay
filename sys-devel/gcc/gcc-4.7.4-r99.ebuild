@@ -53,6 +53,8 @@ src_prepare() {
 		mv libitm/config/linux/x86 libitm/config/linux/x86_glibc
 		cp -r libitm/config/generic libitm/config/linux/x86
 		epatch "${FILESDIR}"/${PN}-4.7.3-musl-linker-path.patch
+		epatch "${FILESDIR}"/${PN}-4.7.3-powerpc-libc-stack-end.patch
+		epatch "${FILESDIR}"/${PN}-4.7.4-secure-plt.patch
 	fi
 
 	use vanilla && return 0
