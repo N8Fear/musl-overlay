@@ -19,14 +19,10 @@ SSP_STABLE="amd64 x86 mips ppc ppc64 arm"
 # uclibc need to be >= 0.9.33
 SSP_UCLIBC_STABLE="x86 amd64 mips ppc ppc64 arm"
 PIE_MUSL_STABLE="amd64 arm ppc mips x86"
-SSP_MUSL_STABLE="amd64 arm ppc mips x86"
+SSP_MUSL_STABLE="amd64 arm ppc mips"
 #end Hardened stuff
 
 inherit eutils toolchain
-
-DESCRIPTION="The GNU Compiler Collection"
-
-LICENSE="GPL-3+ LGPL-3+ || ( GPL-3+ libgcc libstdc++ gcc-runtime-library-exception-3.1 ) FDL-1.3+"
 
 KEYWORDS="amd64 arm x86"
 
