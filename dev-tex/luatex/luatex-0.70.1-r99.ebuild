@@ -13,7 +13,7 @@ SRC_URI="http://foundry.supelec.fr/gf/download/frsrelease/392/1730/${PN}-beta-${
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="amd64 arm ~mips x86"
+KEYWORDS="amd64 arm ~mips ppc x86"
 IUSE="doc"
 
 RDEPEND="dev-libs/zziplib

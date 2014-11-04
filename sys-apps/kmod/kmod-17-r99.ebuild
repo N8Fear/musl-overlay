@@ -13,7 +13,7 @@ if [[ ${PV} == 9999* ]]; then
 	inherit autotools git-2
 else
 	SRC_URI="mirror://kernel/linux/utils/kernel/kmod/${P}.tar.xz"
-	KEYWORDS="amd64 arm ~mips x86"
+	KEYWORDS="amd64 arm ~mips ppc x86"
 	inherit libtool
 fi
 

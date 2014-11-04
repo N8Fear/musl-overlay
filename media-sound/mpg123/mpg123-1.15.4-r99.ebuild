@@ -11,7 +11,7 @@ SRC_URI="http://www.mpg123.org/download/${P}.tar.bz2"
 
 LICENSE="GPL-2 LGPL-2.1"
 SLOT="0"
-KEYWORDS="amd64 arm ~mips x86"
+KEYWORDS="amd64 arm ~mips ppc x86"
 IUSE="3dnow 3dnowext alsa altivec coreaudio int-quality ipv6 jack mmx nas oss portaudio pulseaudio sdl sse"
 
 RDEPEND="app-admin/eselect-mpg123

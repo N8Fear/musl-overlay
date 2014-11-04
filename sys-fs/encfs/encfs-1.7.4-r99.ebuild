@@ -1,4 +1,4 @@
-# Copyright 1999-2012 Gentoo Foundation
+# Copyright 1999-2014 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: /var/cvsroot/gentoo-x86/sys-fs/encfs/encfs-1.7.4.ebuild,v 1.6 2012/10/31 23:14:20 flameeyes Exp $
 
@@ -11,7 +11,7 @@ SRC_URI="http://encfs.googlecode.com/files/${P}.tgz"
 
 LICENSE="GPL-3"
 SLOT="0"
-KEYWORDS="amd64 arm ~mips x86"
+KEYWORDS="amd64 ~ppc x86"
 IUSE="xattr"
 
 RDEPEND=">=dev-libs/boost-1.34

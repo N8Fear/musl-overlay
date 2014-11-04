@@ -16,7 +16,7 @@ SLOT="0"
 # TODO: coverage ?
 IUSE="test +X"
 
-KEYWORDS="amd64 arm ~mips x86"
+KEYWORDS="amd64 arm ~mips ppc x86"
 
 RDEPEND="
 	>=dev-libs/glib-2.35.2:2

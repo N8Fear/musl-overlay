@@ -11,7 +11,7 @@ if [[ ${PV} == "9999" ]] ; then
 	EGIT_BRANCH="master"
 else
 	SRC_URI="ftp://ftp.kernel.org/pub/linux/utils/kbd/${P}.tar.xz"
-	KEYWORDS="~amd64 ~arm ~mips ~x86"
+	KEYWORDS="~amd64 ~arm ~mips ~ppc ~x86"
 fi
 
 inherit autotools eutils ${SCM}

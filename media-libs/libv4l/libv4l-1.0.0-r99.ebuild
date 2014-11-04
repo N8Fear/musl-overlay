@@ -13,7 +13,7 @@ SRC_URI="http://linuxtv.org/downloads/v4l-utils/${MY_P}.tar.bz2"
 
 LICENSE="LGPL-2.1+"
 SLOT="0"
-KEYWORDS="amd64 arm ~mips x86"
+KEYWORDS="amd64 arm ~mips ppc x86"
 IUSE=""
 
 # The libraries only link to -ljpeg, therefore multilib depend only for virtual/jpeg.

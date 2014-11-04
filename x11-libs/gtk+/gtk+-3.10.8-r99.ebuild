@@ -23,7 +23,7 @@ REQUIRED_USE="
 	|| ( aqua wayland X )
 	xinerama? ( X )"
 
-KEYWORDS="amd64 arm ~mips x86"
+KEYWORDS="amd64 arm ~mips ppc x86"
 
 # FIXME: introspection data is built against system installation of gtk+:3
 # NOTE: cairo[svg] dep is due to bug 291283 (not patched to avoid eautoreconf)

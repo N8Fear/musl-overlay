@@ -20,7 +20,7 @@ REQUIRED_USE="
 	udisks? ( udev )
 	systemd? ( udisks )
 "
-KEYWORDS="amd64 arm ~mips x86"
+KEYWORDS="amd64 arm ~mips ppc x86"
 
 # Can use libgphoto-2.5.0 as well. Automagic detection.
 RDEPEND="
@@ -51,7 +51,8 @@ RDEPEND="
 	systemd? ( sys-apps/systemd:0= )
 	udev? (
 		cdda? ( || ( dev-libs/libcdio-paranoia <dev-libs/libcdio-0.90[-minimal] ) )
-		virtual/udev[gudev] )
+		virtual/libgudev:=
+		virtual/libudev:= )
 	udisks? ( >=sys-fs/udisks-1.97:2 )
 "
 DEPEND="${RDEPEND}

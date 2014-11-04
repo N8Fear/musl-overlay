@@ -10,7 +10,7 @@ HOMEPAGE="http://www.gnu.org/software/guile/"
 SRC_URI="mirror://gnu/guile/${P}.tar.gz"
 
 LICENSE="LGPL-2.1"
-KEYWORDS="amd64 arm ~mips x86"
+KEYWORDS="amd64 arm ~mips ppc x86"
 IUSE="networking +regex discouraged +deprecated emacs nls debug-freelist debug-malloc debug +threads"
 RESTRICT="!regex? ( test )"
 

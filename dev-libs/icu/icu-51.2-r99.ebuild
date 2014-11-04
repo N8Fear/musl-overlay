@@ -18,7 +18,7 @@ SLOT="0/51.2"
 # other irregularities occured until the consumers were rebuilt. So let's rather err on the side
 # of caution and more rebuilds here. See also bug 464876. dilfridge
 
-KEYWORDS="amd64 arm ~mips x86"
+KEYWORDS="amd64 arm ~mips ppc x86"
 IUSE="debug doc examples static-libs"
 
 DEPEND="

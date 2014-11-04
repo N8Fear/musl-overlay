@@ -7,7 +7,7 @@ inherit eutils xorg-2
 
 DESCRIPTION="manage utmp/wtmp entries for non-init clients"
 
-KEYWORDS="amd64 arm ~mips x86"
+KEYWORDS="amd64 arm ~mips ppc x86"
 IUSE=""
 
 RDEPEND=""

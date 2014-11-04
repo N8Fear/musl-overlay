@@ -12,7 +12,7 @@ SRC_URI="mirror://gnu-alpha/gzip/${P}.tar.xz
 
 LICENSE="GPL-3"
 SLOT="0"
-KEYWORDS="amd64 arm ~mips x86"
+KEYWORDS="amd64 arm ~mips ppc x86"
 IUSE="nls pic static"
 
 RDEPEND=""

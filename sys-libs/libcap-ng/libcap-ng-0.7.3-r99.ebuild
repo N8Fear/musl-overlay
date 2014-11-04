@@ -15,7 +15,7 @@ SRC_URI="http://people.redhat.com/sgrubb/${PN}/${P}.tar.gz"
 
 LICENSE="LGPL-2.1"
 SLOT="0"
-KEYWORDS="amd64 arm ~mips x86"
+KEYWORDS="amd64 arm ~mips ppc x86"
 IUSE="python static-libs"
 
 RDEPEND="python? ( dev-lang/python )"

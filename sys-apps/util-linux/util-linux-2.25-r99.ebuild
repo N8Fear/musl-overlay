@@ -16,7 +16,7 @@ if [[ ${PV} == 9999 ]] ; then
 	inherit git-2 autotools
 	EGIT_REPO_URI="git://git.kernel.org/pub/scm/utils/util-linux/util-linux.git"
 else
-	#KEYWORDS="~amd64 ~arm ~mips ~x86"
+	#KEYWORDS="~amd64 ~arm ~mips ~ppc ~x86"
 	KEYWORDS=""
 	SRC_URI="mirror://kernel/linux/utils/util-linux/v${PV:0:4}/${MY_P}.tar.xz"
 fi

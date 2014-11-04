@@ -14,7 +14,7 @@ SRC_URI="mirror://gentoo/${P}.tar.xz
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="amd64 arm ~mips x86"
+KEYWORDS="amd64 arm ~mips ppc x86"
 IUSE=""
 
 RDEPEND="|| ( sys-apps/util-linux app-misc/getopt )

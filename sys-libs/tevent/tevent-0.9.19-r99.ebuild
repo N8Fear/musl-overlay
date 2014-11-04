@@ -13,7 +13,7 @@ SRC_URI="http://samba.org/ftp/tevent/${P}.tar.gz"
 
 LICENSE="GPL-3"
 SLOT="0"
-KEYWORDS="amd64 arm ~mips x86"
+KEYWORDS="amd64 arm ~mips ppc x86"
 IUSE=""
 
 RDEPEND=">=sys-libs/talloc-2.0.8[python]
