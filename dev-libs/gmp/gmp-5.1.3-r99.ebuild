@@ -17,7 +17,7 @@ SRC_URI="mirror://gnu/${PN}/${MY_P}.tar.xz
 
 LICENSE="LGPL-3"
 SLOT="0"
-KEYWORDS="amd64 arm ~mips x86"
+KEYWORDS="ppc"
 IUSE="doc cxx pgo static-libs"
 
 DEPEND="sys-devel/m4
