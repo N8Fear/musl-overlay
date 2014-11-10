@@ -180,7 +180,9 @@ src_configure() {
 		append-ldflags -lutil
 	fi
 
+	# __stack_chk_fail_local
 	use x86 && myconf="${myconf} --without-stackprotect"
+	use ppc && myconf="${myconf} --without-stackprotect"
 
 	econf \
 		--with-ldflags="${LDFLAGS}" \
