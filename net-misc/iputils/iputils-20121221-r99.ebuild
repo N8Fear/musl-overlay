@@ -60,6 +60,7 @@ src_prepare() {
 	epatch "${FILESDIR}"/${PN}-20121221-add-bits_types_h.patch
 	epatch "${FILESDIR}"/${PN}-20121221-remove-rdisc-glibc-assumption.patch
 	epatch "${FILESDIR}"/${PN}-20121221-fix-init-elemnt.patch
+	epatch "${FILESDIR}"/${PN}-20121221-fix-header-order.patch
 	use SECURITY_HAZARD && epatch "${FILESDIR}"/${PN}-20071127-nonroot-floodping.patch
 	use static && append-ldflags -static
 }
