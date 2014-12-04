@@ -1,6 +1,6 @@
 # Copyright 1999-2014 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/sys-apps/kmod/kmod-17.ebuild,v 1.9 2014/05/15 20:06:25 maekke Exp $
+# $Header: /var/cvsroot/gentoo-x86/sys-apps/kmod/kmod-19.ebuild,v 1.1 2014/11/23 06:51:01 williamh Exp $
 
 EAPI=5
 
@@ -13,7 +13,7 @@ if [[ ${PV} == 9999* ]]; then
 	inherit autotools git-2
 else
 	SRC_URI="mirror://kernel/linux/utils/kernel/kmod/${P}.tar.xz"
-	KEYWORDS="amd64 arm ~mips ppc x86"
+	KEYWORDS="~amd64 ~arm ~mips ~ppc ~x86"
 	inherit libtool
 fi
 
@@ -30,9 +30,11 @@ IUSE="debug doc lzma python static-libs +tools zlib"
 # See bug #408915.
 RESTRICT="test"
 
+# Block systemd below 217 for -static-nodes-indicate-that-creation-of-static-nodes-.patch
 RDEPEND="!sys-apps/module-init-tools
 	!sys-apps/modutils
-	!<sys-apps/openrc-0.12
+	!<sys-apps/openrc-0.13
+	!<sys-apps/systemd-217
 	lzma? ( >=app-arch/xz-utils-5.0.4-r1 )
 	python? ( ${PYTHON_DEPS} )
 	zlib? ( >=sys-libs/zlib-1.2.6 )" #427130
@@ -51,6 +53,8 @@ fi
 
 REQUIRED_USE="python? ( ${PYTHON_REQUIRED_USE} )"
 
+DOCS="NEWS README TODO"
+
 src_prepare() {
 	if [ ! -e configure ]; then
 		if use doc; then
@@ -60,10 +64,10 @@ src_prepare() {
 		fi
 		eautoreconf
 	else
-		epatch "${FILESDIR}"/${PN}-15-dynamic-kmod.patch #493630
-		epatch "${FILESDIR}"/${PN}-15-use-strndup.patch
 		elibtoolize
 	fi
+
+	epatch "${FILESDIR}"/${P}-strndupa.patch
 
 	# Restore possibility of running --enable-static wrt #472608
 	sed -i \
@@ -73,8 +77,8 @@ src_prepare() {
 
 src_configure() {
 	local myeconfargs=(
-		--bindir=/bin
-		--with-rootlibdir="/$(get_libdir)"
+		--bindir="${EPREFIX}/bin"
+		--with-rootlibdir="${EPREFIX}/$(get_libdir)"
 		--enable-shared
 		$(use_enable static-libs static)
 		$(use_enable tools)
@@ -101,12 +105,6 @@ src_configure() {
 }
 
 src_compile() {
-	if [[ ${PV} != 9999* ]]; then
-		# Force -j1 because of -15-dynamic-kmod.patch, likely caused by lack of eautoreconf
-		# wrt #494806
-		local MAKEOPTS="${MAKEOPTS} -j1"
-	fi
-
 	emake -C "${BUILD_DIR}"
 
 	if use python; then
@@ -126,6 +124,7 @@ src_compile() {
 
 src_install() {
 	emake -C "${BUILD_DIR}" DESTDIR="${D}" install
+	einstalldocs
 
 	if use python; then
 		local native_builddir=${BUILD_DIR}
@@ -162,27 +161,27 @@ src_install() {
 	insinto /lib/modprobe.d
 	doins "${T}"/usb-load-ehci-first.conf #260139
 
-	doinitd "${FILESDIR}"/kmod-static-nodes
+	newinitd "${FILESDIR}"/kmod-static-nodes-r1 kmod-static-nodes
 }
 
 pkg_postinst() {
-	if [[ -L ${ROOT%/}/etc/runlevels/boot/static-nodes ]]; then
+	if [[ -L ${EROOT%/}/etc/runlevels/boot/static-nodes ]]; then
 		ewarn "Removing old conflicting static-nodes init script from the boot runlevel"
-		rm -f "${ROOT%/}"/etc/runlevels/boot/static-nodes
+		rm -f "${EROOT%/}"/etc/runlevels/boot/static-nodes
 	fi
 
 	# Add kmod to the runlevel automatically if this is the first install of this package.
 	if [[ -z ${REPLACING_VERSIONS} ]]; then
-		if [[ ! -d ${ROOT%/}/etc/runlevels/sysinit ]]; then
-			mkdir -p "${ROOT%/}"/etc/runlevels/sysinit
+		if [[ ! -d ${EROOT%/}/etc/runlevels/sysinit ]]; then
+			mkdir -p "${EROOT%/}"/etc/runlevels/sysinit
 		fi
-		if [[ -x ${ROOT%/}/etc/init.d/kmod-static-nodes ]]; then
-			ln -s /etc/init.d/kmod-static-nodes "${ROOT%/}"/etc/runlevels/sysinit/kmod-static-nodes
+		if [[ -x ${EROOT%/}/etc/init.d/kmod-static-nodes ]]; then
+			ln -s /etc/init.d/kmod-static-nodes "${EROOT%/}"/etc/runlevels/sysinit/kmod-static-nodes
 		fi
 	fi
 
-	if [[ -e ${ROOT%/}/etc/runlevels/sysinit ]]; then
-		if [[ ! -e ${ROOT%/}/etc/runlevels/sysinit/kmod-static-nodes ]]; then
+	if [[ -e ${EROOT%/}/etc/runlevels/sysinit ]]; then
+		if [[ ! -e ${EROOT%/}/etc/runlevels/sysinit/kmod-static-nodes ]]; then
 			ewarn
 			ewarn "You need to add kmod-static-nodes to the sysinit runlevel for"
 			ewarn "kernel modules to have required static nodes!"
