@@ -1,0 +1,10 @@
+--- a/mozilla-release/media/libstagefright/system/core/include/cutils/properties.h
++++ b/mozilla-release/media/libstagefright/system/core/include/cutils/properties.h
+@@ -17,7 +17,6 @@
+ #ifndef __CUTILS_PROPERTIES_H
+ #define __CUTILS_PROPERTIES_H
+ 
+-#include <sys/cdefs.h>
+ #include <stddef.h>
+ 
+ #ifdef __cplusplus

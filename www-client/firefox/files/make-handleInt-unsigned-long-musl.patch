@@ -1,0 +1,11 @@
+--- a/mozilla-release/media/webrtc/signaling/src/sipcc/cpr/include/cpr_threads.h
++++ b/mozilla-release/media/webrtc/signaling/src/sipcc/cpr/include/cpr_threads.h
+@@ -30,7 +30,7 @@
+     uint32_t threadId;
+     union {
+         void *handlePtr;
+-        uint64_t handleInt;
++        unsigned long handleInt;
+     } u;
+ } cpr_thread_t;
+
