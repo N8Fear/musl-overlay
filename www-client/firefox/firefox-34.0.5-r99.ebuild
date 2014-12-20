@@ -39,7 +39,7 @@ inherit check-reqs flag-o-matic toolchain-funcs eutils gnome2-utils mozconfig-v5
 DESCRIPTION="Firefox Web Browser"
 HOMEPAGE="http://www.mozilla.com/firefox"
 
-KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~ppc ~ppc64 ~x86 ~amd64-linux ~x86-linux"
+KEYWORDS="~amd64 ~arm ~mips ~ppc ~x86"
 SLOT="0"
 LICENSE="MPL-2.0 GPL-2 LGPL-2.1"
 IUSE="bindist hardened +minimal pgo selinux +gmp-autoupdate test"
@@ -148,49 +148,49 @@ src_prepare() {
 	EPATCH_FORCE="yes" \
 	epatch "${WORKDIR}/firefox"
 
-    # Avoid using basename https://bugzilla.mozilla.org/show_bug.cgi?id=1041962
+	# Avoid using basename https://bugzilla.mozilla.org/show_bug.cgi?id=1041962
 	epatch "${FILESDIR}"/avoid-basename-musl.patch
-    # <fts.h> unavailable on Android and musl, portions from
-    # http://git.alpinelinux.org/cgit/aports/tree/main/firefox/fix-ipc.patch
+	# <fts.h> unavailable on Android and musl, portions from
+	# http://git.alpinelinux.org/cgit/aports/tree/main/firefox/fix-ipc.patch
 	epatch "${FILESDIR}"/avoid-fts-on-nonglibc-musl.patch
-    # getcontext() unavailable on musl, safe to omit
+	# getcontext() unavailable on musl, safe to omit
 	epatch "${FILESDIR}"/avoid-getcontext-musl.patch
-    # the glibc check should be non-Android Linux
+	# the glibc check should be non-Android Linux
 	epatch "${FILESDIR}"/define-gettid-unconditonally-musl.patch
-    # <a.out.h> unavailable on musl, yet somehow the build system still defines
-    # HAVE_A_OUT_H - unconditionally disable for now, better to fix configure.
-    # Portions from
-    # http://git.alpinelinux.org/cgit/aports/tree/main/firefox/fix-toolkit.patch
-	epatch "${FILESDIR}"/dont-include-aouth-musl.patch
-    # non-Android Linux check should be a glibc Linux check
-	epatch "${FILESDIR}"/fix-android-check-musl.patch
-    # <sys/sysctl.h> unavailable on musl
-	epatch "${FILESDIR}"/fix-jemalloc-includes-musl.patch
-    # <sys/sysctl.h> unavailable on musl, also wrong order of kernel headers
-    # Portions from
-    # http://git.alpinelinux.org/cgit/aports/tree/main/firefox/fix-media.patch
-	epatch "${FILESDIR}"/fix-mtransport-includes-musl.patch
-    # Dumb sctp-refimpl include fixes, to be improved and submitted upstream
+	# <a.out.h> unavailable on musl, yet somehow the build system still defines
+	# HAVE_A_OUT_H - unconditionally disable for now, better to fix configure.
 	# Portions from
-    # http://git.alpinelinux.org/cgit/aports/tree/main/firefox/fix-netwerk.patch
+	# http://git.alpinelinux.org/cgit/aports/tree/main/firefox/fix-toolkit.patch
+	epatch "${FILESDIR}"/dont-include-aouth-musl.patch
+	# non-Android Linux check should be a glibc Linux check
+	epatch "${FILESDIR}"/fix-android-check-musl.patch
+	# <sys/sysctl.h> unavailable on musl
+	epatch "${FILESDIR}"/fix-jemalloc-includes-musl.patch
+	# <sys/sysctl.h> unavailable on musl, also wrong order of kernel headers
+	# Portions from
+	# http://git.alpinelinux.org/cgit/aports/tree/main/firefox/fix-media.patch
+	epatch "${FILESDIR}"/fix-mtransport-includes-musl.patch
+	# Dumb sctp-refimpl include fixes, to be improved and submitted upstream
+	# Portions from
+	# http://git.alpinelinux.org/cgit/aports/tree/main/firefox/fix-netwerk.patch
 	epatch "${FILESDIR}"/fix-sctp-includes-musl.patch
-    # Files erroneously assume other headers include <sys/types.h>
-    # Portions from
-    # http://git.alpinelinux.org/cgit/aports/tree/main/firefox/fix-tools.patch
+	# Files erroneously assume other headers include <sys/types.h>
+	# Portions from
+	# http://git.alpinelinux.org/cgit/aports/tree/main/firefox/fix-tools.patch
 	epatch "${FILESDIR}"/include-systypesh-musl.patch
-    # Incorrect assumptions about pthread_t
-    # https://bugzilla.mozilla.org/show_bug.cgi?id=1010194
+	# Incorrect assumptions about pthread_t
+	# https://bugzilla.mozilla.org/show_bug.cgi?id=1010194
 	epatch "${FILESDIR}"/make-handleInt-unsigned-long-musl.patch
-    # Felix Janda's amd64 fixes
+	# Felix Janda's amd64 fixes
 	epatch "${FILESDIR}"/fix-amd64-build-musl.patch
-    # Stagefright includes <sys/cdefs.h>, unavailable on musl. Upstream will
-    # probably want to include it on Android.
+	# Stagefright includes <sys/cdefs.h>, unavailable on musl. Upstream will
+	# probably want to include it on Android.
 	epatch "${FILESDIR}"/dont-include-cdefsh-stagefright-musl.patch
 
 	# Allow user to apply any additional patches without modifing ebuild
 	epatch_user
 
-    # From http://git.alpinelinux.org/cgit/aports/tree/main/firefox/stab.h, added N_UNDF
+	# From http://git.alpinelinux.org/cgit/aports/tree/main/firefox/stab.h, added N_UNDF
 	cp "${FILESDIR}"/stab.h "${S}"/toolkit/crashreporter/google-breakpad/src/
 
 	# Enable gnomebreakpad
@@ -264,7 +264,7 @@ src_configure() {
 	# Other ff-specific settings
 	mozconfig_annotate '' --with-default-mozilla-five-home=${MOZILLA_FIVE_HOME}
 
-    # mozjemalloc doesn't build on musl yet
+	# mozjemalloc doesn't build on musl yet
 	mozconfig_annotate '' --disable-replace-malloc
 	mozconfig_annotate '' --disable-jemalloc
 
