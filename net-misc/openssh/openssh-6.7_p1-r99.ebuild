@@ -28,7 +28,7 @@ SRC_URI="mirror://openbsd/OpenSSH/portable/${PARCH}.tar.gz
 
 LICENSE="BSD GPL-2"
 SLOT="0"
-KEYWORDS="amd64 ~arm ~mips ~ppc ~x86"
+KEYWORDS="amd64 arm ~mips ppc x86"
 IUSE="bindist ${HPN_PATCH:++}hpn kerberos kernel_linux ldap ldns libedit pam +pie sctp selinux skey static X X509"
 REQUIRED_USE="pie? ( !static )"
 
