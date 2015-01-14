@@ -1,0 +1,11 @@
+--- a/mozilla-release/tools/profiler/platform-linux.cc
++++ b/mozilla-release/tools/profiler/platform-linux.cc
+@@ -84,7 +84,7 @@
+ 
+ #define SIGNAL_SAVE_PROFILE SIGUSR2
+ 
+-#if defined(__GLIBC__)
++#if defined(OS_LINUX) && !defined(ANDROID)
+ // glibc doesn't implement gettid(2).
+ #include <sys/syscall.h>
+ pid_t gettid()

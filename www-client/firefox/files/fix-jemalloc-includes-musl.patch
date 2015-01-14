@@ -1,0 +1,10 @@
+--- a/mozilla-release/memory/mozjemalloc/jemalloc.c
++++ b/mozilla-release/memory/mozjemalloc/jemalloc.c
+@@ -337,7 +337,6 @@
+ #include <sys/time.h>
+ #include <sys/types.h>
+ #if !defined(MOZ_MEMORY_SOLARIS) && !defined(MOZ_MEMORY_ANDROID)
+-#include <sys/sysctl.h>
+ #endif
+ #include <sys/uio.h>
+ #ifndef MOZ_MEMORY
