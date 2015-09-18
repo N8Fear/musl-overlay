@@ -1,0 +1,13 @@
+diff --git a/src/system.c b/src/system.c
+index 758ad19..b2e0517 100644
+--- a/src/system.c
++++ b/src/system.c
+@@ -21,7 +21,7 @@
+ 
+ #include <stdlib.h>
+ #include <errno.h>
+-#include <sys/prctl.h>
++#include <linux/prctl.h>
+ 
+ #include <seccomp.h>
+ 
