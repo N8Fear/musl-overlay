@@ -1,0 +1,26 @@
+diff --git a/compat/imsg-buffer.c b/compat/imsg-buffer.c
+index 450fdf1..86bfc85 100644
+--- a/compat/imsg-buffer.c
++++ b/compat/imsg-buffer.c
+@@ -17,7 +17,7 @@
+  */
+ 
+ #include <sys/types.h>
+-#include <sys/queue.h>
++#include <compat/queue.h>
+ #include <sys/socket.h>
+ #include <sys/uio.h>
+ 
+diff --git a/compat/imsg.c b/compat/imsg.c
+index af0da44..6391134 100644
+--- a/compat/imsg.c
++++ b/compat/imsg.c
+@@ -17,7 +17,7 @@
+  */
+ 
+ #include <sys/types.h>
+-#include <sys/queue.h>
++#include <compat/queue.h>
+ #include <sys/socket.h>
+ #include <sys/uio.h>
+ 
