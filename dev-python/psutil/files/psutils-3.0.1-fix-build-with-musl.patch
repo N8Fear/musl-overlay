@@ -1,0 +1,12 @@
+diff --git a/psutil/_psutil_linux.c b/psutil/_psutil_linux.c
+index a3bf564..76a9b4e 100644
+--- a/psutil/_psutil_linux.c
++++ b/psutil/_psutil_linux.c
+@@ -21,6 +21,7 @@
+ #include <sys/sysinfo.h>
+ #include <sys/ioctl.h>
+ #include <sys/socket.h>
++#include <sys/types.h>
+ #include <linux/sockios.h>
+ #include <linux/if.h>
+ #include <linux/ethtool.h>
