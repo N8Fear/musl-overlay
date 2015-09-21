@@ -10,9 +10,9 @@
 inherit eutils flag-o-matic toolchain-funcs multilib unpacker multiprocessing
 
 DESCRIPTION="sandbox'd LD_PRELOAD hack"
-HOMEPAGE="http://www.gentoo.org/proj/en/portage/sandbox/"
+HOMEPAGE="https://www.gentoo.org/proj/en/portage/sandbox/"
 SRC_URI="mirror://gentoo/${P}.tar.xz
-	http://dev.gentoo.org/~vapier/dist/${P}.tar.xz"
+	https://dev.gentoo.org/~vapier/dist/${P}.tar.xz"
 
 LICENSE="GPL-2"
 SLOT="0"
@@ -48,6 +48,7 @@ src_unpack() {
 	cd "${S}"
 	epatch "${FILESDIR}"/${PN}-2.6-musl.patch
 	epatch "${FILESDIR}"/${PN}-2.6-include-PROTECTED-symbols.patch
+	epatch "${FILESDIR}"/${P}-write-ptmx.patch #413327
 	epatch_user
 }
 
