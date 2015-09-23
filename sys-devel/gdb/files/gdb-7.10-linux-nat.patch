@@ -1,0 +1,19 @@
+diff --git a/gdb/linux-nat.c b/gdb/linux-nat.c
+index 727c8da..0a17db7 100644
+--- a/gdb/linux-nat.c
++++ b/gdb/linux-nat.c
+@@ -73,6 +73,14 @@
+ #define SPUFS_MAGIC 0x23c9b64e
+ #endif
+ 
++#ifndef __SIGRTMIN
++#define __SIGRTMIN SIGRTMIN
++#endif
++
++#ifndef W_STOPCODE
++#define W_STOPCODE(sig) ((sig) << 8 | 0x7f)
++#endif
++
+ /* This comment documents high-level logic of this file.
+ 
+ Waiting for events in sync mode
