@@ -1,0 +1,25 @@
+From 7204a88586b7000e12c42c1e5afdc73c4cec4673 Mon Sep 17 00:00:00 2001
+From: Hinnerk van Bruinehsen <h.v.bruinehsen@fu-berlin.de>
+Date: Thu, 24 Sep 2015 23:14:07 +0000
+Subject: [PATCH 1/2] Disable invalid sys/fcntl.h header includes
+
+---
+ orconfig.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/orconfig.h b/orconfig.h
+index eaa5ef0..ddcb0db 100644
+--- a/orconfig.h
++++ b/orconfig.h
+@@ -397,7 +397,7 @@
+ #define HAVE_SYS_EVENTFD_H 1
+ 
+ /* Define to 1 if you have the <sys/fcntl.h> header file. */
+-#define HAVE_SYS_FCNTL_H 1
++//#define HAVE_SYS_FCNTL_H 1
+ 
+ /* Define to 1 if you have the <sys/file.h> header file. */
+ #define HAVE_SYS_FILE_H 1
+-- 
+2.5.3
+
