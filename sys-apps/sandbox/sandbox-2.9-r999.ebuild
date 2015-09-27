@@ -48,7 +48,6 @@ src_unpack() {
 	cd "${S}"
 	epatch "${FILESDIR}"/${PN}-2.6-musl.patch
 	epatch "${FILESDIR}"/${PN}-2.6-include-PROTECTED-symbols.patch
-	epatch "${FILESDIR}"/${P}-write-ptmx.patch #413327
 	epatch_user
 }
 
