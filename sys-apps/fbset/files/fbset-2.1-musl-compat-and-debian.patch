@@ -34,7 +34,7 @@ index 3d0d472..f0fa346 100644
 +con2fbmap: con2fbmap.o
 +con2fbmap.o: con2fbmap.c
 +
-+install: fbset
++install: fbset con2fbmap
 +	$(INSTALL) -d $(DESTDIR)/etc
 +	$(INSTALL) -d $(DESTDIR)/bin
 +	$(INSTALL) -d $(DESTDIR)/usr/share/man/man1
@@ -44,9 +44,9 @@ index 3d0d472..f0fa346 100644
 +	$(INSTALL_PROGRAM) fbset $(DESTDIR)/bin
 +	$(INSTALL_DATA) $(srcdir)/fbset.8 $(DESTDIR)/usr/share/man/man1/fbset.1
 +	$(INSTALL_PROGRAM) $(srcdir)/modeline2fb $(DESTDIR)/bin
-+	$(INSTALL_DATA) $(srcdir)/modeline2fb.1 $(DESTDIR)/usr/share/man/man1
 +	$(INSTALL_PROGRAM) con2fbmap $(DESTDIR)/bin
 +	$(INSTALL_DATA) $(srcdir)/con2fbmap.1 $(DESTDIR)/usr/share/man/man1
++	$(INSTALL_DATA) $(srcdir)/modeline2fb.1 $(DESTDIR)/usr/share/man/man1
 +
 +install-devices:
 +	if [ ! -c /dev/fb0 ]; then mknod $(DESTDIR)/dev/fb0 c 29 0; fi

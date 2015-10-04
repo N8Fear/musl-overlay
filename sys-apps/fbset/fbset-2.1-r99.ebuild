@@ -31,7 +31,7 @@ src_compile() {
 }
 
 src_install() {
-	dobin fbset modeline2fb || die "dobin failed"
-	doman *.[58]
+	dobin fbset modeline2fb con2fbmap || die "dobin failed"
+	doman *.[158]
 	dodoc etc/fb.modes.* INSTALL
 }
