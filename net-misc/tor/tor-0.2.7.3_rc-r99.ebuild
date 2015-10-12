@@ -17,9 +17,11 @@ S="${WORKDIR}/${MY_PF}"
 LICENSE="BSD GPL-2"
 SLOT="0"
 KEYWORDS="amd64 arm ppc ~ppc64 x86"
-IUSE="-bufferevents scrypt seccomp selinux stats systemd tor-hardening transparent-proxy test web"
+IUSE="-bufferevents libressl scrypt seccomp selinux stats systemd tor-hardening transparent-proxy test web"
 
-DEPEND="dev-libs/openssl:=
+DEPEND="
+	!libressl? ( dev-libs/openssl:0= )
+	libressl? ( dev-libs/libressl:= )
 	sys-libs/zlib
 	dev-libs/libevent
 	bufferevents? ( dev-libs/libevent[ssl] )
