@@ -1,0 +1,12 @@
+diff --git a/include/sane/sanei_udp.h b/include/sane/sanei_udp.h
+index c44afdd..41a4951 100644
+--- a/include/sane/sanei_udp.h
++++ b/include/sane/sanei_udp.h
+@@ -19,6 +19,7 @@
+ #define sanei_udp_h
+ 
+ #include <sane/sane.h>
++#include <sys/types.h>
+ 
+ #ifdef HAVE_WINSOCK2_H
+ #include <winsock2.h>
