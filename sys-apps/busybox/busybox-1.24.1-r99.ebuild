@@ -126,6 +126,7 @@ src_configure() {
 	busybox_config_option n IFPLUGD
 	busybox_config_option n EXTRA_COMPAT
 	busybox_config_option n FEATURE_VI_REGEX_SEARCH
+	busybox_config_option n UTMP
 
 	# If these are not set and we are using a uclibc/busybox setup
 	# all calls to system() will fail.
