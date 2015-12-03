@@ -1,0 +1,75 @@
+diff --git a/include/extern.h b/include/extern.h
+index 77bcb11..5a6a729 100644
+--- a/include/extern.h
++++ b/include/extern.h
+@@ -3,6 +3,8 @@
+ 
+ #include <netinet/in.h>
+ #include <stdio.h>
++#include <sys/types.h>
++#include <asm-generic/param.h>
+ 
+ #include "logmessage.h"
+ #include "xmalloc.h"
+diff --git a/include/sundries.h b/include/sundries.h
+index 4379982..55063ad 100644
+--- a/include/sundries.h
++++ b/include/sundries.h
+@@ -10,7 +10,7 @@
+ #include <stdarg.h>
+ #include <stdlib.h>
+ #if !defined(bool_t) && !defined(__GLIBC__)
+-#include <rpc/types.h>
++//#include <rpc/types.h>
+ #endif
+ 
+ extern int mount_mount_quiet;
+diff --git a/src/ifdown.c b/src/ifdown.c
+index cef62af..747d3da 100644
+--- a/src/ifdown.c
++++ b/src/ifdown.c
+@@ -20,7 +20,7 @@ char *v_ifdown = "@(#)ifdown.c  1.10  21-Apr-1997  miquels@cistron.nl";
+ #include <sys/ioctl.h>
+ #include <sys/socket.h>
+ #include <sys/time.h>
+-#include <sys/errno.h>
++#include <errno.h>
+ 
+ #include <net/if.h>
+ #include <netinet/in.h>
+diff --git a/src/pidfile.c b/src/pidfile.c
+index db766c8..1f081f1 100644
+--- a/src/pidfile.c
++++ b/src/pidfile.c
+@@ -7,7 +7,7 @@
+ #include <unistd.h>
+ #include <stdlib.h>
+ #include <string.h>
+-#include <wait.h>
++#include <sys/wait.h>
+ 
+ #include "extern.h"
+ #include "watch_err.h"
+diff --git a/src/shutdown.c b/src/shutdown.c
+index a9fabc7..7420819 100644
+--- a/src/shutdown.c
++++ b/src/shutdown.c
+@@ -26,8 +26,8 @@
+ #include "watch_err.h"
+ #include "extern.h"
+ 
+-#if defined __GLIBC__
+ #include "ext2_mnt.h"
++#if defined __GLIBC__
+ #include <sys/quota.h>
+ #include <sys/swap.h>
+ #include <sys/reboot.h>
+@@ -143,7 +143,7 @@ static void mnt_off()
+ 	FILE *fp;
+ 	struct mntent *mnt;
+ 
+-	fp = setmntent(MNTTAB, "r");
++	fp = setmntent(_PATH_MNTTAB, "r");
+ 	/* in some rare cases fp might be NULL so be careful */
+ 	while (fp != NULL && ((mnt = getmntent(fp)) != (struct mntent *)0)) {
+ 		/* First check if swap */
