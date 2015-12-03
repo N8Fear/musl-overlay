@@ -1,0 +1,31 @@
+diff --git a/compat/.vis.h.un~ b/compat/.vis.h.un~
+index 6994334..153b5f2 100644
+Binary files a/compat/.vis.h.un~ and b/compat/.vis.h.un~ differ
+diff --git a/compat/vis.h b/compat/vis.h
+index 6795139..7b4200d 100644
+--- a/compat/vis.h
++++ b/compat/vis.h
+@@ -73,9 +73,9 @@
+  */
+ #define	UNVIS_END	1	/* no more characters */
+ 
+-#include <sys/cdefs.h>
+-
+-__BEGIN_DECLS
++#ifdef  __cplusplus
++  extern "C" {
++#endif
+ char	*vis(char *, int, int, int);
+ int	strvis(char *, const char *, int);
+ int	stravis(char **, const char *, int);
+@@ -84,7 +84,8 @@ int	strvisx(char *, const char *, size_t, int);
+ int	strunvis(char *, const char *);
+ int	unvis(char *, char, int *, int);
+ ssize_t strnunvis(char *, const char *, size_t);
+-
+-__END_DECLS
++#ifdef  __cplusplus
++  }
++#endif
+ 
+ #endif /* !_VIS_H_ */

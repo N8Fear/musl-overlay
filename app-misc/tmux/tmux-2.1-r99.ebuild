@@ -16,12 +16,14 @@ SLOT="0"
 KEYWORDS="amd64 arm ~mips ppc x86"
 IUSE="debug selinux vim-syntax"
 
-COMMON_DEPEND="
-	>=dev-libs/libevent-2.0.10
+CDEPEND="
+	|| ( =dev-libs/libevent-2.0*
+		 >=dev-libs/libevent-2.1.5-r4 )
+	!sys-apps/utempter
 	sys-libs/ncurses"
-DEPEND="${COMMON_DEPEND}
+DEPEND="${CDEPEND}
 	virtual/pkgconfig"
-RDEPEND="${COMMON_DEPEND}
+RDEPEND="${CDEPEND}
 	selinux? ( sec-policy/selinux-screen )
 	vim-syntax? ( || (
 		app-editors/vim
@@ -29,9 +31,9 @@ RDEPEND="${COMMON_DEPEND}
 
 DOCS=( CHANGES FAQ README TODO )
 
-PATCHES=( "${FILESDIR}"/${P}-flags.patch
-		  "${FILESDIR}"/${PN}-2.0-musl-compat.patch
+PATCHES=( "${FILESDIR}"/${PN}-2.0-flags.patch
 	    )
+		  "${FILESDIR}"/${PN}-2.1-musl-compat.patch
 
 pkg_setup() {
 	if has_version "<app-misc/tmux-1.9a"; then
@@ -54,9 +56,6 @@ src_prepare() {
 
 	# regenerate aclocal.m4 to support earlier automake versions
 	rm aclocal.m4 || die
-
-	# remove generated files
-	rm -r compat/.{dirstamp,deps} || die
 
 	autotools-utils_src_prepare
 }
