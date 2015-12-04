@@ -1,6 +1,3 @@
-diff --git a/compat/.vis.h.un~ b/compat/.vis.h.un~
-index 6994334..153b5f2 100644
-Binary files a/compat/.vis.h.un~ and b/compat/.vis.h.un~ differ
 diff --git a/compat/vis.h b/compat/vis.h
 index 6795139..7b4200d 100644
 --- a/compat/vis.h

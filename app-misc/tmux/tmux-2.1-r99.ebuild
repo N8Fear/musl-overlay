@@ -32,8 +32,8 @@ RDEPEND="${CDEPEND}
 DOCS=( CHANGES FAQ README TODO )
 
 PATCHES=( "${FILESDIR}"/${PN}-2.0-flags.patch
-	    )
 		  "${FILESDIR}"/${PN}-2.1-musl-compat.patch
+	    )
 
 pkg_setup() {
 	if has_version "<app-misc/tmux-1.9a"; then
