@@ -1,11 +1,11 @@
 diff --git a/include/extern.h b/include/extern.h
-index 77bcb11..5a6a729 100644
+index f00e4cf..b70a801 100644
 --- a/include/extern.h
 +++ b/include/extern.h
-@@ -3,6 +3,8 @@
- 
+@@ -5,6 +5,8 @@
+ #include <signal.h>
+ #include <time.h>
  #include <netinet/in.h>
- #include <stdio.h>
 +#include <sys/types.h>
 +#include <asm-generic/param.h>
  
@@ -38,7 +38,7 @@ index cef62af..747d3da 100644
  #include <net/if.h>
  #include <netinet/in.h>
 diff --git a/src/pidfile.c b/src/pidfile.c
-index db766c8..1f081f1 100644
+index 987b8a0..6d57962 100644
 --- a/src/pidfile.c
 +++ b/src/pidfile.c
 @@ -7,7 +7,7 @@
@@ -50,26 +50,3 @@ index db766c8..1f081f1 100644
  
  #include "extern.h"
  #include "watch_err.h"
-diff --git a/src/shutdown.c b/src/shutdown.c
-index a9fabc7..7420819 100644
---- a/src/shutdown.c
-+++ b/src/shutdown.c
-@@ -26,8 +26,8 @@
- #include "watch_err.h"
- #include "extern.h"
- 
--#if defined __GLIBC__
- #include "ext2_mnt.h"
-+#if defined __GLIBC__
- #include <sys/quota.h>
- #include <sys/swap.h>
- #include <sys/reboot.h>
-@@ -143,7 +143,7 @@ static void mnt_off()
- 	FILE *fp;
- 	struct mntent *mnt;
- 
--	fp = setmntent(MNTTAB, "r");
-+	fp = setmntent(_PATH_MNTTAB, "r");
- 	/* in some rare cases fp might be NULL so be careful */
- 	while (fp != NULL && ((mnt = getmntent(fp)) != (struct mntent *)0)) {
- 		/* First check if swap */
