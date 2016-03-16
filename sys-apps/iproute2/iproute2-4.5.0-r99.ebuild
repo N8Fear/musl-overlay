@@ -40,8 +40,7 @@ DEPEND="${RDEPEND}
 src_prepare() {
 	epatch "${FILESDIR}"/${PN}-3.1.0-mtu.patch #291907
 	use ipv6 || epatch "${FILESDIR}"/${PN}-4.2.0-no-ipv6.patch #326849
-	epatch "${FILESDIR}"/${PN}-4.3.0-musl.patch
-	epatch "${FILESDIR}"/${PN}-4.3.0-musl-noiptables.patch
+	epatch "${FILESDIR}"/${PN}-4.5.0-musl.patch
 
 	sed -i \
 		-e '/^CC =/d' \
