@@ -1,0 +1,50 @@
+diff --git a/src/fbterm.cpp b/src/fbterm.cpp
+index 38d4014..43efe30 100644
+--- a/src/fbterm.cpp
++++ b/src/fbterm.cpp
+@@ -37,6 +37,8 @@
+ #include "input_key.h"
+ #include "mouse.h"
+ 
++#define WAIT_ANY (-1)
++
+ #ifdef HAVE_SIGNALFD
+ // <sys/signalfd.h> offered by some systems has bug with g++
+ #include "signalfd.h"
+diff --git a/src/improxy.cpp b/src/improxy.cpp
+index 3d03e66..a603e48 100644
+--- a/src/improxy.cpp
++++ b/src/improxy.cpp
+@@ -23,6 +23,7 @@
+ #include <stdio.h>
+ #include <string.h>
+ #include <errno.h>
++#include <assuan.h>
+ #include <sys/socket.h>
+ #include "improxy.h"
+ #include "immessage.h"
+diff --git a/src/signalfd.h b/src/signalfd.h
+index 2d6129e..b5d0afe 100644
+--- a/src/signalfd.h
++++ b/src/signalfd.h
+@@ -46,13 +46,16 @@ struct signalfd_siginfo
+ };
+ 
+ 
+-__BEGIN_DECLS
++#ifdef __cplusplus
++extern "C" {
++#endif
+ 
+ /* Request notification for delivery of signals in MASK to be
+    performed using descriptor FD.*/
+-extern int signalfd (int __fd, const sigset_t *__mask, int __flags)
+-  __THROW __nonnull ((2));
++extern int signalfd (int __fd, const sigset_t *__mask, int __flags);
+ 
+-__END_DECLS
++#ifdef __cplusplus
++}
++#endif
+ 
+ #endif /* sys/signalfd.h */
